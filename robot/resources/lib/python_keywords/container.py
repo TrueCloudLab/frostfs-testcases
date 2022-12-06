@@ -18,6 +18,8 @@ from neofs_testlib.shell import Shell
 logger = logging.getLogger("NeoLogger")
 
 DEFAULT_PLACEMENT_RULE = "REP 2 IN X CBF 1 SELECT 4 FROM * AS X"
+SINGLE_PLACEMENT_RULE = "REP 1 IN X CBF 1 SELECT 4 FROM * AS X"
+REP_2_FOR_3_NODES_PLACEMENT_RULE = "REP 2 IN X CBF 1 SELECT 3 FROM * AS X"
 
 
 @allure.step("Create Container")

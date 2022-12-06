@@ -1,10 +1,9 @@
 import os
 import uuid
 from dataclasses import dataclass
-from typing import Optional
 
-from cluster import Cluster
-from common import FREE_STORAGE, WALLET_PASS
+from cluster import Cluster, NodeBase
+from common import FREE_STORAGE, WALLET_CONFIG, WALLET_PASS
 from neofs_testlib.shell import Shell
 from neofs_testlib.utils.wallet import get_last_address_from_wallet, init_wallet
 from python_keywords.payment_neogo import deposit_gas, transfer_gas
@@ -13,7 +12,14 @@ from python_keywords.payment_neogo import deposit_gas, transfer_gas
 @dataclass
 class WalletFile:
     path: str
-    password: str
+    password: str = WALLET_PASS
+    config_path: str = WALLET_CONFIG
+
+    @staticmethod
+    def from_node(node: NodeBase):
+        return WalletFile(
+            node.get_wallet_path(), node.get_wallet_password(), node.get_wallet_config_path()
+        )
 
     def get_address(self) -> str:
         """

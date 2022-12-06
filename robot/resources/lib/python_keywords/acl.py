@@ -178,7 +178,7 @@ def form_bearertoken_file(
     then extends it with filters taken from <eacl_rules>, signs
     with bearer token and writes to file
     """
-    enc_cid = _encode_cid_for_eacl(cid)
+    enc_cid = _encode_cid_for_eacl(cid) if cid else None
     file_path = os.path.join(os.getcwd(), ASSETS_DIR, str(uuid.uuid4()))
 
     eacl = get_eacl(wif, cid, shell, endpoint)
@@ -189,7 +189,7 @@ def form_bearertoken_file(
     logger.info(json_eacl)
     eacl_result = {
         "body": {
-            "eaclTable": {"containerID": {"value": enc_cid}, "records": []},
+            "eaclTable": {"containerID": {"value": enc_cid} if cid else enc_cid, "records": []},
             "lifetime": {"exp": EACL_LIFETIME, "nbf": "1", "iat": "0"},
         }
     }

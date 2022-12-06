@@ -202,6 +202,7 @@ class Cluster:
 
     default_rpc_endpoint: str
     default_s3_gate_endpoint: str
+    default_http_gate_endpoint: str
 
     def __init__(self, hosting: Hosting) -> None:
         self._hosting = hosting
