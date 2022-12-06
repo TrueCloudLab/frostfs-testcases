@@ -1,12 +1,8 @@
-from enum import Enum
-
 import allure
 import pytest
+from cluster_test_base import ClusterTestBase
 from common import (
     HTTP_GATE_SERVICE_NAME_REGEX,
-    LOAD_NODE_SSH_PRIVATE_KEY_PATH,
-    LOAD_NODE_SSH_USER,
-    LOAD_NODES,
     S3_GATE_SERVICE_NAME_REGEX,
     STORAGE_NODE_SERVICE_NAME_REGEX,
 )
@@ -17,34 +13,63 @@ from load import (
     init_s3_client,
     multi_node_k6_run,
     prepare_k6_instances,
+    start_stopped_nodes,
+    stop_unused_nodes,
+)
+from load_params import (
+    CONTAINERS_COUNT,
+    DELETERS,
+    LOAD_NODE_SSH_PRIVATE_KEY_PATH,
+    LOAD_NODE_SSH_USER,
+    LOAD_NODES,
+    LOAD_NODES_COUNT,
+    LOAD_TIME,
+    LOAD_TYPE,
+    OBJ_COUNT,
+    OBJ_SIZE,
+    OUT_FILE,
+    READERS,
+    STORAGE_NODE_COUNT,
+    WRITERS,
 )
 from neofs_testlib.hosting import Hosting
 
-
-class LoadTime(Enum):
-    EXPECTED_MAXIMUM = 200
-    PMI_EXPECTATION = 900
-
-
-CONTAINERS_COUNT = 1
-OBJ_COUNT = 3
+ENDPOINTS_ATTRIBUTES = {
+    "http": {"regex": HTTP_GATE_SERVICE_NAME_REGEX, "endpoint_attribute": "endpoint"},
+    "grpc": {"regex": STORAGE_NODE_SERVICE_NAME_REGEX, "endpoint_attribute": "rpc_endpoint"},
+    "s3": {"regex": S3_GATE_SERVICE_NAME_REGEX, "endpoint_attribute": "endpoint"},
+}
 
 
 @pytest.mark.load
-class TestLoad:
+class TestLoad(ClusterTestBase):
     @pytest.fixture(autouse=True)
     def clear_cache_and_data(self, hosting: Hosting):
         clear_cache_and_data(hosting=hosting)
+        yield
+        start_stopped_nodes()
 
-    @pytest.mark.parametrize("obj_size, out_file", [(1000, "1mb_200.json")])
-    @pytest.mark.parametrize("writers, readers, deleters", [(140, 60, 0), (200, 0, 0)])
-    @pytest.mark.parametrize(
-        "load_time", [LoadTime.EXPECTED_MAXIMUM.value, LoadTime.PMI_EXPECTATION.value]
-    )
-    @pytest.mark.parametrize("node_count", [4])
+    @pytest.fixture(scope="session", autouse=True)
+    def init_s3_client(self, hosting: Hosting):
+        if "s3" in LOAD_TYPE.lower():
+            init_s3_client(
+                load_nodes=LOAD_NODES,
+                login=LOAD_NODE_SSH_USER,
+                pkey=LOAD_NODE_SSH_PRIVATE_KEY_PATH,
+                hosting=hosting,
+            )
+
+    @pytest.mark.parametrize("obj_size, out_file", list(zip(OBJ_SIZE, OUT_FILE)))
+    @pytest.mark.parametrize("writers, readers, deleters", list(zip(WRITERS, READERS, DELETERS)))
+    @pytest.mark.parametrize("load_time", LOAD_TIME)
+    @pytest.mark.parametrize("node_count", STORAGE_NODE_COUNT)
+    @pytest.mark.parametrize("containers_count", CONTAINERS_COUNT)
+    @pytest.mark.parametrize("load_type", LOAD_TYPE)
+    @pytest.mark.parametrize("obj_count", OBJ_COUNT)
+    @pytest.mark.parametrize("load_nodes_count", LOAD_NODES_COUNT)
     @pytest.mark.benchmark
     @pytest.mark.grpc
-    def test_grpc_benchmark(
+    def test_custom_load(
         self,
         obj_size,
         out_file,
@@ -53,604 +78,41 @@ class TestLoad:
         deleters,
         load_time,
         node_count,
+        obj_count,
+        load_type,
+        load_nodes_count,
+        containers_count,
         hosting: Hosting,
     ):
         allure.dynamic.title(
-            f"Benchmark test - node_count = {node_count}, "
+            f"Load test - node_count = {node_count}, "
             f"writers = {writers} readers = {readers}, "
             f"deleters = {deleters}, obj_size = {obj_size}, "
             f"load_time = {load_time}"
         )
+        stop_unused_nodes(self.cluster.storage_nodes, node_count)
         with allure.step("Get endpoints"):
             endpoints_list = get_services_endpoints(
                 hosting=hosting,
-                service_name_regex=STORAGE_NODE_SERVICE_NAME_REGEX,
-                endpoint_attribute="rpc_endpoint",
+                service_name_regex=ENDPOINTS_ATTRIBUTES[LOAD_TYPE]["regex"],
+                endpoint_attribute=ENDPOINTS_ATTRIBUTES[LOAD_TYPE]["endpoint_attribute"],
             )
             endpoints = ",".join(endpoints_list[:node_count])
         load_params = LoadParams(
             endpoint=endpoints,
             obj_size=obj_size,
-            containers_count=CONTAINERS_COUNT,
+            containers_count=containers_count,
             out_file=out_file,
-            obj_count=OBJ_COUNT,
+            obj_count=obj_count,
             writers=writers,
             readers=readers,
             deleters=deleters,
             load_time=load_time,
-            load_type="grpc",
+            load_type=load_type,
         )
+        load_nodes_list = LOAD_NODES[:load_nodes_count]
         k6_load_instances = prepare_k6_instances(
-            load_nodes=LOAD_NODES,
-            login=LOAD_NODE_SSH_USER,
-            pkey=LOAD_NODE_SSH_PRIVATE_KEY_PATH,
-            load_params=load_params,
-        )
-        with allure.step("Run load"):
-            multi_node_k6_run(k6_load_instances)
-
-    @pytest.mark.parametrize(
-        "obj_size, out_file, writers",
-        [
-            (4, "4kb_300.json", 300),
-            (16, "16kb_250.json", 250),
-            (64, "64kb_250.json", 250),
-            (128, "128kb_250.json", 250),
-            (512, "512kb_200.json", 200),
-            (1000, "1mb_200.json", 200),
-            (8000, "8mb_150.json", 150),
-            (32000, "32mb_150.json", 150),
-            (128000, "128mb_100.json", 100),
-            (512000, "512mb_50.json", 50),
-        ],
-    )
-    @pytest.mark.parametrize(
-        "load_time", [LoadTime.EXPECTED_MAXIMUM.value, LoadTime.PMI_EXPECTATION.value]
-    )
-    @pytest.mark.benchmark
-    @pytest.mark.grpc
-    def test_grpc_benchmark_write(
-        self,
-        obj_size,
-        out_file,
-        writers,
-        load_time,
-        hosting: Hosting,
-    ):
-        allure.dynamic.title(
-            f"Single gate benchmark write test - "
-            f"writers = {writers}, "
-            f"obj_size = {obj_size}, "
-            f"load_time = {load_time}"
-        )
-        with allure.step("Get endpoints"):
-            endpoints_list = get_services_endpoints(
-                hosting=hosting,
-                service_name_regex=STORAGE_NODE_SERVICE_NAME_REGEX,
-                endpoint_attribute="rpc_endpoint",
-            )
-            endpoints = ",".join(endpoints_list[:1])
-        load_params = LoadParams(
-            endpoint=endpoints,
-            obj_size=obj_size,
-            containers_count=CONTAINERS_COUNT,
-            out_file=out_file,
-            obj_count=OBJ_COUNT,
-            writers=writers,
-            readers=0,
-            deleters=0,
-            load_time=load_time,
-            load_type="grpc",
-        )
-        k6_load_instances = prepare_k6_instances(
-            load_nodes=LOAD_NODES,
-            login=LOAD_NODE_SSH_USER,
-            pkey=LOAD_NODE_SSH_PRIVATE_KEY_PATH,
-            load_params=load_params,
-        )
-        with allure.step("Run load"):
-            multi_node_k6_run(k6_load_instances)
-
-    @pytest.mark.parametrize(
-        "obj_size, out_file, writers, readers",
-        [
-            (8000, "8mb_350.json", 245, 105),
-            (32000, "32mb_300.json", 210, 90),
-            (128000, "128mb_100.json", 70, 30),
-            (512000, "512mb_70.json", 49, 21),
-        ],
-    )
-    @pytest.mark.parametrize(
-        "load_time", [LoadTime.EXPECTED_MAXIMUM.value, LoadTime.PMI_EXPECTATION.value]
-    )
-    @pytest.mark.benchmark
-    @pytest.mark.grpc
-    def test_grpc_benchmark_write_read_70_30(
-        self,
-        obj_size,
-        out_file,
-        writers,
-        readers,
-        load_time,
-        hosting: Hosting,
-    ):
-        allure.dynamic.title(
-            f"Single gate benchmark write + read (70%/30%) test - "
-            f"writers = {writers}, "
-            f"readers = {readers}, "
-            f"obj_size = {obj_size}, "
-            f"load_time = {load_time}"
-        )
-        with allure.step("Get endpoints"):
-            endpoints_list = get_services_endpoints(
-                hosting=hosting,
-                service_name_regex=STORAGE_NODE_SERVICE_NAME_REGEX,
-                endpoint_attribute="rpc_endpoint",
-            )
-            endpoints = ",".join(endpoints_list[:1])
-        load_params = LoadParams(
-            endpoint=endpoints,
-            obj_size=obj_size,
-            containers_count=CONTAINERS_COUNT,
-            out_file=out_file,
-            obj_count=500,
-            writers=writers,
-            readers=readers,
-            deleters=0,
-            load_time=load_time,
-            load_type="grpc",
-        )
-        k6_load_instances = prepare_k6_instances(
-            load_nodes=LOAD_NODES,
-            login=LOAD_NODE_SSH_USER,
-            pkey=LOAD_NODE_SSH_PRIVATE_KEY_PATH,
-            load_params=load_params,
-        )
-        with allure.step("Run load"):
-            multi_node_k6_run(k6_load_instances)
-
-    @pytest.mark.parametrize(
-        "obj_size, out_file, readers",
-        [
-            (4, "4kb_300.json", 300),
-            (16, "16kb_300.json", 300),
-            (64, "64kb_300.json", 300),
-            (128, "128kb_250.json", 250),
-            (512, "512kb_150.json", 150),
-            (1000, "1mb_150.json", 150),
-            (8000, "8mb_150.json", 150),
-            (32000, "32mb_100.json", 100),
-            (128000, "128mb_25.json", 25),
-            (512000, "512mb_25.json", 25),
-        ],
-    )
-    @pytest.mark.parametrize(
-        "load_time", [LoadTime.EXPECTED_MAXIMUM.value, LoadTime.PMI_EXPECTATION.value]
-    )
-    @pytest.mark.benchmark
-    @pytest.mark.grpc
-    def test_grpc_benchmark_read(
-        self,
-        obj_size,
-        out_file,
-        readers,
-        load_time,
-        hosting: Hosting,
-    ):
-        allure.dynamic.title(
-            f"Single gate benchmark read test - "
-            f"readers = {readers}, "
-            f"obj_size = {obj_size}, "
-            f"load_time = {load_time}"
-        )
-        with allure.step("Get endpoints"):
-            endpoints_list = get_services_endpoints(
-                hosting=hosting,
-                service_name_regex=STORAGE_NODE_SERVICE_NAME_REGEX,
-                endpoint_attribute="rpc_endpoint",
-            )
-            endpoints = ",".join(endpoints_list[:1])
-        load_params = LoadParams(
-            endpoint=endpoints,
-            obj_size=obj_size,
-            containers_count=1,
-            out_file=out_file,
-            obj_count=500,
-            writers=0,
-            readers=readers,
-            deleters=0,
-            load_time=load_time,
-            load_type="grpc",
-        )
-        k6_load_instances = prepare_k6_instances(
-            load_nodes=LOAD_NODES,
-            login=LOAD_NODE_SSH_USER,
-            pkey=LOAD_NODE_SSH_PRIVATE_KEY_PATH,
-            load_params=load_params,
-        )
-        with allure.step("Run load"):
-            multi_node_k6_run(k6_load_instances)
-
-    @pytest.mark.parametrize(
-        "obj_size, out_file, writers",
-        [
-            (4, "4kb_300.json", 300),
-            (16, "16kb_250.json", 250),
-            (64, "64kb_250.json", 250),
-            (128, "128kb_250.json", 250),
-            (512, "512kb_200.json", 200),
-            (1000, "1mb_200.json", 200),
-            (8000, "8mb_150.json", 150),
-            (32000, "32mb_150.json", 150),
-            (128000, "128mb_100.json", 100),
-            (512000, "512mb_50.json", 50),
-        ],
-    )
-    @pytest.mark.parametrize(
-        "load_time", [LoadTime.EXPECTED_MAXIMUM.value, LoadTime.PMI_EXPECTATION.value]
-    )
-    @pytest.mark.benchmark
-    @pytest.mark.http
-    def test_http_benchmark_write(
-        self,
-        obj_size,
-        out_file,
-        writers,
-        load_time,
-        hosting: Hosting,
-    ):
-        allure.dynamic.title(
-            f"Single gate benchmark write test - "
-            f"writers = {writers}, "
-            f"obj_size = {obj_size}, "
-            f"load_time = {load_time}"
-        )
-        with allure.step("Get endpoints"):
-            endpoints_list = get_services_endpoints(
-                hosting=hosting,
-                service_name_regex=HTTP_GATE_SERVICE_NAME_REGEX,
-                endpoint_attribute="endpoint",
-            )
-            endpoints = ",".join(endpoints_list[:1])
-        load_params = LoadParams(
-            endpoint=endpoints,
-            obj_size=obj_size,
-            containers_count=CONTAINERS_COUNT,
-            out_file=out_file,
-            obj_count=OBJ_COUNT,
-            writers=writers,
-            readers=0,
-            deleters=0,
-            load_time=load_time,
-            load_type="http",
-        )
-        k6_load_instances = prepare_k6_instances(
-            load_nodes=LOAD_NODES,
-            login=LOAD_NODE_SSH_USER,
-            pkey=LOAD_NODE_SSH_PRIVATE_KEY_PATH,
-            load_params=load_params,
-        )
-        with allure.step("Run load"):
-            multi_node_k6_run(k6_load_instances)
-
-    @pytest.mark.parametrize(
-        "obj_size, out_file, writers, readers",
-        [
-            (8000, "8mb_350.json", 245, 105),
-            (32000, "32mb_300.json", 210, 90),
-            (128000, "128mb_100.json", 70, 30),
-            (512000, "512mb_70.json", 49, 21),
-        ],
-    )
-    @pytest.mark.parametrize(
-        "load_time", [LoadTime.EXPECTED_MAXIMUM.value, LoadTime.PMI_EXPECTATION.value]
-    )
-    @pytest.mark.benchmark
-    @pytest.mark.http
-    def test_http_benchmark_write_read_70_30(
-        self,
-        obj_size,
-        out_file,
-        writers,
-        readers,
-        load_time,
-        hosting: Hosting,
-    ):
-        allure.dynamic.title(
-            f"Single gate benchmark write + read (70%/30%) test - "
-            f"writers = {writers}, "
-            f"readers = {readers}, "
-            f"obj_size = {obj_size}, "
-            f"load_time = {load_time}"
-        )
-        with allure.step("Get endpoints"):
-            endpoints_list = get_services_endpoints(
-                hosting=hosting,
-                service_name_regex=HTTP_GATE_SERVICE_NAME_REGEX,
-                endpoint_attribute="endpoint",
-            )
-            endpoints = ",".join(endpoints_list[:1])
-        load_params = LoadParams(
-            endpoint=endpoints,
-            obj_size=obj_size,
-            containers_count=CONTAINERS_COUNT,
-            out_file=out_file,
-            obj_count=500,
-            writers=writers,
-            readers=readers,
-            deleters=0,
-            load_time=load_time,
-            load_type="http",
-        )
-        k6_load_instances = prepare_k6_instances(
-            load_nodes=LOAD_NODES,
-            login=LOAD_NODE_SSH_USER,
-            pkey=LOAD_NODE_SSH_PRIVATE_KEY_PATH,
-            load_params=load_params,
-        )
-        with allure.step("Run load"):
-            multi_node_k6_run(k6_load_instances)
-
-    @pytest.mark.parametrize(
-        "obj_size, out_file, readers",
-        [
-            (4, "4kb_300.json", 300),
-            (16, "16kb_300.json", 300),
-            (64, "64kb_300.json", 300),
-            (128, "128kb_250.json", 250),
-            (512, "512kb_150.json", 150),
-            (1000, "1mb_150.json", 150),
-            (8000, "8mb_150.json", 150),
-            (32000, "32mb_100.json", 100),
-            (128000, "128mb_25.json", 25),
-            (512000, "512mb_25.json", 25),
-        ],
-    )
-    @pytest.mark.parametrize(
-        "load_time", [LoadTime.EXPECTED_MAXIMUM.value, LoadTime.PMI_EXPECTATION.value]
-    )
-    @pytest.mark.benchmark
-    @pytest.mark.http
-    def test_http_benchmark_read(
-        self,
-        obj_size,
-        out_file,
-        readers,
-        load_time,
-        hosting: Hosting,
-    ):
-        allure.dynamic.title(
-            f"Single gate benchmark read test - "
-            f"readers = {readers}, "
-            f"obj_size = {obj_size}, "
-            f"load_time = {load_time}"
-        )
-        with allure.step("Get endpoints"):
-            endpoints_list = get_services_endpoints(
-                hosting=hosting,
-                service_name_regex=HTTP_GATE_SERVICE_NAME_REGEX,
-                endpoint_attribute="endpoint",
-            )
-            endpoints = ",".join(endpoints_list[:1])
-        load_params = LoadParams(
-            endpoint=endpoints,
-            obj_size=obj_size,
-            containers_count=1,
-            out_file=out_file,
-            obj_count=500,
-            writers=0,
-            readers=readers,
-            deleters=0,
-            load_time=load_time,
-            load_type="http",
-        )
-        k6_load_instances = prepare_k6_instances(
-            load_nodes=LOAD_NODES,
-            login=LOAD_NODE_SSH_USER,
-            pkey=LOAD_NODE_SSH_PRIVATE_KEY_PATH,
-            load_params=load_params,
-        )
-        with allure.step("Run load"):
-            multi_node_k6_run(k6_load_instances)
-
-
-@pytest.mark.load
-@pytest.mark.s3
-class TestS3Load:
-    @pytest.fixture(autouse=True)
-    def clear_cache_and_data(self, hosting: Hosting):
-        clear_cache_and_data(hosting=hosting)
-
-    @pytest.fixture(scope="session", autouse=True)
-    def init_s3_client(self, hosting: Hosting):
-        init_s3_client(
-            load_nodes=LOAD_NODES,
-            login=LOAD_NODE_SSH_USER,
-            pkey=LOAD_NODE_SSH_PRIVATE_KEY_PATH,
-            hosting=hosting,
-        )
-
-    @pytest.mark.parametrize(
-        "obj_size, out_file, writers",
-        [
-            (4, "4kb_300.json", 400),
-            (16, "16kb_250.json", 350),
-            (64, "64kb_250.json", 350),
-            (128, "128kb_250.json", 300),
-            (512, "512kb_200.json", 250),
-            (1000, "1mb_200.json", 250),
-            (8000, "8mb_150.json", 200),
-            (32000, "32mb_150.json", 200),
-            (128000, "128mb_100.json", 150),
-            (512000, "512mb_50.json", 50),
-        ],
-    )
-    @pytest.mark.parametrize(
-        "load_time", [LoadTime.EXPECTED_MAXIMUM.value, LoadTime.PMI_EXPECTATION.value]
-    )
-    @pytest.mark.benchmark
-    @pytest.mark.s3
-    def test_s3_benchmark_write(
-        self,
-        obj_size,
-        out_file,
-        writers,
-        load_time,
-        hosting: Hosting,
-    ):
-        allure.dynamic.title(
-            f"Single gate benchmark write test - "
-            f"writers = {writers}, "
-            f"obj_size = {obj_size}, "
-            f"load_time = {load_time}"
-        )
-        with allure.step("Get endpoints"):
-            endpoints_list = get_services_endpoints(
-                hosting=hosting,
-                service_name_regex=S3_GATE_SERVICE_NAME_REGEX,
-                endpoint_attribute="endpoint",
-            )
-            endpoints = ",".join(endpoints_list[:1])
-        load_params = LoadParams(
-            endpoint=endpoints,
-            obj_size=obj_size,
-            containers_count=CONTAINERS_COUNT,
-            out_file=out_file,
-            obj_count=OBJ_COUNT,
-            writers=writers,
-            readers=0,
-            deleters=0,
-            load_time=load_time,
-            load_type="s3",
-        )
-        k6_load_instances = prepare_k6_instances(
-            load_nodes=LOAD_NODES,
-            login=LOAD_NODE_SSH_USER,
-            pkey=LOAD_NODE_SSH_PRIVATE_KEY_PATH,
-            load_params=load_params,
-        )
-        with allure.step("Run load"):
-            multi_node_k6_run(k6_load_instances)
-
-    @pytest.mark.parametrize(
-        "obj_size, out_file, writers, readers",
-        [
-            (4, "4kb_350.json", 210, 90),
-            (16, "16kb_300.json", 210, 90),
-            (64, "64kb_300.json", 210, 90),
-            (128, "128kb_300.json", 210, 90),
-            (512, "512kb_300.json", 210, 90),
-            (1000, "1mb_300.json", 210, 90),
-            (8000, "8mb_250.json", 175, 75),
-            (32000, "32mb_200.json", 140, 60),
-            (128000, "128mb_100.json", 70, 30),
-            (512000, "512mb_50.json", 35, 15),
-        ],
-    )
-    @pytest.mark.parametrize(
-        "load_time", [LoadTime.EXPECTED_MAXIMUM.value, LoadTime.PMI_EXPECTATION.value]
-    )
-    @pytest.mark.benchmark
-    @pytest.mark.s3
-    def test_s3_benchmark_write_read_70_30(
-        self,
-        obj_size,
-        out_file,
-        writers,
-        readers,
-        load_time,
-        hosting: Hosting,
-    ):
-        allure.dynamic.title(
-            f"Single gate benchmark write + read (70%/30%) test - "
-            f"writers = {writers}, "
-            f"readers = {readers}, "
-            f"obj_size = {obj_size}, "
-            f"load_time = {load_time}"
-        )
-        with allure.step("Get endpoints"):
-            endpoints_list = get_services_endpoints(
-                hosting=hosting,
-                service_name_regex=S3_GATE_SERVICE_NAME_REGEX,
-                endpoint_attribute="endpoint",
-            )
-            endpoints = ",".join(endpoints_list[:1])
-        load_params = LoadParams(
-            endpoint=endpoints,
-            obj_size=obj_size,
-            containers_count=CONTAINERS_COUNT,
-            out_file=out_file,
-            obj_count=500,
-            writers=writers,
-            readers=readers,
-            deleters=0,
-            load_time=load_time,
-            load_type="s3",
-        )
-        k6_load_instances = prepare_k6_instances(
-            load_nodes=LOAD_NODES,
-            login=LOAD_NODE_SSH_USER,
-            pkey=LOAD_NODE_SSH_PRIVATE_KEY_PATH,
-            load_params=load_params,
-        )
-        with allure.step("Run load"):
-            multi_node_k6_run(k6_load_instances)
-
-    @pytest.mark.parametrize(
-        "obj_size, out_file, readers",
-        [
-            (4, "4kb_400.json", 400),
-            (16, "16kb_400.json", 400),
-            (64, "64kb_350.json", 350),
-            (128, "128kb_300.json", 300),
-            (512, "512kb_300.json", 300),
-            (1000, "1mb_300.json", 300),
-            (8000, "8mb_300.json", 300),
-            (32000, "32mb_200.json", 200),
-            (128000, "128mb_150.json", 150),
-            (512000, "512mb_50.json", 50),
-        ],
-    )
-    @pytest.mark.parametrize(
-        "load_time", [LoadTime.EXPECTED_MAXIMUM.value, LoadTime.PMI_EXPECTATION.value]
-    )
-    @pytest.mark.benchmark
-    @pytest.mark.s3
-    def test_s3_benchmark_read(
-        self,
-        obj_size,
-        out_file,
-        readers,
-        load_time,
-        hosting: Hosting,
-    ):
-        allure.dynamic.title(
-            f"Single gate benchmark read test - "
-            f"readers = {readers}, "
-            f"obj_size = {obj_size}, "
-            f"load_time = {load_time}"
-        )
-        with allure.step("Get endpoints"):
-            endpoints_list = get_services_endpoints(
-                hosting=hosting,
-                service_name_regex=S3_GATE_SERVICE_NAME_REGEX,
-                endpoint_attribute="endpoint",
-            )
-            endpoints = ",".join(endpoints_list[:1])
-        load_params = LoadParams(
-            endpoint=endpoints,
-            obj_size=obj_size,
-            containers_count=1,
-            out_file=out_file,
-            obj_count=500,
-            writers=0,
-            readers=readers,
-            deleters=0,
-            load_time=load_time,
-            load_type="s3",
-        )
-        k6_load_instances = prepare_k6_instances(
-            load_nodes=LOAD_NODES,
+            load_nodes=load_nodes_list,
             login=LOAD_NODE_SSH_USER,
             pkey=LOAD_NODE_SSH_PRIVATE_KEY_PATH,
             load_params=load_params,

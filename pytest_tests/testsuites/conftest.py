@@ -12,17 +12,10 @@ from binary_version_helper import get_local_binaries_versions, get_remote_binari
 from cluster import Cluster
 from common import (
     ASSETS_DIR,
-    BACKGROUND_LOAD_MAX_TIME,
-    BACKGROUND_OBJ_SIZE,
-    BACKGROUND_READERS_COUNT,
-    BACKGROUND_WRITERS_COUNT,
     COMPLEX_OBJECT_CHUNKS_COUNT,
     COMPLEX_OBJECT_TAIL_SIZE,
     FREE_STORAGE,
     HOSTING_CONFIG_FILE,
-    LOAD_NODE_SSH_PRIVATE_KEY_PATH,
-    LOAD_NODE_SSH_USER,
-    LOAD_NODES,
     SIMPLE_OBJECT_SIZE,
     STORAGE_NODE_SERVICE_NAME_REGEX,
     WALLET_PASS,
@@ -30,6 +23,15 @@ from common import (
 from env_properties import save_env_properties
 from k6 import LoadParams
 from load import get_services_endpoints, prepare_k6_instances
+from load_params import (
+    BACKGROUND_LOAD_MAX_TIME,
+    BACKGROUND_OBJ_SIZE,
+    BACKGROUND_READERS_COUNT,
+    BACKGROUND_WRITERS_COUNT,
+    LOAD_NODE_SSH_PRIVATE_KEY_PATH,
+    LOAD_NODE_SSH_USER,
+    LOAD_NODES,
+)
 from neofs_testlib.hosting import Hosting
 from neofs_testlib.reporter import AllureHandler, get_reporter
 from neofs_testlib.shell import LocalShell, Shell

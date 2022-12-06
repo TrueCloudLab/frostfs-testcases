@@ -12,6 +12,7 @@ from neofs_testlib.shell import CommandOptions, SSHShell
 from neofs_testlib.shell.interfaces import InteractiveInput
 
 NEOFS_AUTHMATE_PATH = "neofs-s3-authmate"
+STOPPED_HOSTS = []
 
 
 @allure.title("Get services endpoints")
@@ -20,6 +21,21 @@ def get_services_endpoints(
 ) -> list[str]:
     service_configs = hosting.find_service_configs(service_name_regex)
     return [service_config.attributes[endpoint_attribute] for service_config in service_configs]
+
+
+@allure.title("Stop nodes")
+def stop_unused_nodes(storage_nodes: list, used_nodes_count: int):
+    for node in storage_nodes[used_nodes_count:]:
+        host = node.host
+        STOPPED_HOSTS.append(host)
+        host.stop_host("hard")
+
+
+@allure.title("Start nodes")
+def start_stopped_nodes():
+    for host in STOPPED_HOSTS:
+        host.start_host()
+        STOPPED_HOSTS.remove(host)
 
 
 @allure.title("Init s3 client")
