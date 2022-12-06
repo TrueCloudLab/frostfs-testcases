@@ -35,7 +35,7 @@ neo-mamba==0.10.0
 neo3crypto==0.2.1
 neo3vm==0.9.0
 neo3vm-stubs==0.9.0
-neofs-testlib==0.7.0
+neofs-testlib==0.8.0
 netaddr==0.8.0
 orjson==3.6.8
 packaging==21.3

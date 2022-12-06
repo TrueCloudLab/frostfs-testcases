@@ -162,7 +162,7 @@ def run_health_check(collect_logs, cluster: Cluster):
 
 
 @pytest.fixture(scope="session")
-def background_grpc_load(client_shell, default_wallet):
+def background_grpc_load(client_shell):
     registry_file = os.path.join("/tmp/", f"{str(uuid.uuid4())}.bolt")
     prepare_file = os.path.join("/tmp/", f"{str(uuid.uuid4())}.json")
     allure.dynamic.title(
