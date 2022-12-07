@@ -127,6 +127,9 @@ class TestNodeManagement(ClusterTestBase):
         default_wallet,
         return_nodes_after_test_run,
     ):
+        """
+        This test remove one node from cluster then add it back. Test uses base control operations with storage nodes (healthcheck, netmap-snapshot, set-status).
+        """
         wallet = default_wallet
         placement_rule_3 = "REP 3 IN X CBF 1 SELECT 3 FROM * AS X"
         placement_rule_4 = "REP 4 IN X CBF 1 SELECT 4 FROM * AS X"
@@ -201,62 +204,6 @@ class TestNodeManagement(ClusterTestBase):
                 endpoint=alive_node.get_rpc_endpoint(),
             )
             wait_object_replication(cid, oid, 4, shell=self.shell, nodes=storage_nodes)
-
-    @allure.title("Control Operations with storage nodes")
-    @pytest.mark.node_mgmt
-    def test_nodes_management(self, temp_directory):
-        """
-        This test checks base control operations with storage nodes (healthcheck, netmap-snapshot, set-status).
-        """
-
-        storage_nodes = self.cluster.storage_nodes
-        random_node = random.choice(storage_nodes)
-        alive_node = random.choice(list(set(storage_nodes) - {random_node}))
-
-        # Calculate public key that identifies node in netmap
-        random_node_netmap_key = random_node.get_wallet_public_key()
-
-        with allure.step(f"Check node ({random_node}) is in netmap"):
-            snapshot = get_netmap_snapshot(node=alive_node, shell=self.shell)
-            assert (
-                random_node_netmap_key in snapshot
-            ), f"Expected node {random_node} to be in netmap"
-
-        with allure.step("Run health check for all storage nodes"):
-            for node in self.cluster.storage_nodes:
-                health_check = storage_node_healthcheck(node)
-                assert (
-                    health_check.health_status == "READY"
-                    and health_check.network_status == "ONLINE"
-                )
-
-        with allure.step(f"Move node ({random_node}) to offline state"):
-            storage_node_set_status(random_node, status="offline")
-
-        sleep(parse_time(MORPH_BLOCK_TIME))
-        tick_epoch(self.shell, self.cluster)
-
-        with allure.step(f"Check node {random_node} went to offline"):
-            health_check = storage_node_healthcheck(random_node)
-            assert (
-                health_check.health_status == "READY" and health_check.network_status == "OFFLINE"
-            )
-            snapshot = get_netmap_snapshot(node=alive_node, shell=self.shell)
-            assert (
-                random_node_netmap_key not in snapshot
-            ), f"Expected node {random_node} not in netmap"
-
-        with allure.step(f"Check node {random_node} went to online"):
-            storage_node_set_status(random_node, status="online")
-
-        sleep(parse_time(MORPH_BLOCK_TIME))
-        tick_epoch(self.shell, self.cluster)
-
-        with allure.step(f"Check node {random_node} went to online"):
-            health_check = storage_node_healthcheck(random_node)
-            assert health_check.health_status == "READY" and health_check.network_status == "ONLINE"
-            snapshot = get_netmap_snapshot(node=alive_node, shell=self.shell)
-            assert random_node_netmap_key in snapshot, f"Expected node {random_node} in netmap"
 
     @pytest.mark.parametrize(
         "placement_rule,expected_copies",
