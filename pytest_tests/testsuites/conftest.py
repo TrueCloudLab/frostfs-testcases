@@ -16,11 +16,14 @@ from common import (
     BACKGROUND_OBJ_SIZE,
     BACKGROUND_READERS_COUNT,
     BACKGROUND_WRITERS_COUNT,
+    COMPLEX_OBJECT_CHUNKS_COUNT,
+    COMPLEX_OBJECT_TAIL_SIZE,
     FREE_STORAGE,
     HOSTING_CONFIG_FILE,
     LOAD_NODE_SSH_PRIVATE_KEY_PATH,
     LOAD_NODE_SSH_USER,
     LOAD_NODES,
+    SIMPLE_OBJECT_SIZE,
     STORAGE_NODE_SERVICE_NAME_REGEX,
     WALLET_PASS,
 )
@@ -32,6 +35,8 @@ from neofs_testlib.reporter import AllureHandler, get_reporter
 from neofs_testlib.shell import LocalShell, Shell
 from neofs_testlib.utils.wallet import init_wallet
 from payment_neogo import deposit_gas, transfer_gas
+from pytest import FixtureRequest
+from python_keywords.neofs_verbs import get_netmap_netinfo
 from python_keywords.node_management import storage_node_healthcheck
 
 from helpers.wallet import WalletFactory
@@ -79,6 +84,28 @@ def require_multiple_hosts(hosting: Hosting):
     if len(hosting.hosts) <= 1:
         pytest.skip("Test only works with multiple hosts")
     yield
+
+
+@pytest.fixture(scope="session")
+def max_object_size(cluster: Cluster, client_shell: Shell) -> int:
+    storage_node = cluster.storage_nodes[0]
+    net_info = get_netmap_netinfo(
+        wallet=storage_node.get_wallet_path(),
+        wallet_config=storage_node.get_wallet_config_path(),
+        endpoint=storage_node.get_rpc_endpoint(),
+        shell=client_shell,
+    )
+    yield net_info["maximum_object_size"]
+
+
+@pytest.fixture(scope="session")
+def simple_object_size(max_object_size: int) -> int:
+    yield int(SIMPLE_OBJECT_SIZE) if int(SIMPLE_OBJECT_SIZE) < max_object_size else max_object_size
+
+
+@pytest.fixture(scope="session")
+def complex_object_size(max_object_size: int) -> int:
+    return max_object_size * int(COMPLEX_OBJECT_CHUNKS_COUNT) + int(COMPLEX_OBJECT_TAIL_SIZE)
 
 
 @pytest.fixture(scope="session")

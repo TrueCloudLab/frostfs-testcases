@@ -1,7 +1,6 @@
 import allure
 import pytest
 from cluster import Cluster
-from common import COMPLEX_OBJ_SIZE, SIMPLE_OBJ_SIZE
 from container import REP_2_FOR_3_NODES_PLACEMENT_RULE, SINGLE_PLACEMENT_RULE, create_container
 from epoch import get_epoch
 from neofs_testlib.shell import Shell
@@ -88,7 +87,7 @@ class TestObjectApiWithBearerToken(ClusterTestBase):
     )
     @pytest.mark.parametrize(
         "storage_objects",
-        [SIMPLE_OBJ_SIZE, COMPLEX_OBJ_SIZE],
+        [pytest.lazy_fixture("simple_object_size"), pytest.lazy_fixture("complex_object_size")],
         ids=["simple object", "complex object"],
         indirect=True,
     )
@@ -99,7 +98,8 @@ class TestObjectApiWithBearerToken(ClusterTestBase):
         request: FixtureRequest,
     ):
         allure.dynamic.title(
-            f"Check that objects can be deleted from any node using s3gate wallet with bearer token for {request.node.callspec.id}"
+            f"Check that objects can be deleted from any node using s3gate wallet with bearer "
+            f"token for {request.node.callspec.id}"
         )
 
         s3_gate_wallet = self.cluster.s3gates[0]
@@ -124,7 +124,7 @@ class TestObjectApiWithBearerToken(ClusterTestBase):
     )
     @pytest.mark.parametrize(
         "file_size",
-        [SIMPLE_OBJ_SIZE, COMPLEX_OBJ_SIZE],
+        [pytest.lazy_fixture("simple_object_size"), pytest.lazy_fixture("complex_object_size")],
         ids=["simple object", "complex object"],
     )
     def test_get_object_with_s3_wallet_bearer_from_all_nodes(
@@ -135,7 +135,8 @@ class TestObjectApiWithBearerToken(ClusterTestBase):
         request: FixtureRequest,
     ):
         allure.dynamic.title(
-            f"Check that objects can be deleted from any node using s3gate wallet with bearer token for {request.node.callspec.id}"
+            "Check that objects can be deleted from any node using s3gate wallet with bearer "
+            f"token for {request.node.callspec.id}"
         )
 
         s3_gate_wallet = self.cluster.s3gates[0]

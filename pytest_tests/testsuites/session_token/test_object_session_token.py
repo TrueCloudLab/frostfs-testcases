@@ -3,7 +3,7 @@ import random
 import allure
 import pytest
 from cluster_test_base import ClusterTestBase
-from common import COMPLEX_OBJ_SIZE, SIMPLE_OBJ_SIZE, WALLET_PASS
+from common import WALLET_PASS
 from file_helper import generate_file
 from grpc_responses import SESSION_NOT_FOUND
 from neofs_testlib.utils.wallet import get_last_address_from_wallet
@@ -19,7 +19,7 @@ class TestDynamicObjectSession(ClusterTestBase):
     @allure.title("Test Object Operations with Session Token")
     @pytest.mark.parametrize(
         "object_size",
-        [SIMPLE_OBJ_SIZE, COMPLEX_OBJ_SIZE],
+        [pytest.lazy_fixture("simple_object_size"), pytest.lazy_fixture("complex_object_size")],
         ids=["simple object", "complex object"],
     )
     def test_object_session_token(self, default_wallet, object_size):

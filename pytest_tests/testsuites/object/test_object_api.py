@@ -5,14 +5,12 @@ import sys
 import allure
 import pytest
 from cluster import Cluster
-from common import COMPLEX_OBJ_SIZE, SIMPLE_OBJ_SIZE
-from container import create_container
 from file_helper import generate_file, get_file_content, get_file_hash
 from grpc_responses import OUT_OF_RANGE
 from neofs_testlib.shell import Shell
 from pytest import FixtureRequest
+from python_keywords.container import create_container
 from python_keywords.neofs_verbs import (
-    get_netmap_netinfo,
     get_object_from_random_node,
     get_range,
     get_range_hash,
@@ -42,10 +40,7 @@ RANGES_COUNT = 4  # by quarters
 RANGE_MIN_LEN = 10
 RANGE_MAX_LEN = 500
 # Used for static ranges found with issues
-STATIC_RANGES = {
-    SIMPLE_OBJ_SIZE: [],
-    COMPLEX_OBJ_SIZE: [],
-}
+STATIC_RANGES = {}
 
 
 def generate_ranges(file_size: int, max_object_size: int) -> list[(int, int)]:
@@ -58,10 +53,10 @@ def generate_ranges(file_size: int, max_object_size: int) -> list[(int, int)]:
         file_ranges.append((int(file_range_step * i), int(file_range_step * (i + 1))))
 
     # For simple object we can read all file ranges without too much time for testing
-    if file_size == SIMPLE_OBJ_SIZE:
+    if file_size < max_object_size:
         file_ranges_to_test.extend(file_ranges)
     # For complex object we need to fetch multiple child objects from different nodes.
-    if file_size == COMPLEX_OBJ_SIZE:
+    else:
         assert (
             file_size >= RANGE_MAX_LEN + max_object_size
         ), f"Complex object size should be at least {max_object_size + RANGE_MAX_LEN}. Current: {file_size}"
@@ -83,7 +78,7 @@ def generate_ranges(file_size: int, max_object_size: int) -> list[(int, int)]:
 
 
 @pytest.fixture(
-    params=[SIMPLE_OBJ_SIZE, COMPLEX_OBJ_SIZE],
+    params=[pytest.lazy_fixture("simple_object_size"), pytest.lazy_fixture("complex_object_size")],
     ids=["simple object", "complex object"],
     # Scope session to upload/delete each files set only once
     scope="module",
@@ -132,7 +127,7 @@ def storage_objects(
 class TestObjectApi(ClusterTestBase):
     @allure.title("Validate object storage policy by native API")
     def test_object_storage_policies(
-        self, request: FixtureRequest, storage_objects: list[StorageObjectInfo]
+        self, request: FixtureRequest, storage_objects: list[StorageObjectInfo], simple_object_size
     ):
         """
         Validate object storage policy
@@ -143,7 +138,7 @@ class TestObjectApi(ClusterTestBase):
 
         with allure.step("Validate storage policy for objects"):
             for storage_object in storage_objects:
-                if storage_object.size == SIMPLE_OBJ_SIZE:
+                if storage_object.size == simple_object_size:
                     copies = get_simple_object_copies(
                         storage_object.wallet_file_path,
                         storage_object.cid,
@@ -257,7 +252,9 @@ class TestObjectApi(ClusterTestBase):
 
     @allure.title("Validate object search with removed items")
     @pytest.mark.parametrize(
-        "object_size", [SIMPLE_OBJ_SIZE, COMPLEX_OBJ_SIZE], ids=["simple object", "complex object"]
+        "object_size",
+        [pytest.lazy_fixture("simple_object_size"), pytest.lazy_fixture("complex_object_size")],
+        ids=["simple object", "complex object"],
     )
     def test_object_search_should_return_tombstone_items(
         self, default_wallet: str, request: FixtureRequest, object_size: int
@@ -330,7 +327,7 @@ class TestObjectApi(ClusterTestBase):
     @pytest.mark.sanity
     @pytest.mark.grpc_api
     def test_object_get_range_hash(
-        self, request: FixtureRequest, storage_objects: list[StorageObjectInfo]
+        self, request: FixtureRequest, storage_objects: list[StorageObjectInfo], max_object_size
     ):
         """
         Validate get_range_hash for object by common gRPC API
@@ -343,10 +340,6 @@ class TestObjectApi(ClusterTestBase):
         cid = storage_objects[0].cid
         oids = [storage_object.oid for storage_object in storage_objects[:2]]
         file_path = storage_objects[0].file_path
-        net_info = get_netmap_netinfo(
-            wallet, self.shell, endpoint=self.cluster.default_rpc_endpoint
-        )
-        max_object_size = net_info["maximum_object_size"]
 
         file_ranges_to_test = generate_ranges(storage_objects[0].size, max_object_size)
         logging.info(f"Ranges used in test {file_ranges_to_test}")
@@ -372,7 +365,7 @@ class TestObjectApi(ClusterTestBase):
     @pytest.mark.sanity
     @pytest.mark.grpc_api
     def test_object_get_range(
-        self, request: FixtureRequest, storage_objects: list[StorageObjectInfo]
+        self, request: FixtureRequest, storage_objects: list[StorageObjectInfo], max_object_size
     ):
         """
         Validate get_range for object by common gRPC API
@@ -383,10 +376,6 @@ class TestObjectApi(ClusterTestBase):
         cid = storage_objects[0].cid
         oids = [storage_object.oid for storage_object in storage_objects[:2]]
         file_path = storage_objects[0].file_path
-        net_info = get_netmap_netinfo(
-            wallet, self.shell, endpoint=self.cluster.default_rpc_endpoint
-        )
-        max_object_size = net_info["maximum_object_size"]
 
         file_ranges_to_test = generate_ranges(storage_objects[0].size, max_object_size)
         logging.info(f"Ranges used in test {file_ranges_to_test}")

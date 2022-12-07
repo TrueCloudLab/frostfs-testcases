@@ -2,12 +2,11 @@ import logging
 
 import allure
 import pytest
-from common import COMPLEX_OBJ_SIZE, SIMPLE_OBJ_SIZE
-from container import create_container
 from epoch import get_epoch, tick_epoch
 from file_helper import generate_file, get_file_hash
 from grpc_responses import OBJECT_NOT_FOUND
 from pytest import FixtureRequest
+from python_keywords.container import create_container
 from python_keywords.neofs_verbs import get_object_from_random_node, put_object_to_random_node
 from utility import wait_for_gc_pass_on_storage_nodes
 
@@ -21,7 +20,9 @@ logger = logging.getLogger("NeoLogger")
 class ObjectApiLifetimeTest(ClusterTestBase):
     @allure.title("Test object life time")
     @pytest.mark.parametrize(
-        "object_size", [SIMPLE_OBJ_SIZE, COMPLEX_OBJ_SIZE], ids=["simple object", "complex object"]
+        "object_size",
+        [pytest.lazy_fixture("simple_object_size"), pytest.lazy_fixture("complex_object_size")],
+        ids=["simple object", "complex object"],
     )
     def test_object_api_lifetime(
         self, default_wallet: str, request: FixtureRequest, object_size: int

@@ -5,9 +5,8 @@ import allure
 import pytest
 from cluster import Cluster
 from cluster_test_base import ClusterTestBase
-from common import COMPLEX_OBJ_SIZE, SIMPLE_OBJ_SIZE, STORAGE_GC_TIME
+from common import STORAGE_GC_TIME
 from complex_object_actions import get_link_object
-from container import create_container
 from epoch import ensure_fresh_epoch, get_epoch, tick_epoch
 from grpc_responses import (
     LIFETIME_REQUIRED,
@@ -20,6 +19,7 @@ from grpc_responses import (
 )
 from neofs_testlib.shell import Shell
 from pytest import FixtureRequest
+from python_keywords.container import create_container
 from python_keywords.neofs_verbs import delete_object, head_object, lock_object
 from test_control import expect_not_raises, wait_for_success
 from utility import parse_time, wait_for_gc_pass_on_storage_nodes
@@ -143,7 +143,7 @@ class TestObjectLockWithGrpc(ClusterTestBase):
     @allure.title("Locked object should be protected from deletion")
     @pytest.mark.parametrize(
         "locked_storage_object",
-        [SIMPLE_OBJ_SIZE, COMPLEX_OBJ_SIZE],
+        [pytest.lazy_fixture("simple_object_size"), pytest.lazy_fixture("complex_object_size")],
         ids=["simple object", "complex object"],
         indirect=True,
     )
@@ -170,7 +170,9 @@ class TestObjectLockWithGrpc(ClusterTestBase):
 
     @allure.title("Lock object itself should be protected from deletion")
     # We operate with only lock object here so no complex object needed in this test
-    @pytest.mark.parametrize("locked_storage_object", [SIMPLE_OBJ_SIZE], indirect=True)
+    @pytest.mark.parametrize(
+        "locked_storage_object", [pytest.lazy_fixture("simple_object_size")], indirect=True
+    )
     def test_lock_object_itself_cannot_be_deleted(
         self,
         locked_storage_object: StorageObjectInfo,
@@ -193,7 +195,9 @@ class TestObjectLockWithGrpc(ClusterTestBase):
 
     @allure.title("Lock object itself cannot be locked")
     # We operate with only lock object here so no complex object needed in this test
-    @pytest.mark.parametrize("locked_storage_object", [SIMPLE_OBJ_SIZE], indirect=True)
+    @pytest.mark.parametrize(
+        "locked_storage_object", [pytest.lazy_fixture("simple_object_size")], indirect=True
+    )
     def test_lock_object_cannot_be_locked(
         self,
         locked_storage_object: StorageObjectInfo,
@@ -217,7 +221,9 @@ class TestObjectLockWithGrpc(ClusterTestBase):
 
     @allure.title("Cannot lock object without lifetime and expire_at fields")
     # We operate with only lock object here so no complex object needed in this test
-    @pytest.mark.parametrize("locked_storage_object", [SIMPLE_OBJ_SIZE], indirect=True)
+    @pytest.mark.parametrize(
+        "locked_storage_object", [pytest.lazy_fixture("simple_object_size")], indirect=True
+    )
     @pytest.mark.parametrize(
         "wrong_lifetime,wrong_expire_at,expected_error",
         [
@@ -259,7 +265,9 @@ class TestObjectLockWithGrpc(ClusterTestBase):
 
     @allure.title("Expired object should be deleted after locks are expired")
     @pytest.mark.parametrize(
-        "object_size", [SIMPLE_OBJ_SIZE, COMPLEX_OBJ_SIZE], ids=["simple object", "complex object"]
+        "object_size",
+        [pytest.lazy_fixture("simple_object_size"), pytest.lazy_fixture("complex_object_size")],
+        ids=["simple object", "complex object"],
     )
     def test_expired_object_should_be_deleted_after_locks_are_expired(
         self,
@@ -327,7 +335,7 @@ class TestObjectLockWithGrpc(ClusterTestBase):
     @allure.title("Should be possible to lock multiple objects at once")
     @pytest.mark.parametrize(
         "object_size",
-        [SIMPLE_OBJ_SIZE, COMPLEX_OBJ_SIZE],
+        [pytest.lazy_fixture("simple_object_size"), pytest.lazy_fixture("complex_object_size")],
         ids=["simple object", "complex object"],
     )
     def test_should_be_possible_to_lock_multiple_objects_at_once(
@@ -382,7 +390,7 @@ class TestObjectLockWithGrpc(ClusterTestBase):
     @allure.title("Already outdated lock should not be applied")
     @pytest.mark.parametrize(
         "object_size",
-        [SIMPLE_OBJ_SIZE, COMPLEX_OBJ_SIZE],
+        [pytest.lazy_fixture("simple_object_size"), pytest.lazy_fixture("complex_object_size")],
         ids=["simple object", "complex object"],
     )
     def test_already_outdated_lock_should_not_be_applied(
@@ -421,7 +429,7 @@ class TestObjectLockWithGrpc(ClusterTestBase):
     @allure.title("After lock expiration with lifetime user should be able to delete object")
     @pytest.mark.parametrize(
         "object_size",
-        [SIMPLE_OBJ_SIZE, COMPLEX_OBJ_SIZE],
+        [pytest.lazy_fixture("simple_object_size"), pytest.lazy_fixture("complex_object_size")],
         ids=["simple object", "complex object"],
     )
     @expect_not_raises()
@@ -463,7 +471,7 @@ class TestObjectLockWithGrpc(ClusterTestBase):
     @allure.title("After lock expiration with expire_at user should be able to delete object")
     @pytest.mark.parametrize(
         "object_size",
-        [SIMPLE_OBJ_SIZE, COMPLEX_OBJ_SIZE],
+        [pytest.lazy_fixture("simple_object_size"), pytest.lazy_fixture("complex_object_size")],
         ids=["simple object", "complex object"],
     )
     @expect_not_raises()
@@ -508,7 +516,7 @@ class TestObjectLockWithGrpc(ClusterTestBase):
     @pytest.mark.parametrize(
         # Only complex objects are required for this test
         "locked_storage_object",
-        [COMPLEX_OBJ_SIZE],
+        [pytest.lazy_fixture("complex_object_size")],
         indirect=True,
     )
     def test_complex_object_chunks_should_also_be_protected_from_deletion(
@@ -535,7 +543,7 @@ class TestObjectLockWithGrpc(ClusterTestBase):
     @pytest.mark.parametrize(
         # Only complex objects are required for this test
         "locked_storage_object",
-        [COMPLEX_OBJ_SIZE],
+        [pytest.lazy_fixture("complex_object_size")],
         indirect=True,
     )
     def test_link_object_of_complex_object_should_also_be_protected_from_deletion(

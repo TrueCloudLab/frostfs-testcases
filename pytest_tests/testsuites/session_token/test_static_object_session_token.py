@@ -4,7 +4,6 @@ import allure
 import pytest
 from cluster import Cluster
 from cluster_test_base import ClusterTestBase
-from common import COMPLEX_OBJ_SIZE, SIMPLE_OBJ_SIZE
 from epoch import ensure_fresh_epoch
 from file_helper import generate_file
 from grpc_responses import MALFORMED_REQUEST, OBJECT_ACCESS_DENIED, OBJECT_NOT_FOUND
@@ -13,7 +12,6 @@ from pytest import FixtureRequest
 from python_keywords.container import create_container
 from python_keywords.neofs_verbs import (
     delete_object,
-    get_netmap_netinfo,
     get_object,
     get_object_from_random_node,
     get_range,
@@ -58,7 +56,7 @@ def storage_containers(
 
 
 @pytest.fixture(
-    params=[SIMPLE_OBJ_SIZE, COMPLEX_OBJ_SIZE],
+    params=[pytest.lazy_fixture("simple_object_size"), pytest.lazy_fixture("complex_object_size")],
     ids=["simple object", "complex object"],
     # Scope module to upload/delete each files set only once
     scope="module",
@@ -98,16 +96,15 @@ def storage_objects(
 
 
 @allure.step("Get ranges for test")
-def get_ranges(storage_object: StorageObjectInfo, shell: Shell, endpoint: str) -> list[str]:
+def get_ranges(
+    storage_object: StorageObjectInfo, max_object_size: int, shell: Shell, endpoint: str
+) -> list[str]:
     """
     Returns ranges to test range/hash methods via static session
     """
     object_size = storage_object.size
 
-    if object_size == COMPLEX_OBJ_SIZE:
-        net_info = get_netmap_netinfo(storage_object.wallet_file_path, shell, endpoint)
-        max_object_size = net_info["maximum_object_size"]
-        # make sure to test multiple parts of complex object
+    if object_size > max_object_size:
         assert object_size >= max_object_size + RANGE_OFFSET_FOR_COMPLEX_OBJECT
         return [
             "0:10",
@@ -160,9 +157,9 @@ class TestObjectStaticSession(ClusterTestBase):
         self,
         user_wallet: WalletFile,
         storage_objects: list[StorageObjectInfo],
-        static_sessions: list[str],
+        static_sessions: dict[ObjectVerb, str],
         method_under_test,
-        verb: str,
+        verb: ObjectVerb,
         request: FixtureRequest,
     ):
         """
@@ -175,9 +172,9 @@ class TestObjectStaticSession(ClusterTestBase):
         for node in self.cluster.storage_nodes:
             for storage_object in storage_objects[0:2]:
                 method_under_test(
-                    user_wallet.path,
-                    storage_object.cid,
-                    storage_object.oid,
+                    wallet=user_wallet.path,
+                    cid=storage_object.cid,
+                    oid=storage_object.oid,
                     shell=self.shell,
                     endpoint=node.get_rpc_endpoint(),
                     session=static_sessions[verb],
@@ -193,10 +190,11 @@ class TestObjectStaticSession(ClusterTestBase):
         self,
         user_wallet: WalletFile,
         storage_objects: list[StorageObjectInfo],
-        static_sessions: list[str],
+        static_sessions: dict[ObjectVerb, str],
         method_under_test,
-        verb: str,
+        verb: ObjectVerb,
         request: FixtureRequest,
+        max_object_size,
     ):
         """
         Validate static session with range operations
@@ -205,7 +203,9 @@ class TestObjectStaticSession(ClusterTestBase):
             f"Validate static session with range operations for {request.node.callspec.id}"
         )
         storage_object = storage_objects[0]
-        ranges_to_test = get_ranges(storage_object, self.shell, self.cluster.default_rpc_endpoint)
+        ranges_to_test = get_ranges(
+            storage_object, max_object_size, self.shell, self.cluster.default_rpc_endpoint
+        )
 
         for range_to_test in ranges_to_test:
             with allure.step(f"Check range {range_to_test}"):
@@ -227,7 +227,7 @@ class TestObjectStaticSession(ClusterTestBase):
         self,
         user_wallet: WalletFile,
         storage_objects: list[StorageObjectInfo],
-        static_sessions: list[str],
+        static_sessions: dict[ObjectVerb, str],
         request: FixtureRequest,
     ):
         """
@@ -253,7 +253,7 @@ class TestObjectStaticSession(ClusterTestBase):
         self,
         user_wallet: WalletFile,
         storage_objects: list[StorageObjectInfo],
-        static_sessions: list[str],
+        static_sessions: dict[ObjectVerb, str],
         request: FixtureRequest,
     ):
         """
@@ -278,7 +278,7 @@ class TestObjectStaticSession(ClusterTestBase):
         self,
         stranger_wallet: WalletFile,
         storage_objects: list[StorageObjectInfo],
-        static_sessions: list[str],
+        static_sessions: dict[ObjectVerb, str],
         request: FixtureRequest,
     ):
         """
@@ -305,7 +305,7 @@ class TestObjectStaticSession(ClusterTestBase):
         self,
         user_wallet: WalletFile,
         storage_objects: list[StorageObjectInfo],
-        static_sessions: list[str],
+        static_sessions: dict[ObjectVerb, str],
         request: FixtureRequest,
     ):
         """
@@ -333,7 +333,7 @@ class TestObjectStaticSession(ClusterTestBase):
         user_wallet: WalletFile,
         storage_objects: list[StorageObjectInfo],
         storage_containers: list[str],
-        static_sessions: list[str],
+        static_sessions: dict[ObjectVerb, str],
         request: FixtureRequest,
     ):
         """
@@ -361,7 +361,7 @@ class TestObjectStaticSession(ClusterTestBase):
         owner_wallet: WalletFile,
         user_wallet: WalletFile,
         stranger_wallet: WalletFile,
-        storage_containers: list[int],
+        storage_containers: list[str],
         storage_objects: list[StorageObjectInfo],
         temp_directory: str,
         request: FixtureRequest,
@@ -638,7 +638,7 @@ class TestObjectStaticSession(ClusterTestBase):
         self,
         user_wallet: WalletFile,
         storage_objects: list[StorageObjectInfo],
-        static_sessions: list[str],
+        static_sessions: dict[ObjectVerb, str],
         request: FixtureRequest,
     ):
         """
@@ -663,7 +663,7 @@ class TestObjectStaticSession(ClusterTestBase):
         self,
         user_wallet: WalletFile,
         storage_objects: list[StorageObjectInfo],
-        static_sessions: list[str],
+        static_sessions: dict[ObjectVerb, str],
         request: FixtureRequest,
     ):
         """

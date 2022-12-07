@@ -5,10 +5,9 @@ from time import sleep
 
 import allure
 import pytest
-from common import COMPLEX_OBJ_SIZE
-from container import create_container
 from epoch import get_epoch, tick_epoch
 from file_helper import generate_file, get_file_hash
+from python_keywords.container import create_container
 from python_keywords.http_gate import (
     get_via_http_curl,
     get_via_http_gate,
@@ -50,7 +49,7 @@ class TestHttpGate(ClusterTestBase):
         TestHttpGate.wallet = default_wallet
 
     @allure.title("Test Put over gRPC, Get over HTTP")
-    def test_put_grpc_get_http(self):
+    def test_put_grpc_get_http(self, complex_object_size, simple_object_size):
         """
         Test that object can be put using gRPC interface and get using HTTP.
 
@@ -72,7 +71,9 @@ class TestHttpGate(ClusterTestBase):
             rule=self.PLACEMENT_RULE_1,
             basic_acl=PUBLIC_ACL,
         )
-        file_path_simple, file_path_large = generate_file(), generate_file(COMPLEX_OBJ_SIZE)
+        file_path_simple, file_path_large = generate_file(simple_object_size), generate_file(
+            complex_object_size
+        )
 
         with allure.step("Put objects using gRPC"):
             oid_simple = put_object_to_random_node(
@@ -97,7 +98,7 @@ class TestHttpGate(ClusterTestBase):
     @allure.link("https://github.com/nspcc-dev/neofs-http-gw#downloading", name="downloading")
     @allure.title("Test Put over HTTP, Get over HTTP")
     @pytest.mark.smoke
-    def test_put_http_get_http(self):
+    def test_put_http_get_http(self, complex_object_size, simple_object_size):
         """
         Test that object can be put and get using HTTP interface.
 
@@ -117,7 +118,9 @@ class TestHttpGate(ClusterTestBase):
             rule=self.PLACEMENT_RULE_2,
             basic_acl=PUBLIC_ACL,
         )
-        file_path_simple, file_path_large = generate_file(), generate_file(COMPLEX_OBJ_SIZE)
+        file_path_simple, file_path_large = generate_file(simple_object_size), generate_file(
+            complex_object_size
+        )
 
         with allure.step("Put objects using HTTP"):
             oid_simple = upload_via_http_gate(
@@ -143,7 +146,7 @@ class TestHttpGate(ClusterTestBase):
         ],
         ids=["simple", "hyphen", "percent"],
     )
-    def test_put_http_get_http_with_headers(self, attributes: dict):
+    def test_put_http_get_http_with_headers(self, attributes: dict, simple_object_size):
         """
         Test that object can be downloaded using different attributes in HTTP header.
 
@@ -163,7 +166,7 @@ class TestHttpGate(ClusterTestBase):
             rule=self.PLACEMENT_RULE_2,
             basic_acl=PUBLIC_ACL,
         )
-        file_path = generate_file()
+        file_path = generate_file(simple_object_size)
 
         with allure.step("Put objects using HTTP with attribute"):
             headers = self._attr_into_header(attributes)
@@ -179,7 +182,7 @@ class TestHttpGate(ClusterTestBase):
         self.get_object_by_attr_and_verify_hashes(oid, file_path, cid, attributes)
 
     @allure.title("Test Expiration-Epoch in HTTP header")
-    def test_expiration_epoch_in_http(self):
+    def test_expiration_epoch_in_http(self, simple_object_size):
         endpoint = self.cluster.default_rpc_endpoint
         http_endpoint = self.cluster.default_http_gate_endpoint
 
@@ -190,7 +193,7 @@ class TestHttpGate(ClusterTestBase):
             rule=self.PLACEMENT_RULE_2,
             basic_acl=PUBLIC_ACL,
         )
-        file_path = generate_file()
+        file_path = generate_file(simple_object_size)
         oids = []
 
         curr_epoch = get_epoch(self.shell, self.cluster)
@@ -228,7 +231,7 @@ class TestHttpGate(ClusterTestBase):
                     get_via_http_gate(cid=cid, oid=oid, endpoint=http_endpoint)
 
     @allure.title("Test Zip in HTTP header")
-    def test_zip_in_http(self):
+    def test_zip_in_http(self, complex_object_size, simple_object_size):
         cid = create_container(
             self.wallet,
             shell=self.shell,
@@ -236,7 +239,9 @@ class TestHttpGate(ClusterTestBase):
             rule=self.PLACEMENT_RULE_2,
             basic_acl=PUBLIC_ACL,
         )
-        file_path_simple, file_path_large = generate_file(), generate_file(COMPLEX_OBJ_SIZE)
+        file_path_simple, file_path_large = generate_file(simple_object_size), generate_file(
+            complex_object_size
+        )
         common_prefix = "my_files"
 
         headers1 = {"X-Attribute-FilePath": f"{common_prefix}/file1"}
@@ -267,7 +272,7 @@ class TestHttpGate(ClusterTestBase):
 
     @pytest.mark.long
     @allure.title("Test Put over HTTP/Curl, Get over HTTP/Curl for large object")
-    def test_put_http_get_http_large_file(self):
+    def test_put_http_get_http_large_file(self, complex_object_size):
         """
         This test checks upload and download using curl with 'large' object.
         Large is object with size up to 20Mb.
@@ -280,7 +285,7 @@ class TestHttpGate(ClusterTestBase):
             basic_acl=PUBLIC_ACL,
         )
 
-        obj_size = int(os.getenv("BIG_OBJ_SIZE", COMPLEX_OBJ_SIZE))
+        obj_size = int(os.getenv("BIG_OBJ_SIZE", complex_object_size))
         file_path = generate_file(obj_size)
 
         with allure.step("Put objects using HTTP"):
@@ -304,7 +309,7 @@ class TestHttpGate(ClusterTestBase):
         )
 
     @allure.title("Test Put/Get over HTTP using Curl utility")
-    def test_put_http_get_http_curl(self):
+    def test_put_http_get_http_curl(self, complex_object_size, simple_object_size):
         """
         Test checks upload and download over HTTP using curl utility.
         """
@@ -315,7 +320,9 @@ class TestHttpGate(ClusterTestBase):
             rule=self.PLACEMENT_RULE_2,
             basic_acl=PUBLIC_ACL,
         )
-        file_path_simple, file_path_large = generate_file(), generate_file(COMPLEX_OBJ_SIZE)
+        file_path_simple, file_path_large = generate_file(simple_object_size), generate_file(
+            complex_object_size
+        )
 
         with allure.step("Put objects using curl utility"):
             oid_simple = upload_via_http_gate_curl(

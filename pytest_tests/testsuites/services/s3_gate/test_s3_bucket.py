@@ -103,8 +103,8 @@ class TestS3GateBucket(TestS3GateBase):
             ], "Permission for CanonicalUser is FULL_CONTROL"
 
     @allure.title("Test S3: create bucket with object lock")
-    def test_s3_bucket_object_lock(self):
-        file_path = generate_file()
+    def test_s3_bucket_object_lock(self, simple_object_size):
+        file_path = generate_file(simple_object_size)
         file_name = object_key_from_file_path(file_path)
 
         with allure.step("Create bucket with --no-object-lock-enabled-for-bucket"):
@@ -138,10 +138,10 @@ class TestS3GateBucket(TestS3GateBase):
             )
 
     @allure.title("Test S3: delete bucket")
-    def test_s3_delete_bucket(self):
-        file_path_1 = generate_file()
+    def test_s3_delete_bucket(self, simple_object_size):
+        file_path_1 = generate_file(simple_object_size)
         file_name_1 = object_key_from_file_path(file_path_1)
-        file_path_2 = generate_file()
+        file_path_2 = generate_file(simple_object_size)
         file_name_2 = object_key_from_file_path(file_path_2)
         bucket = s3_gate_bucket.create_bucket_s3(self.s3_client)
 

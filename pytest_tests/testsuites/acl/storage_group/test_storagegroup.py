@@ -6,7 +6,7 @@ from typing import Optional
 import allure
 import pytest
 from cluster_test_base import ClusterTestBase
-from common import ASSETS_DIR, COMPLEX_OBJ_SIZE, FREE_STORAGE, SIMPLE_OBJ_SIZE, WALLET_PASS
+from common import ASSETS_DIR, FREE_STORAGE, WALLET_PASS
 from file_helper import generate_file
 from grpc_responses import OBJECT_ACCESS_DENIED, OBJECT_NOT_FOUND
 from neofs_testlib.utils.wallet import init_wallet
@@ -37,7 +37,7 @@ deposit = 30
 
 @pytest.mark.parametrize(
     "object_size",
-    [SIMPLE_OBJ_SIZE, COMPLEX_OBJ_SIZE],
+    [pytest.lazy_fixture("simple_object_size"), pytest.lazy_fixture("complex_object_size")],
     ids=["simple object", "complex object"],
 )
 @pytest.mark.sanity
@@ -68,7 +68,7 @@ class TestStorageGroup(ClusterTestBase):
             )
 
     @allure.title("Test Storage Group in Private Container")
-    def test_storagegroup_basic_private_container(self, object_size):
+    def test_storagegroup_basic_private_container(self, object_size, max_object_size):
         cid = create_container(
             self.main_wallet, shell=self.shell, endpoint=self.cluster.default_rpc_endpoint
         )
@@ -88,6 +88,7 @@ class TestStorageGroup(ClusterTestBase):
             cid=cid,
             obj_list=objects,
             object_size=object_size,
+            max_object_size=max_object_size,
         )
         self.expect_failure_for_storagegroup_operations(
             wallet=self.other_wallet,
@@ -103,7 +104,7 @@ class TestStorageGroup(ClusterTestBase):
         )
 
     @allure.title("Test Storage Group in Public Container")
-    def test_storagegroup_basic_public_container(self, object_size):
+    def test_storagegroup_basic_public_container(self, object_size, max_object_size):
         cid = create_container(
             self.main_wallet,
             basic_acl="public-read-write",
@@ -120,12 +121,14 @@ class TestStorageGroup(ClusterTestBase):
             cid=cid,
             obj_list=objects,
             object_size=object_size,
+            max_object_size=max_object_size,
         )
         self.expect_success_for_storagegroup_operations(
             wallet=self.other_wallet,
             cid=cid,
             obj_list=objects,
             object_size=object_size,
+            max_object_size=max_object_size,
         )
         self.storagegroup_operations_by_system_ro_container(
             wallet=self.main_wallet,
@@ -135,7 +138,7 @@ class TestStorageGroup(ClusterTestBase):
         )
 
     @allure.title("Test Storage Group in Read-Only Container")
-    def test_storagegroup_basic_ro_container(self, object_size):
+    def test_storagegroup_basic_ro_container(self, object_size, max_object_size):
         cid = create_container(
             self.main_wallet,
             basic_acl="public-read",
@@ -152,6 +155,7 @@ class TestStorageGroup(ClusterTestBase):
             cid=cid,
             obj_list=objects,
             object_size=object_size,
+            max_object_size=max_object_size,
         )
         self.storagegroup_operations_by_other_ro_container(
             owner_wallet=self.main_wallet,
@@ -168,7 +172,7 @@ class TestStorageGroup(ClusterTestBase):
         )
 
     @allure.title("Test Storage Group with Bearer Allow")
-    def test_storagegroup_bearer_allow(self, object_size):
+    def test_storagegroup_bearer_allow(self, object_size, max_object_size):
         cid = create_container(
             self.main_wallet,
             basic_acl="eacl-public-read-write",
@@ -185,6 +189,7 @@ class TestStorageGroup(ClusterTestBase):
             cid=cid,
             obj_list=objects,
             object_size=object_size,
+            max_object_size=max_object_size,
         )
         storage_group = put_storagegroup(
             self.shell, self.cluster.default_rpc_endpoint, self.main_wallet, cid, objects
@@ -219,6 +224,7 @@ class TestStorageGroup(ClusterTestBase):
             cid=cid,
             obj_list=objects,
             object_size=object_size,
+            max_object_size=max_object_size,
             bearer=bearer_file,
         )
 
@@ -259,6 +265,7 @@ class TestStorageGroup(ClusterTestBase):
         cid: str,
         obj_list: list,
         object_size: int,
+        max_object_size: int,
         bearer: Optional[str] = None,
     ):
         """
@@ -285,6 +292,7 @@ class TestStorageGroup(ClusterTestBase):
             gid=storage_group,
             obj_list=obj_list,
             object_size=object_size,
+            max_object_size=max_object_size,
             bearer=bearer,
         )
         delete_storagegroup(
@@ -381,7 +389,11 @@ class TestStorageGroup(ClusterTestBase):
 
     @allure.step("Run Storage Group Operations On Systems's Behalf In RO Container")
     def storagegroup_operations_by_system_ro_container(
-        self, wallet: str, cid: str, obj_list: list, object_size: int
+        self,
+        wallet: str,
+        cid: str,
+        obj_list: list,
+        object_size: int,
     ):
         """
         In this func we create a Storage Group on Inner Ring's key behalf

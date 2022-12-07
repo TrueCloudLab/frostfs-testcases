@@ -7,7 +7,7 @@ from typing import Optional
 
 import allure
 from cluster import Cluster
-from common import COMPLEX_OBJ_SIZE, NEOFS_CLI_EXEC, SIMPLE_OBJ_SIZE, WALLET_CONFIG
+from common import NEOFS_CLI_EXEC, WALLET_CONFIG
 from complex_object_actions import get_link_object
 from neofs_testlib.cli import NeofsCli
 from neofs_testlib.shell import Shell
@@ -201,12 +201,13 @@ def verify_get_storage_group(
     gid: str,
     obj_list: list,
     object_size: int,
+    max_object_size: int,
     bearer: str = None,
     wallet_config: str = WALLET_CONFIG,
 ):
     obj_parts = []
     endpoint = cluster.default_rpc_endpoint
-    if object_size == COMPLEX_OBJ_SIZE:
+    if object_size > max_object_size:
         for obj in obj_list:
             link_oid = get_link_object(
                 wallet,
@@ -239,11 +240,10 @@ def verify_get_storage_group(
         bearer=bearer,
         wallet_config=wallet_config,
     )
-    if object_size == SIMPLE_OBJ_SIZE:
-        exp_size = SIMPLE_OBJ_SIZE * obj_num
+    exp_size = object_size * obj_num
+    if object_size < max_object_size:
         assert int(storagegroup_data["Group size"]) == exp_size
         assert storagegroup_data["Members"] == obj_list
     else:
-        exp_size = COMPLEX_OBJ_SIZE * obj_num
         assert int(storagegroup_data["Group size"]) == exp_size
         assert storagegroup_data["Members"] == obj_parts

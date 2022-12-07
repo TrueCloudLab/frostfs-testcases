@@ -38,7 +38,9 @@ class TestFailoverNetwork(ClusterTestBase):
             wait_all_storage_nodes_returned(self.cluster)
 
     @allure.title("Block Storage node traffic")
-    def test_block_storage_node_traffic(self, default_wallet, require_multiple_hosts):
+    def test_block_storage_node_traffic(
+        self, default_wallet, require_multiple_hosts, simple_object_size
+    ):
         """
         Block storage nodes traffic using iptables and wait for replication for objects.
         """
@@ -47,7 +49,7 @@ class TestFailoverNetwork(ClusterTestBase):
         wakeup_node_timeout = 10  # timeout to let nodes detect that traffic has blocked
         nodes_to_block_count = 2
 
-        source_file_path = generate_file()
+        source_file_path = generate_file(simple_object_size)
         cid = create_container(
             wallet,
             shell=self.shell,

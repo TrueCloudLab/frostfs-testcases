@@ -148,6 +148,7 @@ class TestSessionTokenContainer(ClusterTestBase):
         user_wallet: WalletFile,
         stranger_wallet: WalletFile,
         static_sessions: dict[ContainerVerb, str],
+        simple_object_size,
     ):
         """
         Validate static session with set eacl operation
@@ -159,7 +160,7 @@ class TestSessionTokenContainer(ClusterTestBase):
                 shell=self.shell,
                 endpoint=self.cluster.default_rpc_endpoint,
             )
-        file_path = generate_file()
+        file_path = generate_file(simple_object_size)
         assert can_put_object(stranger_wallet.path, cid, file_path, self.shell, self.cluster)
 
         with allure.step(f"Deny all operations for other via eACL"):

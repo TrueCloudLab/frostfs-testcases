@@ -68,8 +68,8 @@ def wallets(default_wallet, temp_directory, cluster: Cluster) -> Wallets:
 
 
 @pytest.fixture(scope="module")
-def file_path():
-    yield generate_file()
+def file_path(simple_object_size):
+    yield generate_file(simple_object_size)
 
 
 @pytest.fixture(scope="function")

@@ -5,12 +5,12 @@ import uuid
 from typing import Any, Optional
 
 import allure
-from common import ASSETS_DIR, SIMPLE_OBJ_SIZE
+from common import ASSETS_DIR
 
 logger = logging.getLogger("NeoLogger")
 
 
-def generate_file(size: int = SIMPLE_OBJ_SIZE) -> str:
+def generate_file(size: int) -> str:
     """Generates a binary file with the specified size in bytes.
 
     Args:
@@ -28,6 +28,7 @@ def generate_file(size: int = SIMPLE_OBJ_SIZE) -> str:
 
 
 def generate_file_with_content(
+    size: int,
     file_path: Optional[str] = None,
     content: Optional[str] = None,
 ) -> str:
@@ -44,7 +45,7 @@ def generate_file_with_content(
     """
     mode = "w+"
     if content is None:
-        content = os.urandom(SIMPLE_OBJ_SIZE)
+        content = os.urandom(size)
         mode = "wb"
 
     if not file_path:

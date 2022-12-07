@@ -1,21 +1,11 @@
 import os
-import time
-from datetime import datetime, timedelta
-from random import choice
-from string import ascii_letters
-from typing import Tuple
 
 import allure
 import pytest
-from file_helper import generate_file, generate_file_with_content
+from file_helper import generate_file
 from python_keywords.container import search_container_by_name
 from python_keywords.storage_policy import get_simple_object_copies
-from s3_helper import (
-    assert_object_lock_mode,
-    check_objects_in_bucket,
-    object_key_from_file_path,
-    set_bucket_versioning,
-)
+from s3_helper import check_objects_in_bucket, object_key_from_file_path, set_bucket_versioning
 
 from steps import s3_gate_bucket, s3_gate_object
 from steps.s3_gate_base import TestS3GateBase
@@ -35,10 +25,10 @@ def pytest_generate_tests(metafunc):
 @pytest.mark.s3_gate
 class TestS3GatePolicy(TestS3GateBase):
     @allure.title("Test S3: Verify bucket creation with retention policy applied")
-    def test_s3_bucket_location(self):
-        file_path_1 = generate_file()
+    def test_s3_bucket_location(self, simple_object_size):
+        file_path_1 = generate_file(simple_object_size)
         file_name_1 = object_key_from_file_path(file_path_1)
-        file_path_2 = generate_file()
+        file_path_2 = generate_file(simple_object_size)
         file_name_2 = object_key_from_file_path(file_path_2)
 
         with allure.step("Create two buckets with different bucket configuration"):

@@ -7,7 +7,7 @@ import allure
 import pytest
 from cluster import StorageNode
 from cluster_test_base import ClusterTestBase
-from common import COMPLEX_OBJ_SIZE, MORPH_BLOCK_TIME, NEOFS_CONTRACT_CACHE_TIMEOUT
+from common import MORPH_BLOCK_TIME, NEOFS_CONTRACT_CACHE_TIMEOUT
 from epoch import tick_epoch
 from file_helper import generate_file
 from grpc_responses import OBJECT_NOT_FOUND, error_matches_status
@@ -49,9 +49,10 @@ check_nodes: list[StorageNode] = []
 class TestNodeManagement(ClusterTestBase):
     @pytest.fixture
     @allure.title("Create container and pick the node with data")
-    def create_container_and_pick_node(self, default_wallet: str) -> Tuple[str, StorageNode]:
-        default_wallet
-        file_path = generate_file()
+    def create_container_and_pick_node(
+        self, default_wallet: str, simple_object_size
+    ) -> Tuple[str, StorageNode]:
+        file_path = generate_file(simple_object_size)
         placement_rule = "REP 1 IN X CBF 1 SELECT 1 FROM * AS X"
         endpoint = self.cluster.default_rpc_endpoint
 
@@ -126,6 +127,7 @@ class TestNodeManagement(ClusterTestBase):
         self,
         default_wallet,
         return_nodes_after_test_run,
+        simple_object_size,
     ):
         """
         This test remove one node from cluster then add it back. Test uses base control operations with storage nodes (healthcheck, netmap-snapshot, set-status).
@@ -133,7 +135,7 @@ class TestNodeManagement(ClusterTestBase):
         wallet = default_wallet
         placement_rule_3 = "REP 3 IN X CBF 1 SELECT 3 FROM * AS X"
         placement_rule_4 = "REP 4 IN X CBF 1 SELECT 4 FROM * AS X"
-        source_file_path = generate_file()
+        source_file_path = generate_file(simple_object_size)
 
         storage_nodes = self.cluster.storage_nodes
         random_node = random.choice(storage_nodes[1:])
@@ -219,12 +221,14 @@ class TestNodeManagement(ClusterTestBase):
     )
     @pytest.mark.node_mgmt
     @allure.title("Test object copies based on placement policy")
-    def test_placement_policy(self, default_wallet, placement_rule, expected_copies):
+    def test_placement_policy(
+        self, default_wallet, placement_rule, expected_copies, simple_object_size
+    ):
         """
         This test checks object's copies based on container's placement policy.
         """
         wallet = default_wallet
-        file_path = generate_file()
+        file_path = generate_file(simple_object_size)
         self.validate_object_copies(wallet, placement_rule, file_path, expected_copies)
 
     @pytest.mark.parametrize(
@@ -279,14 +283,19 @@ class TestNodeManagement(ClusterTestBase):
     @pytest.mark.node_mgmt
     @allure.title("Test object copies and storage nodes based on placement policy")
     def test_placement_policy_with_nodes(
-        self, default_wallet, placement_rule, expected_copies, expected_nodes_id: set[int]
+        self,
+        default_wallet,
+        placement_rule,
+        expected_copies,
+        expected_nodes_id: set[int],
+        simple_object_size,
     ):
         """
         Based on container's placement policy check that storage nodes are piked correctly and object has
         correct copies amount.
         """
         wallet = default_wallet
-        file_path = generate_file()
+        file_path = generate_file(simple_object_size)
         cid, oid, found_nodes = self.validate_object_copies(
             wallet, placement_rule, file_path, expected_copies
         )
@@ -303,24 +312,28 @@ class TestNodeManagement(ClusterTestBase):
     )
     @pytest.mark.node_mgmt
     @allure.title("Negative cases for placement policy")
-    def test_placement_policy_negative(self, default_wallet, placement_rule, expected_copies):
+    def test_placement_policy_negative(
+        self, default_wallet, placement_rule, expected_copies, simple_object_size
+    ):
         """
         Negative test for placement policy.
         """
         wallet = default_wallet
-        file_path = generate_file()
+        file_path = generate_file(simple_object_size)
         with pytest.raises(RuntimeError, match=".*not enough nodes to SELECT from.*"):
             self.validate_object_copies(wallet, placement_rule, file_path, expected_copies)
 
     @pytest.mark.node_mgmt
     @allure.title("NeoFS object could be dropped using control command")
-    def test_drop_object(self, default_wallet):
+    def test_drop_object(self, default_wallet, complex_object_size, simple_object_size):
         """
         Test checks object could be dropped using `neofs-cli control drop-objects` command.
         """
         wallet = default_wallet
         endpoint = self.cluster.default_rpc_endpoint
-        file_path_simple, file_path_complex = generate_file(), generate_file(COMPLEX_OBJ_SIZE)
+        file_path_simple, file_path_complex = generate_file(simple_object_size), generate_file(
+            complex_object_size
+        )
 
         locode = get_locode_from_random_node(self.cluster)
         rule = f"REP 1 CBF 1 SELECT 1 FROM * FILTER 'UN-LOCODE' EQ '{locode}' AS LOC"
@@ -358,9 +371,10 @@ class TestNodeManagement(ClusterTestBase):
         self,
         default_wallet,
         create_container_and_pick_node,
+        simple_object_size,
     ):
         wallet = default_wallet
-        file_path = generate_file()
+        file_path = generate_file(simple_object_size)
 
         cid, node = create_container_and_pick_node
         original_oid = put_object_to_random_node(wallet, file_path, cid, self.shell, self.cluster)

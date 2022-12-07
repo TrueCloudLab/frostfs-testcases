@@ -32,8 +32,8 @@ class TestS3GateTagging(TestS3GateBase):
         return tags
 
     @allure.title("Test S3: Object tagging")
-    def test_s3_object_tagging(self, bucket):
-        file_path = generate_file()
+    def test_s3_object_tagging(self, bucket, simple_object_size):
+        file_path = generate_file(simple_object_size)
         file_name = object_key_from_file_path(file_path)
 
         with allure.step("Put with 3 tags object into bucket"):

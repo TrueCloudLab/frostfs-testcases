@@ -21,8 +21,8 @@ def pytest_generate_tests(metafunc):
 @pytest.mark.parametrize("version_id", [None, "second"])
 class TestS3GateLocking(TestS3GateBase):
     @allure.title("Test S3: Checking the operation of retention period & legal lock on the object")
-    def test_s3_object_locking(self, version_id):
-        file_path = generate_file()
+    def test_s3_object_locking(self, version_id, simple_object_size):
+        file_path = generate_file(simple_object_size)
         file_name = object_key_from_file_path(file_path)
         retention_period = 2
 
@@ -30,7 +30,7 @@ class TestS3GateLocking(TestS3GateBase):
 
         with allure.step("Put several versions of object into bucket"):
             s3_gate_object.put_object_s3(self.s3_client, bucket, file_path)
-            file_name_1 = generate_file_with_content(file_path=file_path)
+            file_name_1 = generate_file_with_content(simple_object_size, file_path=file_path)
             version_id_2 = s3_gate_object.put_object_s3(self.s3_client, bucket, file_name_1)
             check_objects_in_bucket(self.s3_client, bucket, [file_name])
             if version_id:
@@ -74,8 +74,8 @@ class TestS3GateLocking(TestS3GateBase):
                 s3_gate_object.delete_object_s3(self.s3_client, bucket, file_name, version_id)
 
     @allure.title("Test S3: Checking the impossibility to change the retention mode COMPLIANCE")
-    def test_s3_mode_compliance(self, version_id):
-        file_path = generate_file()
+    def test_s3_mode_compliance(self, version_id, simple_object_size):
+        file_path = generate_file(simple_object_size)
         file_name = object_key_from_file_path(file_path)
         retention_period = 2
         retention_period_1 = 1
@@ -115,8 +115,8 @@ class TestS3GateLocking(TestS3GateBase):
                 )
 
     @allure.title("Test S3: Checking the ability to change retention mode GOVERNANCE")
-    def test_s3_mode_governance(self, version_id):
-        file_path = generate_file()
+    def test_s3_mode_governance(self, version_id, simple_object_size):
+        file_path = generate_file(simple_object_size)
         file_name = object_key_from_file_path(file_path)
         retention_period = 3
         retention_period_1 = 2
@@ -183,8 +183,8 @@ class TestS3GateLocking(TestS3GateBase):
             )
 
     @allure.title("Test S3: Checking if an Object Cannot Be Locked")
-    def test_s3_legal_hold(self, version_id):
-        file_path = generate_file()
+    def test_s3_legal_hold(self, version_id, simple_object_size):
+        file_path = generate_file(simple_object_size)
         file_name = object_key_from_file_path(file_path)
 
         bucket = s3_gate_bucket.create_bucket_s3(self.s3_client, False)
@@ -205,8 +205,8 @@ class TestS3GateLocking(TestS3GateBase):
 @pytest.mark.s3_gate
 class TestS3GateLockingBucket(TestS3GateBase):
     @allure.title("Test S3: Bucket Lock")
-    def test_s3_bucket_lock(self):
-        file_path = generate_file()
+    def test_s3_bucket_lock(self, simple_object_size):
+        file_path = generate_file(simple_object_size)
         file_name = object_key_from_file_path(file_path)
         configuration = {"Rule": {"DefaultRetention": {"Mode": "COMPLIANCE", "Days": 1}}}
 

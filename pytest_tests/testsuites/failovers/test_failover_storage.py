@@ -47,14 +47,11 @@ class TestFailoverStorage(ClusterTestBase):
     @pytest.mark.parametrize("hard_reboot", [True, False])
     @pytest.mark.failover_reboot
     def test_lose_storage_node_host(
-        self,
-        default_wallet,
-        hard_reboot: bool,
-        require_multiple_hosts,
+        self, default_wallet, hard_reboot: bool, require_multiple_hosts, simple_object_size
     ):
         wallet = default_wallet
         placement_rule = "REP 2 IN X CBF 2 SELECT 2 FROM * AS X"
-        source_file_path = generate_file()
+        source_file_path = generate_file(simple_object_size)
         cid = create_container(
             wallet,
             shell=self.shell,
@@ -106,14 +103,11 @@ class TestFailoverStorage(ClusterTestBase):
     @pytest.mark.parametrize("sequence", [True, False])
     @pytest.mark.failover_panic
     def test_panic_storage_node_host(
-        self,
-        default_wallet,
-        require_multiple_hosts,
-        sequence: bool,
+        self, default_wallet, require_multiple_hosts, sequence: bool, simple_object_size
     ):
         wallet = default_wallet
         placement_rule = "REP 2 IN X CBF 2 SELECT 2 FROM * AS X"
-        source_file_path = generate_file()
+        source_file_path = generate_file(simple_object_size)
         cid = create_container(
             wallet,
             shell=self.shell,
