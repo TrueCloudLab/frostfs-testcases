@@ -32,7 +32,6 @@ from neofs_testlib.reporter import AllureHandler, get_reporter
 from neofs_testlib.shell import LocalShell, Shell
 from neofs_testlib.utils.wallet import init_wallet
 from payment_neogo import deposit_gas, transfer_gas
-from pytest import FixtureRequest
 from python_keywords.node_management import storage_node_healthcheck
 
 from helpers.wallet import WalletFactory
@@ -116,25 +115,6 @@ def temp_directory():
         shutil.rmtree(full_path)
 
 
-@pytest.fixture(scope="function", autouse=True)
-@allure.title("Analyze logs")
-def analyze_logs(temp_directory: str, hosting: Hosting, request: FixtureRequest):
-    start_time = datetime.utcnow()
-    yield
-    end_time = datetime.utcnow()
-
-    # Skip tests where we expect failures in logs
-    if request.node.get_closest_marker("no_log_analyze"):
-        with allure.step("Skip analyze logs due to no_log_analyze mark"):
-            return
-
-    # Test name may exceed os NAME_MAX (255 bytes), so we use test start datetime instead
-    start_time_str = start_time.strftime("%Y_%m_%d_%H_%M_%S_%f")
-    logs_dir = os.path.join(temp_directory, f"logs_{start_time_str}")
-    dump_logs(hosting, logs_dir, start_time, end_time)
-    check_logs(logs_dir)
-
-
 @pytest.fixture(scope="session", autouse=True)
 @allure.title("Collect logs")
 def collect_logs(temp_directory, hosting: Hosting):
@@ -146,6 +126,7 @@ def collect_logs(temp_directory, hosting: Hosting):
     logs_dir = os.path.join(temp_directory, "logs")
     dump_logs(hosting, logs_dir, start_time, end_time)
     attach_logs(logs_dir)
+    check_logs(logs_dir)
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -254,6 +235,7 @@ def default_wallet(client_shell: Shell, temp_directory: str, cluster: Cluster):
     return wallet_path
 
 
+@allure.title("Check logs for OOM and PANIC entries in {logs_dir}")
 def check_logs(logs_dir: str):
     problem_pattern = r"\Wpanic\W|\Woom\W"
 
@@ -267,10 +249,10 @@ def check_logs(logs_dir: str):
 
     logs_with_problem = []
     for file_path in log_file_paths:
-        with open(file_path, "r") as log_file:
-            if re.search(problem_pattern, log_file.read(), flags=re.IGNORECASE):
-                attach_logs(logs_dir)
-                logs_with_problem.append(file_path)
+        with allure.step(f"Check log file {file_path}"):
+            with open(file_path, "r") as log_file:
+                if re.search(problem_pattern, log_file.read(), flags=re.IGNORECASE):
+                    logs_with_problem.append(file_path)
     if logs_with_problem:
         raise pytest.fail(f"System logs {', '.join(logs_with_problem)} contain critical errors")
 
@@ -280,7 +262,11 @@ def dump_logs(hosting: Hosting, logs_dir: str, since: datetime, until: datetime)
     os.makedirs(logs_dir)
 
     for host in hosting.hosts:
-        host.dump_logs(logs_dir, since=since, until=until)
+        with allure.step(f"Dump logs from host {host.config.address}"):
+            try:
+                host.dump_logs(logs_dir, since=since, until=until)
+            except Exception as ex:
+                logger.warning(f"Exception during logs collection: {ex}")
 
 
 def attach_logs(logs_dir: str) -> None:
