@@ -1,7 +1,5 @@
 import logging
 import os
-import random
-from time import sleep
 
 import allure
 import pytest
@@ -9,15 +7,17 @@ from epoch import get_epoch, tick_epoch
 from file_helper import generate_file, get_file_hash
 from python_keywords.container import create_container
 from python_keywords.http_gate import (
+    attr_into_header,
+    get_object_and_verify_hashes,
+    get_object_by_attr_and_verify_hashes,
     get_via_http_curl,
     get_via_http_gate,
-    get_via_http_gate_by_attribute,
     get_via_zip_http_gate,
+    try_to_get_object_and_expect_error,
     upload_via_http_gate,
     upload_via_http_gate_curl,
 )
-from python_keywords.neofs_verbs import get_object, put_object_to_random_node
-from python_keywords.storage_policy import get_nodes_without_object
+from python_keywords.neofs_verbs import put_object_to_random_node
 from utility import wait_for_gc_pass_on_storage_nodes
 from wellknown_acl import PUBLIC_ACL
 
@@ -25,11 +25,6 @@ from steps.cluster_test_base import ClusterTestBase
 
 logger = logging.getLogger("NeoLogger")
 OBJECT_NOT_FOUND_ERROR = "not found"
-
-# For some reason object uploaded via http gateway is not immediately available for downloading
-# Until this issue is resolved we are waiting for some time before attempting to read an object
-# TODO: remove after https://github.com/nspcc-dev/neofs-http-gw/issues/176 is fixed
-OBJECT_UPLOAD_DELAY = 10
 
 
 @allure.link(
@@ -92,7 +87,15 @@ class TestHttpGate(ClusterTestBase):
             )
 
         for oid, file_path in ((oid_simple, file_path_simple), (oid_large, file_path_large)):
-            self.get_object_and_verify_hashes(oid, file_path, self.wallet, cid)
+            get_object_and_verify_hashes(
+                oid=oid,
+                file_name=file_path,
+                wallet=self.wallet,
+                cid=cid,
+                shell=self.shell,
+                nodes=self.cluster.storage_nodes,
+                endpoint=self.cluster.default_http_gate_endpoint,
+            )
 
     @allure.link("https://github.com/nspcc-dev/neofs-http-gw#uploading", name="uploading")
     @allure.link("https://github.com/nspcc-dev/neofs-http-gw#downloading", name="downloading")
@@ -131,7 +134,15 @@ class TestHttpGate(ClusterTestBase):
             )
 
         for oid, file_path in ((oid_simple, file_path_simple), (oid_large, file_path_large)):
-            self.get_object_and_verify_hashes(oid, file_path, self.wallet, cid)
+            get_object_and_verify_hashes(
+                oid=oid,
+                file_name=file_path,
+                wallet=self.wallet,
+                cid=cid,
+                shell=self.shell,
+                nodes=self.cluster.storage_nodes,
+                endpoint=self.cluster.default_http_gate_endpoint,
+            )
 
     @allure.link(
         "https://github.com/nspcc-dev/neofs-http-gw#by-attributes", name="download by attributes"
@@ -169,7 +180,7 @@ class TestHttpGate(ClusterTestBase):
         file_path = generate_file(simple_object_size)
 
         with allure.step("Put objects using HTTP with attribute"):
-            headers = self._attr_into_header(attributes)
+            headers = attr_into_header(attributes)
             oid = upload_via_http_gate(
                 cid=cid,
                 path=file_path,
@@ -177,9 +188,13 @@ class TestHttpGate(ClusterTestBase):
                 endpoint=self.cluster.default_http_gate_endpoint,
             )
 
-        sleep(OBJECT_UPLOAD_DELAY)
-
-        self.get_object_by_attr_and_verify_hashes(oid, file_path, cid, attributes)
+        get_object_by_attr_and_verify_hashes(
+            oid=oid,
+            file_name=file_path,
+            cid=cid,
+            attrs=attributes,
+            endpoint=self.cluster.default_http_gate_endpoint,
+        )
 
     @allure.title("Test Expiration-Epoch in HTTP header")
     def test_expiration_epoch_in_http(self, simple_object_size):
@@ -222,8 +237,11 @@ class TestHttpGate(ClusterTestBase):
             wait_for_gc_pass_on_storage_nodes()
 
             for oid in expired_objects:
-                self.try_to_get_object_and_expect_error(
-                    cid=cid, oid=oid, error_pattern=OBJECT_NOT_FOUND_ERROR
+                try_to_get_object_and_expect_error(
+                    cid=cid,
+                    oid=oid,
+                    error_pattern=OBJECT_NOT_FOUND_ERROR,
+                    endpoint=self.cluster.default_http_gate_endpoint,
                 )
 
             with allure.step("Other objects can be get"):
@@ -259,8 +277,6 @@ class TestHttpGate(ClusterTestBase):
             headers=headers2,
             endpoint=self.cluster.default_http_gate_endpoint,
         )
-
-        sleep(OBJECT_UPLOAD_DELAY)
 
         dir_path = get_via_zip_http_gate(
             cid=cid, prefix=common_prefix, endpoint=self.cluster.default_http_gate_endpoint
@@ -299,12 +315,23 @@ class TestHttpGate(ClusterTestBase):
                 endpoint=self.cluster.default_http_gate_endpoint,
             )
 
-        self.get_object_and_verify_hashes(oid_gate, file_path, self.wallet, cid)
-        self.get_object_and_verify_hashes(
-            oid_curl,
-            file_path,
-            self.wallet,
-            cid,
+        get_object_and_verify_hashes(
+            oid=oid_gate,
+            file_name=file_path,
+            wallet=self.wallet,
+            cid=cid,
+            shell=self.shell,
+            nodes=self.cluster.storage_nodes,
+            endpoint=self.cluster.default_http_gate_endpoint,
+        )
+        get_object_and_verify_hashes(
+            oid=oid_curl,
+            file_name=file_path,
+            wallet=self.wallet,
+            cid=cid,
+            shell=self.shell,
+            nodes=self.cluster.storage_nodes,
+            endpoint=self.cluster.default_http_gate_endpoint,
             object_getter=get_via_http_curl,
         )
 
@@ -333,76 +360,13 @@ class TestHttpGate(ClusterTestBase):
             )
 
         for oid, file_path in ((oid_simple, file_path_simple), (oid_large, file_path_large)):
-            self.get_object_and_verify_hashes(
-                oid,
-                file_path,
-                self.wallet,
-                cid,
+            get_object_and_verify_hashes(
+                oid=oid,
+                file_name=file_path,
+                wallet=self.wallet,
+                cid=cid,
+                shell=self.shell,
+                nodes=self.cluster.storage_nodes,
+                endpoint=self.cluster.default_http_gate_endpoint,
                 object_getter=get_via_http_curl,
             )
-
-    @allure.step("Try to get object and expect error")
-    def try_to_get_object_and_expect_error(self, cid: str, oid: str, error_pattern: str) -> None:
-        try:
-            get_via_http_gate(cid=cid, oid=oid, endpoint=self.cluster.default_http_gate_endpoint)
-            raise AssertionError(f"Expected error on getting object with cid: {cid}")
-        except Exception as err:
-            match = error_pattern.casefold() in str(err).casefold()
-            assert match, f"Expected {err} to match {error_pattern}"
-
-    @allure.step("Verify object can be get using HTTP header attribute")
-    def get_object_by_attr_and_verify_hashes(
-        self, oid: str, file_name: str, cid: str, attrs: dict
-    ) -> None:
-        got_file_path_http = get_via_http_gate(
-            cid=cid, oid=oid, endpoint=self.cluster.default_http_gate_endpoint
-        )
-        got_file_path_http_attr = get_via_http_gate_by_attribute(
-            cid=cid, attribute=attrs, endpoint=self.cluster.default_http_gate_endpoint
-        )
-
-        TestHttpGate._assert_hashes_are_equal(
-            file_name, got_file_path_http, got_file_path_http_attr
-        )
-
-    @allure.step("Verify object can be get using HTTP")
-    def get_object_and_verify_hashes(
-        self, oid: str, file_name: str, wallet: str, cid: str, object_getter=None
-    ) -> None:
-        nodes = get_nodes_without_object(
-            wallet=wallet,
-            cid=cid,
-            oid=oid,
-            shell=self.shell,
-            nodes=self.cluster.storage_nodes,
-        )
-        random_node = random.choice(nodes)
-        object_getter = object_getter or get_via_http_gate
-
-        got_file_path = get_object(
-            wallet=wallet,
-            cid=cid,
-            oid=oid,
-            shell=self.shell,
-            endpoint=random_node.get_rpc_endpoint(),
-        )
-        got_file_path_http = object_getter(
-            cid=cid, oid=oid, endpoint=self.cluster.default_http_gate_endpoint
-        )
-
-        TestHttpGate._assert_hashes_are_equal(file_name, got_file_path, got_file_path_http)
-
-    @staticmethod
-    def _assert_hashes_are_equal(orig_file_name: str, got_file_1: str, got_file_2: str) -> None:
-        msg = "Expected hashes are equal for files {f1} and {f2}"
-        got_file_hash_http = get_file_hash(got_file_1)
-        assert get_file_hash(got_file_2) == got_file_hash_http, msg.format(
-            f1=got_file_2, f2=got_file_1
-        )
-        assert get_file_hash(orig_file_name) == got_file_hash_http, msg.format(
-            f1=orig_file_name, f2=got_file_1
-        )
-
-    @staticmethod
-    def _attr_into_header(attrs: dict) -> dict:
-        return {f"X-Attribute-{_key}": _value for _key, _value in attrs.items()}
