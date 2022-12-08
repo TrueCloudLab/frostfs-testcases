@@ -16,6 +16,7 @@ cffi==1.15.0
 chardet==4.0.0
 charset-normalizer==2.0.12
 coverage==6.3.3
+configobj==5.0.6
 docker==4.4.0
 docutils==0.17.1
 Events==0.4

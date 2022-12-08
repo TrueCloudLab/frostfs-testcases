@@ -62,6 +62,22 @@ class NodeBase:
             _ConfigAttributes.WALLET_PATH,
         )
 
+    def get_remote_wallet_path(self) -> str:
+        """
+        Returns node wallet file path located on remote host
+        """
+        return self._get_attribute(
+            _ConfigAttributes.WALLET_PATH,
+        )
+
+    def get_remote_config_path(self) -> str:
+        """
+        Returns node config file path located on remote host
+        """
+        return self._get_attribute(
+            _ConfigAttributes.CONFIG_PATH,
+        )
+
     def get_wallet_config_path(self):
         return self._get_attribute(
             _ConfigAttributes.LOCAL_WALLET_CONFIG,
@@ -317,6 +333,7 @@ class _ConfigAttributes:
     WALLET_PASSWORD = "wallet_password"
     WALLET_PATH = "wallet_path"
     WALLET_CONFIG = "wallet_config"
+    CONFIG_PATH = "config_path"
     LOCAL_WALLET_PATH = "local_wallet_path"
     LOCAL_WALLET_CONFIG = "local_config_path"
     RPC_ENDPOINT = "rpc_endpoint"
