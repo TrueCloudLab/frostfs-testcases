@@ -98,8 +98,7 @@ class TestObjectApiWithBearerToken(ClusterTestBase):
         request: FixtureRequest,
     ):
         allure.dynamic.title(
-            f"Check that objects can be deleted from any node using s3gate wallet with bearer "
-            f"token for {request.node.callspec.id}"
+            f"Object can be deleted from any node using s3gate wallet with bearer token for {request.node.callspec.id}"
         )
 
         s3_gate_wallet = self.cluster.s3gates[0]
@@ -135,8 +134,7 @@ class TestObjectApiWithBearerToken(ClusterTestBase):
         request: FixtureRequest,
     ):
         allure.dynamic.title(
-            "Check that objects can be deleted from any node using s3gate wallet with bearer "
-            f"token for {request.node.callspec.id}"
+            f"Object can be fetched from any node using s3gate wallet with bearer token for {request.node.callspec.id}"
         )
 
         s3_gate_wallet = self.cluster.s3gates[0]

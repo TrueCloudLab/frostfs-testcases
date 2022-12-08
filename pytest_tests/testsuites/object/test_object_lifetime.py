@@ -17,7 +17,7 @@ logger = logging.getLogger("NeoLogger")
 
 @pytest.mark.sanity
 @pytest.mark.grpc_api
-class ObjectApiLifetimeTest(ClusterTestBase):
+class TestObjectApiLifetime(ClusterTestBase):
     @allure.title("Test object life time")
     @pytest.mark.parametrize(
         "object_size",

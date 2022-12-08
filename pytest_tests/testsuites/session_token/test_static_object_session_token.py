@@ -20,6 +20,7 @@ from python_keywords.neofs_verbs import (
     put_object_to_random_node,
     search_object,
 )
+from test_control import expect_not_raises
 from wallet import WalletFile
 
 from helpers.storage_object_info import StorageObjectInfo
@@ -209,15 +210,16 @@ class TestObjectStaticSession(ClusterTestBase):
 
         for range_to_test in ranges_to_test:
             with allure.step(f"Check range {range_to_test}"):
-                method_under_test(
-                    user_wallet.path,
-                    storage_object.cid,
-                    storage_object.oid,
-                    shell=self.shell,
-                    endpoint=self.cluster.default_rpc_endpoint,
-                    session=static_sessions[verb],
-                    range_cut=range_to_test,
-                )
+                with expect_not_raises():
+                    method_under_test(
+                        user_wallet.path,
+                        storage_object.cid,
+                        storage_object.oid,
+                        shell=self.shell,
+                        endpoint=self.cluster.default_rpc_endpoint,
+                        session=static_sessions[verb],
+                        range_cut=range_to_test,
+                    )
 
     @allure.title("Validate static session with search operation")
     @pytest.mark.static_session
