@@ -72,7 +72,7 @@ def generate_ranges(file_size: int, max_object_size: int) -> list[(int, int)]:
 
         file_ranges_to_test.append((range_start, min(range_start + range_length, file_size)))
 
-    file_ranges_to_test.extend(STATIC_RANGES[file_size])
+    file_ranges_to_test.extend(STATIC_RANGES.get(file_size, []))
 
     return file_ranges_to_test
 

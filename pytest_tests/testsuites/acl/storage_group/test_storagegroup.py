@@ -101,6 +101,7 @@ class TestStorageGroup(ClusterTestBase):
             cid=cid,
             obj_list=objects,
             object_size=object_size,
+            max_object_size=max_object_size,
         )
 
     @allure.title("Test Storage Group in Public Container")
@@ -135,6 +136,7 @@ class TestStorageGroup(ClusterTestBase):
             cid=cid,
             obj_list=objects,
             object_size=object_size,
+            max_object_size=max_object_size,
         )
 
     @allure.title("Test Storage Group in Read-Only Container")
@@ -163,12 +165,14 @@ class TestStorageGroup(ClusterTestBase):
             cid=cid,
             obj_list=objects,
             object_size=object_size,
+            max_object_size=max_object_size,
         )
         self.storagegroup_operations_by_system_ro_container(
             wallet=self.main_wallet,
             cid=cid,
             obj_list=objects,
             object_size=object_size,
+            max_object_size=max_object_size,
         )
 
     @allure.title("Test Storage Group with Bearer Allow")
@@ -350,6 +354,7 @@ class TestStorageGroup(ClusterTestBase):
         cid: str,
         obj_list: list,
         object_size: int,
+        max_object_size: int,
     ):
         storage_group = put_storagegroup(
             self.shell, self.cluster.default_rpc_endpoint, owner_wallet, cid, obj_list
@@ -377,6 +382,7 @@ class TestStorageGroup(ClusterTestBase):
             gid=storage_group,
             obj_list=obj_list,
             object_size=object_size,
+            max_object_size=max_object_size,
         )
         with pytest.raises(Exception, match=OBJECT_ACCESS_DENIED):
             delete_storagegroup(
@@ -394,6 +400,7 @@ class TestStorageGroup(ClusterTestBase):
         cid: str,
         obj_list: list,
         object_size: int,
+        max_object_size: int,
     ):
         """
         In this func we create a Storage Group on Inner Ring's key behalf
@@ -450,6 +457,7 @@ class TestStorageGroup(ClusterTestBase):
             gid=storage_group,
             obj_list=obj_list,
             object_size=object_size,
+            max_object_size=max_object_size,
             wallet_config=ir_wallet_config,
         )
         with pytest.raises(Exception, match=OBJECT_ACCESS_DENIED):
