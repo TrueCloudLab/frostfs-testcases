@@ -28,7 +28,7 @@ class Test_http_object(ClusterTestBase):
         Test_http_object.wallet = default_wallet
 
     @allure.title("Test Put over gRPC, Get over HTTP")
-    def test_object_put_get_attributes(self):
+    def test_object_put_get_attributes(self, simple_object_size):
         """
         Test that object can be put using gRPC interface and get using HTTP.
 
@@ -56,7 +56,7 @@ class Test_http_object(ClusterTestBase):
             )
 
         # Generate file
-        file_path = generate_file()
+        file_path = generate_file(simple_object_size)
 
         # List of Key=Value attributes
         obj_key1 = "chapter1"
