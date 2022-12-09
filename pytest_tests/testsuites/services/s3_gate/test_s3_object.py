@@ -79,7 +79,7 @@ class TestS3GateObject(TestS3GateBase):
                 s3_gate_object.copy_object_s3(self.s3_client, bucket_1, file_name)
 
     @allure.title("Test S3: Copy version of object")
-    def test_s3_copy_version_object(self, two_buckets):
+    def test_s3_copy_version_object(self, two_buckets, simple_object_size):
         version_1_content = "Version 1"
         file_name_simple = generate_file_with_content(simple_object_size, content=version_1_content)
         obj_key = os.path.basename(file_name_simple)
@@ -349,7 +349,7 @@ class TestS3GateObject(TestS3GateBase):
             ), f"Expected object has versions: {version_to_save}"
 
     @allure.title("Test S3: Get versions of object")
-    def test_s3_get_versioning(self, bucket):
+    def test_s3_get_versioning(self, bucket, simple_object_size):
         version_1_content = "Version 1"
         version_2_content = "Version 2"
         file_name_simple = generate_file_with_content(simple_object_size, content=version_1_content)
