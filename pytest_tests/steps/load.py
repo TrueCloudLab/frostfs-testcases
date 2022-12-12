@@ -39,7 +39,9 @@ def start_stopped_nodes():
 
 
 @allure.title("Init s3 client")
-def init_s3_client(load_nodes: list, login: str, pkey: str, hosting: Hosting):
+def init_s3_client(
+    load_nodes: list, login: str, pkey: str, container_placement_policy: str, hosting: Hosting
+):
     service_configs = hosting.find_service_configs(STORAGE_NODE_SERVICE_NAME_REGEX)
     host = hosting.get_host_by_service(service_configs[0].name)
     wallet_path = service_configs[0].attributes["wallet_path"]
@@ -60,7 +62,7 @@ def init_s3_client(load_nodes: list, login: str, pkey: str, hosting: Hosting):
             peer=node_endpoint,
             bearer_rules=f"{path}/scenarios/files/rules.json",
             gate_public_key=public_key,
-            container_placement_policy="REP 1 IN X CBF 1 SELECT 1  FROM * AS X",
+            container_placement_policy=container_placement_policy,
             container_policy=f"{path}/scenarios/files/policy.json",
             wallet_password="",
         ).stdout

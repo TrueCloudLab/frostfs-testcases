@@ -17,6 +17,7 @@ from load import (
     stop_unused_nodes,
 )
 from load_params import (
+    CONTAINER_PLACEMENT_POLICY,
     CONTAINERS_COUNT,
     DELETERS,
     LOAD_NODE_SSH_PRIVATE_KEY_PATH,
@@ -57,6 +58,7 @@ class TestLoad(ClusterTestBase):
                 login=LOAD_NODE_SSH_USER,
                 pkey=LOAD_NODE_SSH_PRIVATE_KEY_PATH,
                 hosting=hosting,
+                container_placement_policy=CONTAINER_PLACEMENT_POLICY,
             )
 
     @pytest.mark.parametrize("obj_size, out_file", list(zip(OBJ_SIZE, OUT_FILE)))

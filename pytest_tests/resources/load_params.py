@@ -22,3 +22,6 @@ LOAD_TIME = os.getenv("LOAD_TIME", "200").split(",")
 LOAD_TYPE = os.getenv("LOAD_TYPE", "grpc").split(",")
 LOAD_NODES_COUNT = os.getenv("LOAD_NODES_COUNT", "1").split(",")
 STORAGE_NODE_COUNT = os.getenv("STORAGE_NODE_COUNT", "4").split(",")
+CONTAINER_PLACEMENT_POLICY = os.getenv(
+    "STORAGE_NODE_COUNT", "REP 1 IN X CBF 1 SELECT 1  FROM * AS X"
+)
