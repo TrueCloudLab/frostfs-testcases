@@ -88,15 +88,32 @@ class TestS3GateBase(ClusterTestBase):
     def delete_all_object_in_bucket(self, bucket):
         versioning_status = s3_gate_bucket.get_bucket_versioning_status(self.s3_client, bucket)
         if versioning_status == s3_gate_bucket.VersioningStatus.ENABLED.value:
-            # From versioned bucket we should delete all versions of all objects
+            # From versioned bucket we should delete all versions and delete markers of all objects
             objects_versions = s3_gate_object.list_objects_versions_s3(self.s3_client, bucket)
             if objects_versions:
-                s3_gate_object.delete_object_versions_s3(self.s3_client, bucket, objects_versions)
+                s3_gate_object.delete_object_versions_s3_without_dm(
+                    self.s3_client, bucket, objects_versions
+                )
+            objects_delete_markers = s3_gate_object.list_objects_delete_markers_s3(
+                self.s3_client, bucket
+            )
+            if objects_delete_markers:
+                s3_gate_object.delete_object_versions_s3_without_dm(
+                    self.s3_client, bucket, objects_delete_markers
+                )
+
         else:
             # From non-versioned bucket it's sufficient to delete objects by key
             objects = s3_gate_object.list_objects_s3(self.s3_client, bucket)
             if objects:
                 s3_gate_object.delete_objects_s3(self.s3_client, bucket, objects)
+            objects_delete_markers = s3_gate_object.list_objects_delete_markers_s3(
+                self.s3_client, bucket
+            )
+            if objects_delete_markers:
+                s3_gate_object.delete_object_versions_s3_without_dm(
+                    self.s3_client, bucket, objects_delete_markers
+                )
 
         # Delete the bucket itself
         s3_gate_bucket.delete_bucket_s3(self.s3_client, bucket)
