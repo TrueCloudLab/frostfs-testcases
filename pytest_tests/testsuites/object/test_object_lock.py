@@ -18,17 +18,17 @@ from grpc_responses import (
     OBJECT_NOT_FOUND,
 )
 from neofs_testlib.shell import Shell
+from node_management import drop_object
 from pytest import FixtureRequest
 from python_keywords.container import create_container
 from python_keywords.neofs_verbs import delete_object, head_object, lock_object
+from storage_policy import get_nodes_with_object
 from test_control import expect_not_raises, wait_for_success
 from utility import parse_time, wait_for_gc_pass_on_storage_nodes
 
-import steps
 from helpers.container import StorageContainer, StorageContainerInfo
 from helpers.storage_object_info import LockObjectInfo, StorageObjectInfo
 from helpers.wallet import WalletFactory, WalletFile
-from steps.cluster_test_base import ClusterTestBase
 from steps.storage_object import delete_objects
 
 logger = logging.getLogger("NeoLogger")
@@ -65,6 +65,9 @@ def locked_storage_object(
     cluster: Cluster,
     request: FixtureRequest,
 ):
+    """
+    Intention of this fixture is to provide storage object which is NOT expected to be deleted during test act phase
+    """
     with allure.step("Creating locked object"):
         current_epoch = ensure_fresh_epoch(client_shell, cluster)
         expiration_epoch = current_epoch + FIXTURE_LOCK_LIFETIME
@@ -117,7 +120,32 @@ def locked_storage_object(
 @pytest.mark.sanity
 @pytest.mark.grpc_object_lock
 class TestObjectLockWithGrpc(ClusterTestBase):
-    def get_storage_object_chunks(self, storage_object: StorageObjectInfo):
+    @pytest.fixture()
+    def new_locked_storage_object(
+        self, user_container: StorageContainer, request: FixtureRequest
+    ) -> StorageObjectInfo:
+        """
+        Intention of this fixture is to provide new storage object for tests which may delete or corrupt the object or it's complementary objects
+        So we need a new one each time we ask for it
+        """
+        with allure.step("Creating locked object"):
+            current_epoch = self.get_epoch()
+
+            storage_object = user_container.generate_object(
+                request.param, expire_at=current_epoch + FIXTURE_OBJECT_LIFETIME
+            )
+            lock_object(
+                storage_object.wallet_file_path,
+                storage_object.cid,
+                storage_object.oid,
+                self.shell,
+                self.cluster.default_rpc_endpoint,
+                lifetime=FIXTURE_LOCK_LIFETIME,
+            )
+
+        return storage_object
+
+    def get_storage_object_chunks(self, storage_object: StorageObjectInfo) -> list[str]:
         with allure.step(f"Get complex object chunks (f{storage_object.oid})"):
             split_object_id = get_link_object(
                 storage_object.wallet_file_path,
@@ -538,6 +566,83 @@ class TestObjectLockWithGrpc(ClusterTestBase):
                         self.shell,
                         self.cluster.default_rpc_endpoint,
                     )
+
+    @allure.title("Link object of locked complex object can be dropped")
+    @pytest.mark.grpc_control
+    @pytest.mark.parametrize(
+        "new_locked_storage_object",
+        # Only complex object is required
+        [pytest.lazy_fixture("complex_object_size")],
+        indirect=True,
+    )
+    def test_link_object_of_locked_complex_object_can_be_dropped(
+        self, new_locked_storage_object: StorageObjectInfo
+    ):
+        link_object_id = get_link_object(
+            new_locked_storage_object.wallet_file_path,
+            new_locked_storage_object.cid,
+            new_locked_storage_object.oid,
+            self.shell,
+            self.cluster.storage_nodes,
+        )
+
+        with allure.step(f"Drop link object with id {link_object_id} from nodes"):
+            nodes_with_object = get_nodes_with_object(
+                new_locked_storage_object.cid,
+                link_object_id,
+                shell=self.shell,
+                nodes=self.cluster.storage_nodes,
+            )
+            for node in nodes_with_object:
+                with expect_not_raises():
+                    drop_object(node, new_locked_storage_object.cid, link_object_id)
+
+    @allure.title("Chunks of locked complex object can be dropped")
+    @pytest.mark.grpc_control
+    @pytest.mark.parametrize(
+        "new_locked_storage_object",
+        # Only complex object is required
+        [pytest.lazy_fixture("complex_object_size")],
+        indirect=True,
+    )
+    def test_chunks_of_locked_complex_object_can_be_dropped(
+        self, new_locked_storage_object: StorageObjectInfo
+    ):
+        chunk_objects = self.get_storage_object_chunks(new_locked_storage_object)
+
+        for chunk_object_id in chunk_objects:
+            with allure.step(f"Drop chunk object with id {chunk_object_id} from nodes"):
+                nodes_with_object = get_nodes_with_object(
+                    new_locked_storage_object.cid,
+                    chunk_object_id,
+                    shell=self.shell,
+                    nodes=self.cluster.storage_nodes,
+                )
+                for node in nodes_with_object:
+                    with expect_not_raises():
+                        drop_object(node, new_locked_storage_object.cid, chunk_object_id)
+
+    @pytest.mark.grpc_control
+    @pytest.mark.parametrize(
+        "new_locked_storage_object",
+        [pytest.lazy_fixture("simple_object_size"), pytest.lazy_fixture("complex_object_size")],
+        ids=["simple object", "complex object"],
+        indirect=True,
+    )
+    def test_locked_object_can_be_dropped(
+        self, new_locked_storage_object: StorageObjectInfo, request: FixtureRequest
+    ):
+        allure.dynamic.title(f"Locked {request.node.callspec.id} can be dropped")
+        nodes_with_object = get_nodes_with_object(
+            new_locked_storage_object.cid,
+            new_locked_storage_object.oid,
+            shell=self.shell,
+            nodes=self.cluster.storage_nodes,
+        )
+
+        for node in nodes_with_object:
+            with expect_not_raises():
+                drop_object(node, new_locked_storage_object.cid, new_locked_storage_object.oid)
 
     @allure.title("Link object of complex object should also be protected from deletion")
     @pytest.mark.parametrize(
