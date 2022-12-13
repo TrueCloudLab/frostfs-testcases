@@ -429,7 +429,7 @@ class TestS3GateObject(TestS3GateBase):
                 bucket,
                 file_name,
                 version_id_2,
-                range=[0, int(complex_object_size / 3)],
+                range=[0, int(simple_object_size / 3)],
             )
             object_2_part_2 = s3_gate_object.get_object_s3(
                 self.s3_client,
@@ -443,7 +443,7 @@ class TestS3GateObject(TestS3GateBase):
                 bucket,
                 file_name,
                 version_id_2,
-                range=[2 * int(simple_object_size / 3) + 1, complex_object_size],
+                range=[2 * int(simple_object_size / 3) + 1, simple_object_size],
             )
             con_file_1 = concat_files([object_2_part_1, object_2_part_2, object_2_part_3])
             assert get_file_hash(con_file_1) == get_file_hash(
@@ -464,7 +464,7 @@ class TestS3GateObject(TestS3GateBase):
                 self.s3_client,
                 bucket,
                 file_name,
-                range=[2 * int(simple_object_size / 3) + 1, complex_object_size],
+                range=[2 * int(simple_object_size / 3) + 1, simple_object_size],
             )
             con_file = concat_files([object_3_part_1, object_3_part_2, object_3_part_3])
             assert get_file_hash(con_file) == get_file_hash(file_name_1), "Hashes must be the same"
