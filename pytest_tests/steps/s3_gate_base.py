@@ -46,13 +46,9 @@ class TestS3GateBase(ClusterTestBase):
         wallet = default_wallet
         s3_bearer_rules_file = f"{os.getcwd()}/robot/resources/files/s3_bearer_rules.json"
         policy = None if isinstance(request.param, str) else request.param[1]
-        (
-            cid,
-            bucket,
-            access_key_id,
-            secret_access_key,
-            owner_private_key,
-        ) = init_s3_credentials(wallet, cluster, s3_bearer_rules_file=s3_bearer_rules_file)
+        (cid, bucket, access_key_id, secret_access_key, owner_private_key,) = init_s3_credentials(
+            wallet, cluster, s3_bearer_rules_file=s3_bearer_rules_file, policy=policy
+        )
         containers_list = list_containers(
             wallet, shell=client_shell, endpoint=self.cluster.default_rpc_endpoint
         )
