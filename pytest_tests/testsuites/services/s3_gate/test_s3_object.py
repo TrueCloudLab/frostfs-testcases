@@ -788,10 +788,11 @@ class TestS3GateObject(TestS3GateBase):
             assert get_file_hash(file_path_7) == get_file_hash(object_7), "Hashes must be the same"
 
     @allure.title("Test S3: put object with lock-mode")
-    def test_s3_put_object_lock_mode(self, bucket, complex_object_size, simple_object_size):
+    def test_s3_put_object_lock_mode(self, complex_object_size, simple_object_size):
 
         file_path_1 = generate_file(complex_object_size)
         file_name = self.object_key_from_file_path(file_path_1)
+        bucket = s3_gate_bucket.create_bucket_s3(self.s3_client, True)
         set_bucket_versioning(self.s3_client, bucket, s3_gate_bucket.VersioningStatus.ENABLED)
 
         with allure.step(
