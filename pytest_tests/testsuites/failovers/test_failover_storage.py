@@ -87,7 +87,7 @@ class TestFailoverStorage(ClusterTestBase):
             )
             assert get_file_hash(source_file_path) == get_file_hash(got_file_path)
 
-        with allure.step(f"Return all hosts"):
+        with allure.step("Return all hosts"):
             return_stopped_hosts(self.cluster)
 
         with allure.step("Check object data is not corrupted"):
@@ -123,7 +123,7 @@ class TestFailoverStorage(ClusterTestBase):
             cid, oid, 2, shell=self.shell, nodes=self.cluster.storage_nodes
         )
         allure.attach(
-            "\n".join(nodes),
+            "\n".join([str(node) for node in nodes]),
             "Current nodes with object",
             allure.attachment_type.TEXT,
         )
@@ -151,7 +151,7 @@ class TestFailoverStorage(ClusterTestBase):
                         )
 
                     allure.attach(
-                        "\n".join(new_nodes),
+                        "\n".join([str(new_node) for new_node in new_nodes]),
                         f"Nodes with object after {node} fail",
                         allure.attachment_type.TEXT,
                     )
@@ -161,7 +161,7 @@ class TestFailoverStorage(ClusterTestBase):
                 cid, oid, 2, shell=self.shell, nodes=self.cluster.storage_nodes
             )
             allure.attach(
-                "\n".join(new_nodes),
+                "\n".join([str(new_node) for new_node in new_nodes]),
                 "Nodes with object after nodes fail",
                 allure.attachment_type.TEXT,
             )
