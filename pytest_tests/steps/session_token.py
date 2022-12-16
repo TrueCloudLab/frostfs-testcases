@@ -124,7 +124,7 @@ def generate_container_session_token(
     session = {
         "container": {
             "verb": verb.value,
-            "wildcard": cid is not None,
+            "wildcard": cid is None,
             **({"containerID": {"value": f"{encode_for_json(cid)}"}} if cid is not None else {}),
         },
     }
