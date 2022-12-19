@@ -5,8 +5,15 @@ import sys
 import allure
 import pytest
 from cluster import Cluster
+from complex_object_actions import get_complex_object_split_ranges
 from file_helper import generate_file, get_file_content, get_file_hash
-from grpc_responses import OUT_OF_RANGE
+from grpc_responses import (
+    INVALID_LENGTH_SPECIFIER,
+    INVALID_OFFSET_SPECIFIER,
+    INVALID_RANGE_OVERFLOW,
+    INVALID_RANGE_ZERO_LENGTH,
+    OUT_OF_RANGE,
+)
 from neofs_testlib.shell import Shell
 from pytest import FixtureRequest
 from python_keywords.container import create_container
@@ -43,36 +50,41 @@ RANGE_MAX_LEN = 500
 STATIC_RANGES = {}
 
 
-def generate_ranges(file_size: int, max_object_size: int) -> list[(int, int)]:
-    file_range_step = file_size / RANGES_COUNT
+def generate_ranges(
+    storage_object: StorageObjectInfo, max_object_size: int, shell: Shell, cluster: Cluster
+) -> list[(int, int)]:
+    file_range_step = storage_object.size / RANGES_COUNT
 
     file_ranges = []
     file_ranges_to_test = []
 
     for i in range(0, RANGES_COUNT):
-        file_ranges.append((int(file_range_step * i), int(file_range_step * (i + 1))))
+        file_ranges.append((int(file_range_step * i), int(file_range_step)))
 
     # For simple object we can read all file ranges without too much time for testing
-    if file_size < max_object_size:
+    if storage_object.size < max_object_size:
         file_ranges_to_test.extend(file_ranges)
     # For complex object we need to fetch multiple child objects from different nodes.
     else:
         assert (
-            file_size >= RANGE_MAX_LEN + max_object_size
-        ), f"Complex object size should be at least {max_object_size + RANGE_MAX_LEN}. Current: {file_size}"
-        file_ranges_to_test.append((RANGE_MAX_LEN, RANGE_MAX_LEN + max_object_size))
+            storage_object.size >= RANGE_MAX_LEN + max_object_size
+        ), f"Complex object size should be at least {max_object_size + RANGE_MAX_LEN}. Current: {storage_object.size}"
+        file_ranges_to_test.append((RANGE_MAX_LEN, max_object_size - RANGE_MAX_LEN))
+        file_ranges_to_test.extend(get_complex_object_split_ranges(storage_object, shell, cluster))
 
     # Special cases to read some bytes from start and some bytes from end of object
     file_ranges_to_test.append((0, RANGE_MIN_LEN))
-    file_ranges_to_test.append((file_size - RANGE_MIN_LEN, file_size))
+    file_ranges_to_test.append((storage_object.size - RANGE_MIN_LEN, RANGE_MIN_LEN))
 
-    for start, end in file_ranges:
+    for offset, length in file_ranges:
         range_length = random.randint(RANGE_MIN_LEN, RANGE_MAX_LEN)
-        range_start = random.randint(start, end)
+        range_start = random.randint(offset, offset + length)
 
-        file_ranges_to_test.append((range_start, min(range_start + range_length, file_size)))
+        file_ranges_to_test.append(
+            (range_start, min(range_length, storage_object.size - range_start))
+        )
 
-    file_ranges_to_test.extend(STATIC_RANGES.get(file_size, []))
+    file_ranges_to_test.extend(STATIC_RANGES.get(storage_object.size, []))
 
     return file_ranges_to_test
 
@@ -330,7 +342,7 @@ class TestObjectApi(ClusterTestBase):
         self, request: FixtureRequest, storage_objects: list[StorageObjectInfo], max_object_size
     ):
         """
-        Validate get_range_hash for object by common gRPC API
+        Validate get_range_hash for object by native gRPC API
         """
         allure.dynamic.title(
             f"Validate native get_range_hash object API for {request.node.callspec.id}"
@@ -341,11 +353,12 @@ class TestObjectApi(ClusterTestBase):
         oids = [storage_object.oid for storage_object in storage_objects[:2]]
         file_path = storage_objects[0].file_path
 
-        file_ranges_to_test = generate_ranges(storage_objects[0].size, max_object_size)
+        file_ranges_to_test = generate_ranges(
+            storage_objects[0], max_object_size, self.shell, self.cluster
+        )
         logging.info(f"Ranges used in test {file_ranges_to_test}")
 
-        for range_start, range_end in file_ranges_to_test:
-            range_len = range_end - range_start
+        for range_start, range_len in file_ranges_to_test:
             range_cut = f"{range_start}:{range_len}"
             with allure.step(f"Get range hash ({range_cut})"):
                 for oid in oids:
@@ -368,7 +381,7 @@ class TestObjectApi(ClusterTestBase):
         self, request: FixtureRequest, storage_objects: list[StorageObjectInfo], max_object_size
     ):
         """
-        Validate get_range for object by common gRPC API
+        Validate get_range for object by native gRPC API
         """
         allure.dynamic.title(f"Validate native get_range object API for {request.node.callspec.id}")
 
@@ -377,11 +390,12 @@ class TestObjectApi(ClusterTestBase):
         oids = [storage_object.oid for storage_object in storage_objects[:2]]
         file_path = storage_objects[0].file_path
 
-        file_ranges_to_test = generate_ranges(storage_objects[0].size, max_object_size)
+        file_ranges_to_test = generate_ranges(
+            storage_objects[0], max_object_size, self.shell, self.cluster
+        )
         logging.info(f"Ranges used in test {file_ranges_to_test}")
 
-        for range_start, range_end in file_ranges_to_test:
-            range_len = range_end - range_start
+        for range_start, range_len in file_ranges_to_test:
             range_cut = f"{range_start}:{range_len}"
             with allure.step(f"Get range ({range_cut})"):
                 for oid in oids:
@@ -409,7 +423,7 @@ class TestObjectApi(ClusterTestBase):
         storage_objects: list[StorageObjectInfo],
     ):
         """
-        Validate get_range negative for object by common gRPC API
+        Validate get_range negative for object by native gRPC API
         """
         allure.dynamic.title(
             f"Validate native get_range negative object API for {request.node.callspec.id}"
@@ -424,20 +438,30 @@ class TestObjectApi(ClusterTestBase):
             RANGE_MIN_LEN < file_size
         ), f"Incorrect test setup. File size ({file_size}) is less than RANGE_MIN_LEN ({RANGE_MIN_LEN})"
 
-        file_ranges_to_test = [
+        file_ranges_to_test: list[tuple(int, int, str)] = [
             # Offset is bigger than the file size, the length is small.
-            (file_size + 1, RANGE_MIN_LEN),
+            (file_size + 1, RANGE_MIN_LEN, OUT_OF_RANGE),
             # Offset is ok, but offset+length is too big.
-            (file_size - RANGE_MIN_LEN, RANGE_MIN_LEN * 2),
+            (file_size - RANGE_MIN_LEN, RANGE_MIN_LEN * 2, OUT_OF_RANGE),
             # Offset is ok, and length is very-very big (e.g. MaxUint64) so that offset+length is wrapped and still "valid".
-            (RANGE_MIN_LEN, sys.maxsize * 2 + 1),
+            (RANGE_MIN_LEN, sys.maxsize * 2 + 1, INVALID_RANGE_OVERFLOW),
+            # Length is zero
+            (10, 0, INVALID_RANGE_ZERO_LENGTH),
+            # Negative values
+            (-1, 1, INVALID_OFFSET_SPECIFIER),
+            (10, -5, INVALID_LENGTH_SPECIFIER),
         ]
 
-        for range_start, range_len in file_ranges_to_test:
+        for range_start, range_len, expected_error in file_ranges_to_test:
             range_cut = f"{range_start}:{range_len}"
+            expected_error = (
+                expected_error.format(range=range_cut)
+                if "{range}" in expected_error
+                else expected_error
+            )
             with allure.step(f"Get range ({range_cut})"):
                 for oid in oids:
-                    with pytest.raises(Exception, match=OUT_OF_RANGE):
+                    with pytest.raises(Exception, match=expected_error):
                         get_range(
                             wallet,
                             cid,
@@ -454,7 +478,7 @@ class TestObjectApi(ClusterTestBase):
         storage_objects: list[StorageObjectInfo],
     ):
         """
-        Validate get_range_hash negative for object by common gRPC API
+        Validate get_range_hash negative for object by native gRPC API
         """
         allure.dynamic.title(
             f"Validate native get_range_hash negative object API for {request.node.callspec.id}"
@@ -469,20 +493,30 @@ class TestObjectApi(ClusterTestBase):
             RANGE_MIN_LEN < file_size
         ), f"Incorrect test setup. File size ({file_size}) is less than RANGE_MIN_LEN ({RANGE_MIN_LEN})"
 
-        file_ranges_to_test = [
+        file_ranges_to_test: list[tuple(int, int, str)] = [
             # Offset is bigger than the file size, the length is small.
-            (file_size + 1, RANGE_MIN_LEN),
+            (file_size + 1, RANGE_MIN_LEN, OUT_OF_RANGE),
             # Offset is ok, but offset+length is too big.
-            (file_size - RANGE_MIN_LEN, RANGE_MIN_LEN * 2),
+            (file_size - RANGE_MIN_LEN, RANGE_MIN_LEN * 2, OUT_OF_RANGE),
             # Offset is ok, and length is very-very big (e.g. MaxUint64) so that offset+length is wrapped and still "valid".
-            (RANGE_MIN_LEN, sys.maxsize * 2 + 1),
+            (RANGE_MIN_LEN, sys.maxsize * 2 + 1, INVALID_RANGE_OVERFLOW),
+            # Length is zero
+            (10, 0, INVALID_RANGE_ZERO_LENGTH),
+            # Negative values
+            (-1, 1, INVALID_OFFSET_SPECIFIER),
+            (10, -5, INVALID_LENGTH_SPECIFIER),
         ]
 
-        for range_start, range_len in file_ranges_to_test:
+        for range_start, range_len, expected_error in file_ranges_to_test:
             range_cut = f"{range_start}:{range_len}"
-            with allure.step(f"Get range ({range_cut})"):
+            expected_error = (
+                expected_error.format(range=range_cut)
+                if "{range}" in expected_error
+                else expected_error
+            )
+            with allure.step(f"Get range hash ({range_cut})"):
                 for oid in oids:
-                    with pytest.raises(Exception, match=OUT_OF_RANGE):
+                    with pytest.raises(Exception, match=expected_error):
                         get_range_hash(
                             wallet,
                             cid,

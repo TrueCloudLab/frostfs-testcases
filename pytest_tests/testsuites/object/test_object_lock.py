@@ -6,7 +6,7 @@ import pytest
 from cluster import Cluster
 from cluster_test_base import ClusterTestBase
 from common import STORAGE_GC_TIME
-from complex_object_actions import get_link_object
+from complex_object_actions import get_link_object, get_storage_object_chunks
 from epoch import ensure_fresh_epoch, get_epoch, tick_epoch
 from grpc_responses import (
     LIFETIME_REQUIRED,
@@ -144,29 +144,6 @@ class TestObjectLockWithGrpc(ClusterTestBase):
             )
 
         return storage_object
-
-    def get_storage_object_chunks(self, storage_object: StorageObjectInfo) -> list[str]:
-        with allure.step(f"Get complex object chunks (f{storage_object.oid})"):
-            split_object_id = get_link_object(
-                storage_object.wallet_file_path,
-                storage_object.cid,
-                storage_object.oid,
-                self.shell,
-                self.cluster.storage_nodes,
-                is_direct=False,
-            )
-            head = head_object(
-                storage_object.wallet_file_path,
-                storage_object.cid,
-                split_object_id,
-                self.shell,
-                self.cluster.default_rpc_endpoint,
-            )
-
-            chunks_object_ids = []
-            if "split" in head["header"] and "children" in head["header"]["split"]:
-                chunks_object_ids = head["header"]["split"]["children"]
-            return chunks_object_ids
 
     @allure.title("Locked object should be protected from deletion")
     @pytest.mark.parametrize(
@@ -555,7 +532,9 @@ class TestObjectLockWithGrpc(ClusterTestBase):
         Complex object chunks should also be protected from deletion
         """
 
-        chunk_object_ids = self.get_storage_object_chunks(locked_storage_object)
+        chunk_object_ids = get_storage_object_chunks(
+            locked_storage_object, self.shell, self.cluster
+        )
         for chunk_object_id in chunk_object_ids:
             with allure.step(f"Try to delete chunk object {chunk_object_id}"):
                 with pytest.raises(Exception, match=OBJECT_IS_LOCKED):
@@ -608,7 +587,9 @@ class TestObjectLockWithGrpc(ClusterTestBase):
     def test_chunks_of_locked_complex_object_can_be_dropped(
         self, new_locked_storage_object: StorageObjectInfo
     ):
-        chunk_objects = self.get_storage_object_chunks(new_locked_storage_object)
+        chunk_objects = get_storage_object_chunks(
+            new_locked_storage_object, self.shell, self.cluster
+        )
 
         for chunk_object_id in chunk_objects:
             with allure.step(f"Drop chunk object with id {chunk_object_id} from nodes"):

@@ -11,15 +11,95 @@
 """
 
 import logging
-from typing import Optional
+from typing import Optional, Tuple
 
 import allure
 import neofs_verbs
-from cluster import StorageNode
+from cluster import Cluster, StorageNode
 from common import WALLET_CONFIG
 from neofs_testlib.shell import Shell
+from neofs_verbs import head_object
+from storage_object import StorageObjectInfo
 
 logger = logging.getLogger("NeoLogger")
+
+
+def get_storage_object_chunks(
+    storage_object: StorageObjectInfo, shell: Shell, cluster: Cluster
+) -> list[str]:
+    """
+    Get complex object split objects ids (no linker object)
+
+    Args:
+    storage_object: storage_object to get it's chunks
+    shell: client shell to do cmd requests
+    cluster: cluster object under test
+
+    Returns:
+    list of object ids of complex object chunks
+    """
+
+    with allure.step(f"Get complex object chunks (f{storage_object.oid})"):
+        split_object_id = get_link_object(
+            storage_object.wallet_file_path,
+            storage_object.cid,
+            storage_object.oid,
+            shell,
+            cluster.storage_nodes,
+            is_direct=False,
+        )
+        head = head_object(
+            storage_object.wallet_file_path,
+            storage_object.cid,
+            split_object_id,
+            shell,
+            cluster.default_rpc_endpoint,
+        )
+
+        chunks_object_ids = []
+        if "split" in head["header"] and "children" in head["header"]["split"]:
+            chunks_object_ids = head["header"]["split"]["children"]
+
+        return chunks_object_ids
+
+
+def get_complex_object_split_ranges(
+    storage_object: StorageObjectInfo, shell: Shell, cluster: Cluster
+) -> list[Tuple[int, int]]:
+
+    """
+    Get list of split ranges tuples (offset, length) of a complex object
+    For example if object size if 100 and max object size in system is 30
+    the returned list should be
+    [(0, 30), (30, 30), (60, 30), (90, 10)]
+
+    Args:
+    storage_object: storage_object to get it's chunks
+    shell: client shell to do cmd requests
+    cluster: cluster object under test
+
+    Returns:
+    list of object ids of complex object chunks
+    """
+
+    ranges: list = []
+    offset = 0
+    chunks_ids = get_storage_object_chunks(storage_object, shell, cluster)
+    for chunk_id in chunks_ids:
+        head = head_object(
+            storage_object.wallet_file_path,
+            storage_object.cid,
+            chunk_id,
+            shell,
+            cluster.default_rpc_endpoint,
+        )
+
+        length = int(head["header"]["payloadLength"])
+        ranges.append((offset, length))
+
+        offset = offset + length
+
+    return ranges
 
 
 @allure.step("Get Link Object")

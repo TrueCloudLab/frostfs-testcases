@@ -20,6 +20,10 @@ LOCK_NON_REGULAR_OBJECT = "code = 2051"
 LIFETIME_REQUIRED = "either expiration epoch of a lifetime is required"
 LOCK_OBJECT_REMOVAL = "lock object removal"
 LOCK_OBJECT_EXPIRATION = "lock object expiration: {expiration_epoch}; current: {current_epoch}"
+INVALID_RANGE_ZERO_LENGTH = "invalid '{range}' range: zero length"
+INVALID_RANGE_OVERFLOW = "invalid '{range}' range: uint64 overflow"
+INVALID_OFFSET_SPECIFIER = "invalid '{range}' range offset specifier"
+INVALID_LENGTH_SPECIFIER = "invalid '{range}' range length specifier"
 
 
 def error_matches_status(error: Exception, status_pattern: str) -> bool:
