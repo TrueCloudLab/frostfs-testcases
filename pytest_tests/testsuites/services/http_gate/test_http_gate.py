@@ -311,7 +311,6 @@ class TestHttpGate(ClusterTestBase):
             oid_curl = upload_via_http_gate_curl(
                 cid=cid,
                 filepath=file_path,
-                large_object=True,
                 endpoint=self.cluster.default_http_gate_endpoint,
             )
 
@@ -356,7 +355,9 @@ class TestHttpGate(ClusterTestBase):
                 cid=cid, filepath=file_path_simple, endpoint=self.cluster.default_http_gate_endpoint
             )
             oid_large = upload_via_http_gate_curl(
-                cid=cid, filepath=file_path_large, endpoint=self.cluster.default_http_gate_endpoint
+                cid=cid,
+                filepath=file_path_large,
+                endpoint=self.cluster.default_http_gate_endpoint,
             )
 
         for oid, file_path in ((oid_simple, file_path_simple), (oid_large, file_path_large)):

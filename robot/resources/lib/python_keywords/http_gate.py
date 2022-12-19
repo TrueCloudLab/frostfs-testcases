@@ -10,8 +10,10 @@ from urllib.parse import quote_plus
 
 import allure
 import requests
+from aws_cli_client import LONG_TIMEOUT
 from cli_helpers import _cmd_run
 from cluster import StorageNode
+from common import SIMPLE_OBJECT_SIZE
 from file_helper import get_file_hash
 from neofs_testlib.shell import Shell
 from python_keywords.neofs_verbs import get_object
@@ -159,9 +161,27 @@ def upload_via_http_gate(cid: str, path: str, endpoint: str, headers: dict = Non
     return resp.json().get("object_id")
 
 
+@allure.step("Check is the passed object large")
+def is_object_large(filepath: str) -> bool:
+    """
+    This function check passed file size and return True if file_size > SIMPLE_OBJECT_SIZE
+    filepath: File path to check
+    """
+    file_size = os.path.getsize(filepath)
+    logger.info(f"Size= {file_size}")
+    if file_size > int(SIMPLE_OBJECT_SIZE):
+        return True
+    else:
+        return False
+
+
 @allure.step("Upload via HTTP Gate using Curl")
 def upload_via_http_gate_curl(
-    cid: str, filepath: str, endpoint: str, large_object=False, headers: dict = None
+    cid: str,
+    filepath: str,
+    endpoint: str,
+    headers: list = None,
+    error_pattern: Optional[str] = None,
 ) -> str:
     """
     This function upload given object through HTTP gate using curl utility.
@@ -169,14 +189,33 @@ def upload_via_http_gate_curl(
     filepath: File path to upload
     headers: Object header
     endpoint: http gate endpoint
+    error_pattern: [optional] expected error message from the command
     """
     request = f"{endpoint}/upload/{cid}"
-    files = f"file=@{filepath};filename={os.path.basename(filepath)}"
-    cmd = f"curl -F '{files}' {request}"
+    attributes = ""
+    if headers:
+        # parse attributes
+        attributes = " ".join(headers)
+
+    large_object = is_object_large(filepath)
     if large_object:
+        # pre-clean
+        _cmd_run("rm pipe -f")
         files = f"file=@pipe;filename={os.path.basename(filepath)}"
-        cmd = f"mkfifo pipe;cat {filepath} > pipe & curl --no-buffer -F '{files}' {request}"
-    output = _cmd_run(cmd)
+        cmd = f"mkfifo pipe;cat {filepath} > pipe & curl --no-buffer -F '{files}' {attributes} {request}"
+        output = _cmd_run(cmd, LONG_TIMEOUT)
+        # clean up pipe
+        _cmd_run("rm pipe")
+    else:
+        files = f"file=@{filepath};filename={os.path.basename(filepath)}"
+        cmd = f"curl -F '{files}' {attributes} {request}"
+        output = _cmd_run(cmd)
+
+    if error_pattern:
+        match = error_pattern.casefold() in str(output).casefold()
+        assert match, f"Expected {output} to match {error_pattern}"
+        return ""
+
     oid_re = re.search(r'"object_id": "(.*)"', output)
     if not oid_re:
         raise AssertionError(f'Could not find "object_id" in {output}')
@@ -226,7 +265,6 @@ def get_object_by_attr_and_verify_hashes(
     got_file_path_http_attr = get_via_http_gate_by_attribute(
         cid=cid, attribute=attrs, endpoint=endpoint
     )
-
     assert_hashes_are_equal(file_name, got_file_path_http, got_file_path_http_attr)
 
 
@@ -240,14 +278,19 @@ def get_object_and_verify_hashes(
     endpoint: str,
     object_getter=None,
 ) -> None:
-    nodes = get_nodes_without_object(
+    nodes_list = get_nodes_without_object(
         wallet=wallet,
         cid=cid,
         oid=oid,
         shell=shell,
         nodes=nodes,
     )
-    random_node = random.choice(nodes)
+    # for some reason we can face with case when nodes_list is empty due to object resides in all nodes
+    if nodes_list is None:
+        random_node = random.choice(nodes)
+    else:
+        random_node = random.choice(nodes_list)
+
     object_getter = object_getter or get_via_http_gate
 
     got_file_path = get_object(
@@ -273,6 +316,17 @@ def assert_hashes_are_equal(orig_file_name: str, got_file_1: str, got_file_2: st
 
 def attr_into_header(attrs: dict) -> dict:
     return {f"X-Attribute-{_key}": _value for _key, _value in attrs.items()}
+
+
+@allure.step(
+    "Convert each attribute (Key=Value) to the following format: -H 'X-Attribute-Key: Value'"
+)
+def attr_into_str_header_curl(attrs: dict) -> list:
+    headers = []
+    for k, v in attrs.items():
+        headers.append(f"-H 'X-Attribute-{k}: {v}'")
+    logger.info(f"[List of Attrs for curl:] {headers}")
+    return headers
 
 
 @allure.step(
