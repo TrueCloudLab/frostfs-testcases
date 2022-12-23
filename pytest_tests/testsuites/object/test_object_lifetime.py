@@ -49,7 +49,7 @@ class TestObjectApiLifetime(ClusterTestBase):
 
         with allure.step("Tick two epochs"):
             for _ in range(2):
-                tick_epoch(self.shell, self.cluster)
+                self.tick_epoch()
 
         # Wait for GC, because object with expiration is counted as alive until GC removes it
         wait_for_gc_pass_on_storage_nodes()

@@ -99,7 +99,7 @@ class TestS3Gate(TestS3GateBase):
 
         with allure.step(f"Delete bucket {bucket_1}"):
             s3_gate_bucket.delete_bucket_s3(self.s3_client, bucket_1)
-            tick_epoch(self.shell, self.cluster)
+            self.tick_epoch()
 
         with allure.step(f"Check bucket {bucket_1} deleted"):
             with pytest.raises(Exception, match=r".*Not Found.*"):

@@ -204,7 +204,7 @@ class Test_http_headers(ClusterTestBase):
                 shell=self.shell,
                 endpoint=self.cluster.default_rpc_endpoint,
             )
-            tick_epoch(self.shell, self.cluster)
+            self.tick_epoch()
             wait_for_container_deletion(
                 self.wallet,
                 storage_object_1.cid,

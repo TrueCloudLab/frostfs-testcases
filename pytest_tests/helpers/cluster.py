@@ -122,7 +122,7 @@ class S3Gate(NodeBase):
     """
 
     def get_endpoint(self) -> str:
-        return self._get_attribute(_ConfigAttributes.ENDPOINT)
+        return self._get_attribute(_ConfigAttributes.ENDPOINT_DATA)
 
     @property
     def label(self) -> str:
@@ -135,7 +135,7 @@ class HTTPGate(NodeBase):
     """
 
     def get_endpoint(self) -> str:
-        return self._get_attribute(_ConfigAttributes.ENDPOINT)
+        return self._get_attribute(_ConfigAttributes.ENDPOINT_DATA)
 
     @property
     def label(self) -> str:
@@ -158,7 +158,7 @@ class MorphChain(NodeBase):
         self.rpc_client = RPCClient(self.get_endpoint())
 
     def get_endpoint(self) -> str:
-        return self._get_attribute(_ConfigAttributes.ENDPOINT)
+        return self._get_attribute(_ConfigAttributes.ENDPOINT_INTERNAL)
 
     @property
     def label(self) -> str:
@@ -181,7 +181,7 @@ class MainChain(NodeBase):
         self.rpc_client = RPCClient(self.get_endpoint())
 
     def get_endpoint(self) -> str:
-        return self._get_attribute(_ConfigAttributes.ENDPOINT)
+        return self._get_attribute(_ConfigAttributes.ENDPOINT_INTERNAL)
 
     @property
     def label(self) -> str:
@@ -199,7 +199,7 @@ class StorageNode(NodeBase):
     """
 
     def get_rpc_endpoint(self) -> str:
-        return self._get_attribute(_ConfigAttributes.RPC_ENDPOINT)
+        return self._get_attribute(_ConfigAttributes.ENDPOINT_DATA)
 
     def get_control_endpoint(self) -> str:
         return self._get_attribute(_ConfigAttributes.CONTROL_ENDPOINT)
@@ -331,9 +331,16 @@ class Cluster:
     def get_random_storage_rpc_endpoint(self) -> str:
         return random.choice(self.get_storage_rpc_endpoints())
 
+    def get_random_storage_rpc_endpoint_mgmt(self) -> str:
+        return random.choice(self.get_storage_rpc_endpoints_mgmt())
+
     def get_storage_rpc_endpoints(self) -> list[str]:
         nodes = self.storage_nodes
         return [node.get_rpc_endpoint() for node in nodes]
+
+    def get_storage_rpc_endpoints_mgmt(self) -> list[str]:
+        nodes = self.storage_nodes
+        return [node.get_rpc_endpoint_mgmt() for node in nodes]
 
     def get_morph_endpoints(self) -> list[str]:
         nodes = self.morph_chain_nodes
@@ -356,7 +363,7 @@ class _ConfigAttributes:
     CONFIG_PATH = "config_path"
     LOCAL_WALLET_PATH = "local_wallet_path"
     LOCAL_WALLET_CONFIG = "local_config_path"
-    RPC_ENDPOINT = "rpc_endpoint"
-    ENDPOINT = "endpoint"
+    ENDPOINT_DATA = "endpoint_data0"
+    ENDPOINT_INTERNAL = "endpoint_internal0"
     CONTROL_ENDPOINT = "control_endpoint"
     UN_LOCODE = "un_locode"

@@ -81,7 +81,7 @@ class TestContainer(ClusterTestBase):
             delete_container(
                 wallet, cid, shell=self.shell, endpoint=self.cluster.default_rpc_endpoint
             )
-            tick_epoch(self.shell, self.cluster)
+            self.tick_epoch()
             wait_for_container_deletion(
                 wallet, cid, shell=self.shell, endpoint=self.cluster.default_rpc_endpoint
             )
@@ -121,7 +121,7 @@ class TestContainer(ClusterTestBase):
                 delete_container(
                     wallet, cid, shell=self.shell, endpoint=self.cluster.default_rpc_endpoint
                 )
-            tick_epoch(self.shell, self.cluster)
+            self.tick_epoch()
             wait_for_container_deletion(
                 wallet, cid, shell=self.shell, endpoint=self.cluster.default_rpc_endpoint
             )

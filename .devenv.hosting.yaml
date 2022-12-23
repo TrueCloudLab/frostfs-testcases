@@ -11,7 +11,7 @@ hosts:
       local_wallet_path: ../neofs-dev-env/services/storage/wallet01.json
       wallet_password: ""
       volume_name: storage_storage_s01
-      rpc_endpoint: s01.neofs.devenv:8080
+      endpoint_data0: s01.neofs.devenv:8080
       control_endpoint: s01.neofs.devenv:8081
       un_locode: "RU MOW"
   - name: s02
@@ -23,7 +23,7 @@ hosts:
       local_wallet_path: ../neofs-dev-env/services/storage/wallet02.json
       wallet_password: ""
       volume_name: storage_storage_s02
-      rpc_endpoint: s02.neofs.devenv:8080
+      endpoint_data0: s02.neofs.devenv:8080
       control_endpoint: s02.neofs.devenv:8081
       un_locode: "RU LED"
   - name: s03
@@ -35,7 +35,7 @@ hosts:
       local_wallet_path: ../neofs-dev-env/services/storage/wallet03.json
       wallet_password: ""
       volume_name: storage_storage_s03
-      rpc_endpoint: s03.neofs.devenv:8080
+      endpoint_data0: s03.neofs.devenv:8080
       control_endpoint: s03.neofs.devenv:8081
       un_locode: "SE STO"
   - name: s04
@@ -47,7 +47,7 @@ hosts:
       local_wallet_path: ../neofs-dev-env/services/storage/wallet04.json
       wallet_password: ""
       volume_name: storage_storage_s04
-      rpc_endpoint: s04.neofs.devenv:8080
+      endpoint_data0: s04.neofs.devenv:8080
       control_endpoint: s04.neofs.devenv:8081
       un_locode: "FI HEL"
   - name: s3-gate01
@@ -58,7 +58,7 @@ hosts:
       local_config_path: ./TemporaryDir/password-s3.yml
       local_wallet_path: ../neofs-dev-env/services/s3_gate/wallet.json
       wallet_password: "s3"
-      endpoint: https://s3.neofs.devenv:8080
+      endpoint_data0: https://s3.neofs.devenv:8080
   - name: http-gate01
     attributes:
       container_name: http_gate
@@ -67,7 +67,7 @@ hosts:
       local_config_path: ./TemporaryDir/password-other.yml
       local_wallet_path: ../neofs-dev-env/services/http_gate/wallet.json
       wallet_password: "one"
-      endpoint: http://http.neofs.devenv
+      endpoint_data0: http://http.neofs.devenv
   - name: ir01
     attributes:
       container_name: ir01
@@ -84,7 +84,7 @@ hosts:
       local_config_path: ./TemporaryDir/password-other.yml
       local_wallet_path: ../neofs-dev-env/services/morph_chain/node-wallet.json
       wallet_password: "one"
-      endpoint: http://morph-chain.neofs.devenv:30333
+      endpoint_internal0: http://morph-chain.neofs.devenv:30333
   - name: main-chain01
     attributes:
       container_name: main_chain
@@ -93,7 +93,7 @@ hosts:
       local_config_path: ./TemporaryDir/password-other.yml
       local_wallet_path: ../neofs-dev-env/services/chain/node-wallet.json
       wallet_password: "one"
-      endpoint: http://main-chain.neofs.devenv:30333
+      endpoint_internal0: http://main-chain.neofs.devenv:30333
   - name: coredns01
     attributes:
         container_name: coredns
