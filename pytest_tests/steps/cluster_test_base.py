@@ -1,3 +1,4 @@
+import allure
 import epoch
 import pytest
 from cluster import Cluster
@@ -14,6 +15,11 @@ class ClusterTestBase:
         ClusterTestBase.shell = client_shell
         ClusterTestBase.cluster = cluster
         yield
+
+    @allure.title("Tick {epochs_to_tick} epochs")
+    def tick_epochs(self, epochs_to_tick: int):
+        for _ in range(epochs_to_tick):
+            self.tick_epoch()
 
     def tick_epoch(self):
         epoch.tick_epoch(self.shell, self.cluster)

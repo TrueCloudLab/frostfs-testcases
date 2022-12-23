@@ -297,7 +297,7 @@ class TestObjectLockWithGrpc(ClusterTestBase):
                 storage_object.oid,
                 self.shell,
                 self.cluster.default_rpc_endpoint,
-                lifetime=3,
+                lifetime=2,
             )
             lock_object(
                 storage_object.wallet_file_path,
@@ -305,12 +305,11 @@ class TestObjectLockWithGrpc(ClusterTestBase):
                 storage_object.oid,
                 self.shell,
                 self.cluster.default_rpc_endpoint,
-                expire_at=current_epoch + 3,
+                expire_at=current_epoch + 2,
             )
 
         with allure.step("Check object is not deleted at expiration time"):
-            self.tick_epoch()
-            self.tick_epoch()
+            self.tick_epochs(2)
             # Must wait to ensure object is not deleted
             wait_for_gc_pass_on_storage_nodes()
             with expect_not_raises():
@@ -452,7 +451,7 @@ class TestObjectLockWithGrpc(ClusterTestBase):
         )
 
         current_epoch = self.ensure_fresh_epoch()
-        storage_object = user_container.generate_object(object_size, expire_at=current_epoch + 1)
+        storage_object = user_container.generate_object(object_size, expire_at=current_epoch + 5)
 
         lock_object(
             storage_object.wallet_file_path,
@@ -463,7 +462,7 @@ class TestObjectLockWithGrpc(ClusterTestBase):
             lifetime=1,
         )
 
-        self.tick_epoch()
+        self.tick_epochs(2)
         with expect_not_raises():
             delete_object(
                 storage_object.wallet_file_path,
@@ -506,7 +505,7 @@ class TestObjectLockWithGrpc(ClusterTestBase):
             expire_at=current_epoch + 1,
         )
 
-        self.tick_epoch()
+        self.tick_epochs(2)
 
         with expect_not_raises():
             delete_object(
