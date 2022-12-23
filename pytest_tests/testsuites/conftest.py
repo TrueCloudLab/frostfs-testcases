@@ -115,8 +115,11 @@ def wallet_factory(temp_directory: str, client_shell: Shell, cluster: Cluster) -
 
 
 @pytest.fixture(scope="session")
-def cluster(hosting: Hosting) -> Cluster:
-    yield Cluster(hosting)
+def cluster(temp_directory: str, hosting: Hosting) -> Cluster:
+    cluster = Cluster(hosting)
+    if cluster.is_local_devevn():
+        cluster.create_wallet_configs(hosting)
+    yield cluster
 
 
 @pytest.fixture(scope="session", autouse=True)

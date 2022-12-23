@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Any
 
 import data_formatters
+import yaml
 from neofs_testlib.blockchain import RPCClient
 from neofs_testlib.hosting import Host, Hosting
 from neofs_testlib.hosting.config import ServiceConfig
@@ -236,6 +237,25 @@ class Cluster:
     @property
     def hosting(self) -> Hosting:
         return self._hosting
+
+    def _create_wallet_config(self, service: ServiceConfig) -> None:
+        wallet_path = service.attributes[_ConfigAttributes.LOCAL_WALLET_CONFIG]
+        wallet_password = service.attributes[_ConfigAttributes.WALLET_PASSWORD]
+        with open(wallet_path, "w") as file:
+            yaml.dump({"password": wallet_password}, file)
+
+    def create_wallet_configs(self, hosting: Hosting) -> None:
+        configs = hosting.find_service_configs(".*")
+        for config in configs:
+            if _ConfigAttributes.LOCAL_WALLET_CONFIG in config.attributes:
+                self._create_wallet_config(config)
+
+    def is_local_devevn(self) -> bool:
+        if len(self.hosting.hosts) == 1:
+            host = self.hosting.hosts[0]
+            if host.config.address == "localhost" and host.config.plugin_name == "docker":
+                return True
+        return False
 
     @property
     def storage_nodes(self) -> list[StorageNode]:

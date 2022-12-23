@@ -7,6 +7,8 @@ hosts:
       container_name: s01
       config_path: ../neofs-dev-env/services/storage/.storage.env
       wallet_path: ../neofs-dev-env/services/storage/wallet01.json
+      local_config_path: ./TemporaryDir/empty-password.yml
+      local_wallet_path: ../neofs-dev-env/services/storage/wallet01.json
       wallet_password: ""
       volume_name: storage_storage_s01
       rpc_endpoint: s01.neofs.devenv:8080
@@ -17,6 +19,8 @@ hosts:
       container_name: s02
       config_path: ../neofs-dev-env/services/storage/.storage.env
       wallet_path: ../neofs-dev-env/services/storage/wallet02.json
+      local_config_path: ./TemporaryDir/empty-password.yml
+      local_wallet_path: ../neofs-dev-env/services/storage/wallet02.json
       wallet_password: ""
       volume_name: storage_storage_s02
       rpc_endpoint: s02.neofs.devenv:8080
@@ -27,6 +31,8 @@ hosts:
       container_name: s03
       config_path: ../neofs-dev-env/services/storage/.storage.env
       wallet_path: ../neofs-dev-env/services/storage/wallet03.json
+      local_config_path: ./TemporaryDir/empty-password.yml
+      local_wallet_path: ../neofs-dev-env/services/storage/wallet03.json
       wallet_password: ""
       volume_name: storage_storage_s03
       rpc_endpoint: s03.neofs.devenv:8080
@@ -37,6 +43,8 @@ hosts:
       container_name: s04
       config_path: ../neofs-dev-env/services/storage/.storage.env
       wallet_path: ../neofs-dev-env/services/storage/wallet04.json
+      local_config_path: ./TemporaryDir/empty-password.yml
+      local_wallet_path: ../neofs-dev-env/services/storage/wallet04.json
       wallet_password: ""
       volume_name: storage_storage_s04
       rpc_endpoint: s04.neofs.devenv:8080
@@ -47,6 +55,8 @@ hosts:
       container_name: s3_gate
       config_path: ../neofs-dev-env/services/s3_gate/.s3.env
       wallet_path: ../neofs-dev-env/services/s3_gate/wallet.json
+      local_config_path: ./TemporaryDir/password-s3.yml
+      local_wallet_path: ../neofs-dev-env/services/s3_gate/wallet.json
       wallet_password: "s3"
       endpoint: https://s3.neofs.devenv:8080
   - name: http-gate01
@@ -54,6 +64,8 @@ hosts:
       container_name: http_gate
       config_path: ../neofs-dev-env/services/http_gate/.http.env
       wallet_path: ../neofs-dev-env/services/http_gate/wallet.json
+      local_config_path: ./TemporaryDir/password-other.yml
+      local_wallet_path: ../neofs-dev-env/services/http_gate/wallet.json
       wallet_password: "one"
       endpoint: http://http.neofs.devenv
   - name: ir01
@@ -61,12 +73,16 @@ hosts:
       container_name: ir01
       config_path: ../neofs-dev-env/services/ir/.ir.env
       wallet_path: ../neofs-dev-env/services/ir/az.json
+      local_config_path: ./TemporaryDir/password-other.yml
+      local_wallet_path: ../neofs-dev-env/services/ir/az.json
       wallet_password: "one"
   - name: morph-chain01
     attributes:
       container_name: morph_chain
       config_path: ../neofs-dev-env/services/morph_chain/protocol.privnet.yml
       wallet_path: ../neofs-dev-env/services/morph_chain/node-wallet.json
+      local_config_path: ./TemporaryDir/password-other.yml
+      local_wallet_path: ../neofs-dev-env/services/morph_chain/node-wallet.json
       wallet_password: "one"
       endpoint: http://morph-chain.neofs.devenv:30333
   - name: main-chain01
@@ -74,6 +90,8 @@ hosts:
       container_name: main_chain
       config_path: ../neofs-dev-env/services/chain/protocol.privnet.yml
       wallet_path: ../neofs-dev-env/services/chain/node-wallet.json
+      local_config_path: ./TemporaryDir/password-other.yml
+      local_wallet_path: ../neofs-dev-env/services/chain/node-wallet.json
       wallet_password: "one"
       endpoint: http://main-chain.neofs.devenv:30333
   - name: coredns01
