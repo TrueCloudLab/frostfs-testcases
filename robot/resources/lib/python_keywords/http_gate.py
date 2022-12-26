@@ -286,10 +286,10 @@ def get_object_and_verify_hashes(
         nodes=nodes,
     )
     # for some reason we can face with case when nodes_list is empty due to object resides in all nodes
-    if nodes_list is None:
-        random_node = random.choice(nodes)
-    else:
+    if nodes_list:
         random_node = random.choice(nodes_list)
+    else:
+        random_node = random.choice(nodes)
 
     object_getter = object_getter or get_via_http_gate
 
