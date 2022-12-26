@@ -178,6 +178,7 @@ def delete_container(
     endpoint: str,
     force: bool = False,
     session_token: Optional[str] = None,
+    await_mode: bool = False,
 ) -> None:
     """
     A wrapper for `neofs-cli container delete` call.
@@ -193,7 +194,12 @@ def delete_container(
 
     cli = NeofsCli(shell, NEOFS_CLI_EXEC, WALLET_CONFIG)
     cli.container.delete(
-        wallet=wallet, cid=cid, rpc_endpoint=endpoint, force=force, session=session_token
+        wallet=wallet,
+        cid=cid,
+        rpc_endpoint=endpoint,
+        force=force,
+        session=session_token,
+        await_mode=await_mode,
     )
 
 

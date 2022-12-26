@@ -25,6 +25,7 @@ from steps.cluster_test_base import ClusterTestBase
 from steps.session_token import ContainerVerb, get_container_signed_token
 
 
+@pytest.mark.static_session_container
 class TestSessionTokenContainer(ClusterTestBase):
     @pytest.fixture(scope="module")
     def static_sessions(
@@ -136,6 +137,7 @@ class TestSessionTokenContainer(ClusterTestBase):
                 session_token=static_sessions[ContainerVerb.DELETE],
                 shell=self.shell,
                 endpoint=self.cluster.default_rpc_endpoint,
+                await_mode=True,
             )
 
         assert cid not in list_containers(
