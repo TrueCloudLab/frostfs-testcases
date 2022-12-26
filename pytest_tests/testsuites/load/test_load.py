@@ -52,7 +52,7 @@ class TestLoad(ClusterTestBase):
 
     @pytest.fixture(scope="session", autouse=True)
     def init_s3_client(self, hosting: Hosting):
-        if "s3" in LOAD_TYPE.lower():
+        if "s3" in list(map(lambda x: x.lower(), LOAD_TYPE)):
             init_s3_client(
                 load_nodes=LOAD_NODES,
                 login=LOAD_NODE_SSH_USER,

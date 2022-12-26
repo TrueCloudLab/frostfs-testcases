@@ -47,7 +47,7 @@ def init_s3_client(
     wallet_path = service_configs[0].attributes["wallet_path"]
     neogo_cli_config = host.get_cli_config("neo-go")
     neogo_wallet = NeoGo(shell=host.get_shell(), neo_go_exec_path=neogo_cli_config.exec_path).wallet
-    dump_keys_output = neogo_wallet.dump_keys(wallet_config=wallet_path).stdout
+    dump_keys_output = neogo_wallet.dump_keys(wallet=wallet_path, wallet_config=None).stdout
     public_key = str(re.search(r":\n(?P<public_key>.*)", dump_keys_output).group("public_key"))
     node_endpoint = service_configs[0].attributes["rpc_endpoint"]
     # prompt_pattern doesn't work at the moment
