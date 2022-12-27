@@ -278,6 +278,7 @@ def get_object_and_verify_hashes(
     endpoint: str,
     object_getter=None,
 ) -> None:
+
     nodes_list = get_nodes_without_object(
         wallet=wallet,
         cid=cid,
@@ -286,7 +287,7 @@ def get_object_and_verify_hashes(
         nodes=nodes,
     )
     # for some reason we can face with case when nodes_list is empty due to object resides in all nodes
-    if nodes_list is None:
+    if nodes_list:
         random_node = random.choice(nodes)
     else:
         random_node = random.choice(nodes_list)
