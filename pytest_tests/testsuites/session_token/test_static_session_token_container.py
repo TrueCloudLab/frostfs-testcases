@@ -75,7 +75,6 @@ class TestSessionTokenContainer(ClusterTestBase):
             owner_wallet.path, shell=self.shell, endpoint=self.cluster.default_rpc_endpoint
         )
 
-    @pytest.mark.skip("Failed with timeout")
     def test_static_session_token_container_create_with_other_verb(
         self,
         user_wallet: WalletFile,
@@ -95,7 +94,6 @@ class TestSessionTokenContainer(ClusterTestBase):
                         wait_for_creation=False,
                     )
 
-    @pytest.mark.skip("Failed with timeout")
     def test_static_session_token_container_create_with_other_wallet(
         self,
         stranger_wallet: WalletFile,
