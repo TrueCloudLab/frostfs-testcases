@@ -268,7 +268,7 @@ def default_wallet(client_shell: Shell, temp_directory: str, cluster: Cluster):
 
 @allure.title("Check logs for OOM and PANIC entries in {logs_dir}")
 def check_logs(logs_dir: str):
-    problem_pattern = r"\Wpanic\W|\Woom\W"
+    problem_pattern = r"\Wpanic\W|\Woom\W|\Wtoo many open files\W"
 
     log_file_paths = []
     for directory_path, _, file_names in os.walk(logs_dir):
