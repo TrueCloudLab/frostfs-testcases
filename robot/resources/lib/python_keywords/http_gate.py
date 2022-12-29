@@ -1,3 +1,4 @@
+import base64
 import logging
 import os
 import random
@@ -18,8 +19,6 @@ from file_helper import get_file_hash
 from neofs_testlib.shell import Shell
 from python_keywords.neofs_verbs import get_object
 from python_keywords.storage_policy import get_nodes_without_object
-
-from pytest_tests.steps.cluster_test_base import ClusterTestBase
 
 logger = logging.getLogger("NeoLogger")
 
@@ -288,9 +287,9 @@ def get_object_and_verify_hashes(
     )
     # for some reason we can face with case when nodes_list is empty due to object resides in all nodes
     if nodes_list:
-        random_node = random.choice(nodes)
-    else:
         random_node = random.choice(nodes_list)
+    else:
+        random_node = random.choice(nodes)
 
     object_getter = object_getter or get_via_http_gate
 
