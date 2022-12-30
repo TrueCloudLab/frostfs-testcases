@@ -59,7 +59,9 @@ class Test_http_system_header(ClusterTestBase):
             endpoint=self.cluster.default_rpc_endpoint,
             shell=self.shell,
         )
-        return net_info["epoch_duration"]
+        epoch_duration_in_blocks = net_info["epoch_duration"]
+        time_per_block = net_info["time_per_block"]
+        return int(epoch_duration_in_blocks * time_per_block)
 
     @allure.title("Return N-epoch count in minutes")
     def epoch_count_into_mins(self, epoch_duration: int, epoch: int) -> str:
