@@ -16,8 +16,8 @@ from cli_helpers import _cmd_run
 from cluster import StorageNode
 from common import SIMPLE_OBJECT_SIZE
 from file_helper import get_file_hash
-from neofs_testlib.shell import Shell
-from python_keywords.neofs_verbs import get_object
+from frostfs_testlib.shell import Shell
+from python_keywords.frostfs_verbs import get_object
 from python_keywords.storage_policy import get_nodes_without_object
 
 logger = logging.getLogger("NeoLogger")

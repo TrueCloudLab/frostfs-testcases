@@ -8,6 +8,7 @@ from cluster_test_base import ClusterTestBase
 from common import STORAGE_GC_TIME
 from complex_object_actions import get_link_object, get_storage_object_chunks
 from epoch import ensure_fresh_epoch, get_epoch, tick_epoch
+from frostfs_testlib.shell import Shell
 from grpc_responses import (
     LIFETIME_REQUIRED,
     LOCK_NON_REGULAR_OBJECT,
@@ -17,11 +18,10 @@ from grpc_responses import (
     OBJECT_IS_LOCKED,
     OBJECT_NOT_FOUND,
 )
-from neofs_testlib.shell import Shell
 from node_management import drop_object
 from pytest import FixtureRequest
 from python_keywords.container import create_container
-from python_keywords.neofs_verbs import delete_object, head_object, lock_object
+from python_keywords.frostfs_verbs import delete_object, head_object, lock_object
 from storage_policy import get_nodes_with_object
 from test_control import expect_not_raises, wait_for_success
 from utility import parse_time, wait_for_gc_pass_on_storage_nodes

@@ -1,10 +1,10 @@
 import logging
 import re
 
-from common import NEOFS_ADM_EXEC, NEOFS_CLI_EXEC, WALLET_CONFIG
-from neofs_testlib.cli import NeofsAdm, NeofsCli
-from neofs_testlib.hosting import Hosting
-from neofs_testlib.shell import Shell
+from common import FROSTFS_ADM_EXEC, FROSTFS_CLI_EXEC, WALLET_CONFIG
+from frostfs_testlib.cli import FrostfsAdm, FrostfsCli
+from frostfs_testlib.hosting import Hosting
+from frostfs_testlib.shell import Shell
 
 logger = logging.getLogger("NeoLogger")
 
@@ -12,18 +12,18 @@ logger = logging.getLogger("NeoLogger")
 def get_local_binaries_versions(shell: Shell) -> dict[str, str]:
     versions = {}
 
-    for binary in ["neo-go", "neofs-authmate"]:
+    for binary in ["neo-go", "frostfs-authmate"]:
         out = shell.exec(f"{binary} --version").stdout
         versions[binary] = _parse_version(out)
 
-    neofs_cli = NeofsCli(shell, NEOFS_CLI_EXEC, WALLET_CONFIG)
-    versions["neofs-cli"] = _parse_version(neofs_cli.version.get().stdout)
+    frostfs_cli = FrostfsCli(shell, FROSTFS_CLI_EXEC, WALLET_CONFIG)
+    versions["frostfs-cli"] = _parse_version(frostfs_cli.version.get().stdout)
 
     try:
-        neofs_adm = NeofsAdm(shell, NEOFS_ADM_EXEC)
-        versions["neofs-adm"] = _parse_version(neofs_adm.version.get().stdout)
+        frostfs_adm = FrostfsAdm(shell, FROSTFS_ADM_EXEC)
+        versions["frostfs-adm"] = _parse_version(frostfs_adm.version.get().stdout)
     except RuntimeError:
-        logger.info(f"neofs-adm not installed")
+        logger.info(f"frostfs-adm not installed")
 
     out = shell.exec("aws --version").stdout
     out_lines = out.split("\n")

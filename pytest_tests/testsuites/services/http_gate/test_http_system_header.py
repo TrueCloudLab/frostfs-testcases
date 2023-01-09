@@ -15,20 +15,24 @@ from http_gate import (
     try_to_get_object_and_expect_error,
     upload_via_http_gate_curl,
 )
-from python_keywords.neofs_verbs import get_netmap_netinfo, get_object_from_random_node, head_object
+from python_keywords.frostfs_verbs import (
+    get_netmap_netinfo,
+    get_object_from_random_node,
+    head_object,
+)
 from wellknown_acl import PUBLIC_ACL
 
 from steps.cluster_test_base import ClusterTestBase
 
 logger = logging.getLogger("NeoLogger")
-EXPIRATION_TIMESTAMP_HEADER = "__NEOFS__EXPIRATION_TIMESTAMP"
-EXPIRATION_EPOCH_HEADER = "__NEOFS__EXPIRATION_EPOCH"
-EXPIRATION_DURATION_HEADER = "__NEOFS__EXPIRATION_DURATION"
-EXPIRATION_EXPIRATION_RFC = "__NEOFS__EXPIRATION_RFC3339"
-NEOFS_EXPIRATION_EPOCH = "Neofs-Expiration-Epoch"
-NEOFS_EXPIRATION_DURATION = "Neofs-Expiration-Duration"
-NEOFS_EXPIRATION_TIMESTAMP = "Neofs-Expiration-Timestamp"
-NEOFS_EXIPRATION_RFC3339 = "Neofs-Expiration-RFC3339"
+EXPIRATION_TIMESTAMP_HEADER = "__FROSRFS__EXPIRATION_TIMESTAMP"
+EXPIRATION_EPOCH_HEADER = "__FROSRFS__EXPIRATION_EPOCH"
+EXPIRATION_DURATION_HEADER = "__FROSRFS__EXPIRATION_DURATION"
+EXPIRATION_EXPIRATION_RFC = "__FROSRFS__EXPIRATION_RFC3339"
+FROSRFS_EXPIRATION_EPOCH = "Frostfs-Expiration-Epoch"
+FROSRFS_EXPIRATION_DURATION = "Frostfs-Expiration-Duration"
+FROSRFS_EXPIRATION_TIMESTAMP = "Frostfs-Expiration-Timestamp"
+FROSRFS_EXIPRATION_RFC3339 = "Frostfs-Expiration-RFC3339"
 
 
 @pytest.mark.sanity
@@ -94,7 +98,7 @@ class Test_http_system_header(ClusterTestBase):
         f"Validate that only {EXPIRATION_EPOCH_HEADER} exists in header and other headers are abesent"
     )
     def validation_for_http_header_attr(self, head_info: dict, expected_epoch: int) -> None:
-        # check that __NEOFS__EXPIRATION_EPOCH attribute has corresponding epoch
+        # check that __FROSTFS__EXPIRATION_EPOCH attribute has corresponding epoch
         assert self.check_key_value_presented_header(
             head_info, {EXPIRATION_EPOCH_HEADER: str(expected_epoch)}
         ), f'Expected to find {EXPIRATION_EPOCH_HEADER}: {expected_epoch} in: {head_info["header"]["attributes"]}'
@@ -140,7 +144,7 @@ class Test_http_system_header(ClusterTestBase):
     @allure.title("[negative] attempt to put object with expired epoch")
     def test_unable_put_expired_epoch(self, user_container: str, simple_object_size: int):
         headers = attr_into_str_header_curl(
-            {"Neofs-Expiration-Epoch": str(get_epoch(self.shell, self.cluster) - 1)}
+            {"Frostfs-Expiration-Epoch": str(get_epoch(self.shell, self.cluster) - 1)}
         )
         file_path = generate_file(simple_object_size)
         with allure.step(
@@ -154,12 +158,12 @@ class Test_http_system_header(ClusterTestBase):
                 error_pattern="object has expired",
             )
 
-    @allure.title("[negative] attempt to put object with negative Neofs-Expiration-Duration")
+    @allure.title("[negative] attempt to put object with negative Frostfs-Expiration-Duration")
     def test_unable_put_negative_duration(self, user_container: str, simple_object_size: int):
-        headers = attr_into_str_header_curl({"Neofs-Expiration-Duration": "-1h"})
+        headers = attr_into_str_header_curl({"Frostfs-Expiration-Duration": "-1h"})
         file_path = generate_file(simple_object_size)
         with allure.step(
-            "Put object using HTTP with attribute Neofs-Expiration-Duration where duration is negative"
+            "Put object using HTTP with attribute Frostfs-Expiration-Duration where duration is negative"
         ):
             upload_via_http_gate_curl(
                 cid=user_container,
@@ -170,13 +174,13 @@ class Test_http_system_header(ClusterTestBase):
             )
 
     @allure.title(
-        "[negative] attempt to put object with Neofs-Expiration-Timestamp value in the past"
+        "[negative] attempt to put object with Frostfs-Expiration-Timestamp value in the past"
     )
     def test_unable_put_expired_timestamp(self, user_container: str, simple_object_size: int):
-        headers = attr_into_str_header_curl({"Neofs-Expiration-Timestamp": "1635075727"})
+        headers = attr_into_str_header_curl({"Frostfs-Expiration-Timestamp": "1635075727"})
         file_path = generate_file(simple_object_size)
         with allure.step(
-            "Put object using HTTP with attribute Neofs-Expiration-Timestamp where duration is in the past"
+            "Put object using HTTP with attribute Frostfs-Expiration-Timestamp where duration is in the past"
         ):
             upload_via_http_gate_curl(
                 cid=user_container,
@@ -187,10 +191,10 @@ class Test_http_system_header(ClusterTestBase):
             )
 
     @allure.title(
-        "[negative] Put object using HTTP with attribute Neofs-Expiration-RFC3339 where duration is in the past"
+        "[negative] Put object using HTTP with attribute Frostfs-Expiration-RFC3339 where duration is in the past"
     )
     def test_unable_put_expired_rfc(self, user_container: str, simple_object_size: int):
-        headers = attr_into_str_header_curl({"Neofs-Expiration-RFC3339": "2021-11-22T09:55:49Z"})
+        headers = attr_into_str_header_curl({"Frostfs-Expiration-RFC3339": "2021-11-22T09:55:49Z"})
         file_path = generate_file(simple_object_size)
         upload_via_http_gate_curl(
             cid=user_container,
@@ -215,7 +219,7 @@ class Test_http_system_header(ClusterTestBase):
         logger.info(
             f"epoch duration={epoch_duration}, current_epoch= {get_epoch(self.shell, self.cluster)} expected_epoch {expected_epoch}"
         )
-        attributes = {NEOFS_EXPIRATION_EPOCH: expected_epoch, NEOFS_EXPIRATION_DURATION: "1m"}
+        attributes = {FROSTFS_EXPIRATION_EPOCH: expected_epoch, FROSTFS_EXPIRATION_DURATION: "1m"}
         file_path = generate_file(object_size)
         with allure.step(
             f"Put objects using HTTP with attributes and head command should display {EXPIRATION_EPOCH_HEADER}: {expected_epoch} attr"
@@ -263,10 +267,10 @@ class Test_http_system_header(ClusterTestBase):
             f"epoch duration={epoch_duration}, current_epoch= {get_epoch(self.shell, self.cluster)} expected_epoch {expected_epoch}"
         )
         attributes = {
-            NEOFS_EXPIRATION_DURATION: self.epoch_count_into_mins(
+            FROSTFS_EXPIRATION_DURATION: self.epoch_count_into_mins(
                 epoch_duration=epoch_duration, epoch=2
             ),
-            NEOFS_EXPIRATION_TIMESTAMP: self.epoch_count_into_timestamp(
+            FROSTFS_EXPIRATION_TIMESTAMP: self.epoch_count_into_timestamp(
                 epoch_duration=epoch_duration, epoch=1
             ),
         }
@@ -317,10 +321,10 @@ class Test_http_system_header(ClusterTestBase):
             f"epoch duration={epoch_duration}, current_epoch= {get_epoch(self.shell, self.cluster)} expected_epoch {expected_epoch}"
         )
         attributes = {
-            NEOFS_EXPIRATION_TIMESTAMP: self.epoch_count_into_timestamp(
+            FROSTFS_EXPIRATION_TIMESTAMP: self.epoch_count_into_timestamp(
                 epoch_duration=epoch_duration, epoch=2
             ),
-            NEOFS_EXIPRATION_RFC3339: self.epoch_count_into_timestamp(
+            FROSTFS_EXIPRATION_RFC3339: self.epoch_count_into_timestamp(
                 epoch_duration=epoch_duration, epoch=1, rfc3339=True
             ),
         }
@@ -369,7 +373,7 @@ class Test_http_system_header(ClusterTestBase):
             f"epoch duration={epoch_duration}, current_epoch= {get_epoch(self.shell, self.cluster)} expected_epoch {expected_epoch}"
         )
         attributes = {
-            NEOFS_EXIPRATION_RFC3339: self.epoch_count_into_timestamp(
+            FROSTFS_EXIPRATION_RFC3339: self.epoch_count_into_timestamp(
                 epoch_duration=epoch_duration, epoch=2, rfc3339=True
             )
         }

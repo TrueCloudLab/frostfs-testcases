@@ -4,14 +4,14 @@ from dataclasses import asdict
 
 import allure
 from common import STORAGE_NODE_SERVICE_NAME_REGEX
+from frostfs_testlib.cli.frostfs_authmate import FrostfsAuthmate
+from frostfs_testlib.cli.neogo import NeoGo
+from frostfs_testlib.hosting import Hosting
+from frostfs_testlib.shell import CommandOptions, SSHShell
+from frostfs_testlib.shell.interfaces import InteractiveInput
 from k6 import K6, LoadParams, LoadResults
-from neofs_testlib.cli.neofs_authmate import NeofsAuthmate
-from neofs_testlib.cli.neogo import NeoGo
-from neofs_testlib.hosting import Hosting
-from neofs_testlib.shell import CommandOptions, SSHShell
-from neofs_testlib.shell.interfaces import InteractiveInput
 
-NEOFS_AUTHMATE_PATH = "neofs-s3-authmate"
+FROSTFS_AUTHMATE_PATH = "frostfs-s3-authmate"
 STOPPED_HOSTS = []
 
 
@@ -56,8 +56,8 @@ def init_s3_client(
         path = ssh_client.exec(r"sudo find . -name 'k6' -exec dirname {} \; -quit").stdout.strip(
             "\n"
         )
-        neofs_authmate_exec = NeofsAuthmate(ssh_client, NEOFS_AUTHMATE_PATH)
-        issue_secret_output = neofs_authmate_exec.secret.issue(
+        frostfs_authmate_exec = FrostfsAuthmate(ssh_client, FROSTFS_AUTHMATE_PATH)
+        issue_secret_output = frostfs_authmate_exec.secret.issue(
             wallet=f"{path}/scenarios/files/wallet.json",
             peer=node_endpoint,
             bearer_rules=f"{path}/scenarios/files/rules.json",

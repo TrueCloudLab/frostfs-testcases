@@ -1,7 +1,7 @@
 #!/usr/bin/python3.9
 
 """
-Helper functions to use with `neofs-cli`, `neo-go` and other CLIs.
+Helper functions to use with `frostfs-cli`, `neo-go` and other CLIs.
 """
 import json
 import logging

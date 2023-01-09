@@ -24,7 +24,9 @@ from python_keywords.container_access import (
 class TestACLBearer(ClusterTestBase):
     @pytest.mark.parametrize("role", [EACLRole.USER, EACLRole.OTHERS])
     def test_bearer_token_operations(self, wallets, eacl_container_with_objects, role):
-        allure.dynamic.title(f"Testcase to validate NeoFS operations with {role.value} BearerToken")
+        allure.dynamic.title(
+            f"Testcase to validate FrostFS operations with {role.value} BearerToken"
+        )
         cid, objects_oids, file_path = eacl_container_with_objects
         user_wallet = wallets.get_wallet()
         deny_wallet = wallets.get_wallet(role)

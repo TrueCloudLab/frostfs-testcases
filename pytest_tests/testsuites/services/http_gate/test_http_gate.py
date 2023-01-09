@@ -6,6 +6,7 @@ import pytest
 from epoch import get_epoch, tick_epoch
 from file_helper import generate_file, get_file_hash
 from python_keywords.container import create_container
+from python_keywords.frostfs_verbs import put_object_to_random_node
 from python_keywords.http_gate import (
     attr_into_header,
     get_object_and_verify_hashes,
@@ -17,7 +18,6 @@ from python_keywords.http_gate import (
     upload_via_http_gate,
     upload_via_http_gate_curl,
 )
-from python_keywords.neofs_verbs import put_object_to_random_node
 from utility import wait_for_gc_pass_on_storage_nodes
 from wellknown_acl import PUBLIC_ACL
 
@@ -28,10 +28,11 @@ OBJECT_NOT_FOUND_ERROR = "not found"
 
 
 @allure.link(
-    "https://github.com/nspcc-dev/neofs-http-gw#neofs-http-gateway", name="neofs-http-gateway"
+    "https://github.com/TrueCloudLab/frostfs-http-gw#frostfs-http-gateway",
+    name="frostfs-http-gateway",
 )
-@allure.link("https://github.com/nspcc-dev/neofs-http-gw#uploading", name="uploading")
-@allure.link("https://github.com/nspcc-dev/neofs-http-gw#downloading", name="downloading")
+@allure.link("https://github.com/TrueCloudLab/frostfs-http-gw#uploading", name="uploading")
+@allure.link("https://github.com/TrueCloudLab/frostfs-http-gw#downloading", name="downloading")
 @pytest.mark.sanity
 @pytest.mark.http_gate
 class TestHttpGate(ClusterTestBase):
@@ -50,9 +51,9 @@ class TestHttpGate(ClusterTestBase):
 
         Steps:
         1. Create simple and large objects.
-        2. Put objects using gRPC (neofs-cli).
-        3. Download objects using HTTP gate (https://github.com/nspcc-dev/neofs-http-gw#downloading).
-        4. Get objects using gRPC (neofs-cli).
+        2. Put objects using gRPC (frostfs-cli).
+        3. Download objects using HTTP gate (https://github.com/TrueCloudLab/frostfs-http-gw#downloading).
+        4. Get objects using gRPC (frostfs-cli).
         5. Compare hashes for got objects.
         6. Compare hashes for got and original objects.
 
@@ -97,8 +98,8 @@ class TestHttpGate(ClusterTestBase):
                 endpoint=self.cluster.default_http_gate_endpoint,
             )
 
-    @allure.link("https://github.com/nspcc-dev/neofs-http-gw#uploading", name="uploading")
-    @allure.link("https://github.com/nspcc-dev/neofs-http-gw#downloading", name="downloading")
+    @allure.link("https://github.com/TrueCloudLab/frostfs-http-gw#uploading", name="uploading")
+    @allure.link("https://github.com/TrueCloudLab/frostfs-http-gw#downloading", name="downloading")
     @allure.title("Test Put over HTTP, Get over HTTP")
     @pytest.mark.smoke
     def test_put_http_get_http(self, complex_object_size, simple_object_size):
@@ -107,8 +108,8 @@ class TestHttpGate(ClusterTestBase):
 
         Steps:
         1. Create simple and large objects.
-        2. Upload objects using HTTP (https://github.com/nspcc-dev/neofs-http-gw#uploading).
-        3. Download objects using HTTP gate (https://github.com/nspcc-dev/neofs-http-gw#downloading).
+        2. Upload objects using HTTP (https://github.com/TrueCloudLab/frostfs-http-gw#uploading).
+        3. Download objects using HTTP gate (https://github.com/TrueCloudLab/frostfs-http-gw#downloading).
         4. Compare hashes for got and original objects.
 
         Expected result:
@@ -145,7 +146,8 @@ class TestHttpGate(ClusterTestBase):
             )
 
     @allure.link(
-        "https://github.com/nspcc-dev/neofs-http-gw#by-attributes", name="download by attributes"
+        "https://github.com/TrueCloudLab/frostfs-http-gw#by-attributes",
+        name="download by attributes",
     )
     @allure.title("Test Put over HTTP, Get over HTTP with headers")
     @pytest.mark.parametrize(
@@ -164,7 +166,7 @@ class TestHttpGate(ClusterTestBase):
         Steps:
         1. Create simple and large objects.
         2. Upload objects using HTTP with particular attributes in the header.
-        3. Download objects by attributes using HTTP gate (https://github.com/nspcc-dev/neofs-http-gw#by-attributes).
+        3. Download objects by attributes using HTTP gate (https://github.com/TrueCloudLab/frostfs-http-gw#by-attributes).
         4. Compare hashes for got and original objects.
 
         Expected result:
@@ -215,7 +217,7 @@ class TestHttpGate(ClusterTestBase):
         epochs = (curr_epoch, curr_epoch + 1, curr_epoch + 2, curr_epoch + 100)
 
         for epoch in epochs:
-            headers = {"X-Attribute-Neofs-Expiration-Epoch": str(epoch)}
+            headers = {"X-Attribute-Frostfs-Expiration-Epoch": str(epoch)}
 
             with allure.step("Put objects using HTTP with attribute Expiration-Epoch"):
                 oids.append(

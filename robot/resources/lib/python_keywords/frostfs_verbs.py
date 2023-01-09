@@ -8,9 +8,9 @@ from typing import Any, Optional
 import allure
 import json_transformers
 from cluster import Cluster
-from common import ASSETS_DIR, NEOFS_CLI_EXEC, WALLET_CONFIG
-from neofs_testlib.cli import NeofsCli
-from neofs_testlib.shell import Shell
+from common import ASSETS_DIR, FROSTFS_CLI_EXEC, WALLET_CONFIG
+from frostfs_testlib.cli import FrostfsCli
+from frostfs_testlib.shell import Shell
 
 logger = logging.getLogger("NeoLogger")
 
@@ -30,7 +30,7 @@ def get_object_from_random_node(
     session: Optional[str] = None,
 ) -> str:
     """
-    GET from NeoFS random storage node
+    GET from FrostFS random storage node
 
     Args:
         wallet: wallet on whose behalf GET is done
@@ -39,7 +39,7 @@ def get_object_from_random_node(
         shell: executor for cli command
         bearer (optional, str): path to Bearer Token file, appends to `--bearer` key
         write_object (optional, str): path to downloaded file, appends to `--file` key
-        endpoint: NeoFS endpoint to send request to, appends to `--rpc-endpoint` key
+        endpoint: FrostFS endpoint to send request to, appends to `--rpc-endpoint` key
         wallet_config(optional, str): path to the wallet config
         no_progress(optional, bool): do not show progress bar
         xhdr (optional, dict): Request X-Headers in form of Key=Value
@@ -78,7 +78,7 @@ def get_object(
     session: Optional[str] = None,
 ) -> str:
     """
-    GET from NeoFS.
+    GET from FrostFS.
 
     Args:
         wallet (str): wallet on whose behalf GET is done
@@ -87,7 +87,7 @@ def get_object(
         shell: executor for cli command
         bearer: path to Bearer Token file, appends to `--bearer` key
         write_object: path to downloaded file, appends to `--file` key
-        endpoint: NeoFS endpoint to send request to, appends to `--rpc-endpoint` key
+        endpoint: FrostFS endpoint to send request to, appends to `--rpc-endpoint` key
         wallet_config(optional, str): path to the wallet config
         no_progress(optional, bool): do not show progress bar
         xhdr (optional, dict): Request X-Headers in form of Key=Value
@@ -100,7 +100,7 @@ def get_object(
         write_object = str(uuid.uuid4())
     file_path = os.path.join(ASSETS_DIR, write_object)
 
-    cli = NeofsCli(shell, NEOFS_CLI_EXEC, wallet_config or WALLET_CONFIG)
+    cli = FrostfsCli(shell, FROSTFS_CLI_EXEC, wallet_config or WALLET_CONFIG)
     cli.object.get(
         rpc_endpoint=endpoint,
         wallet=wallet,
@@ -140,14 +140,14 @@ def get_range_hash(
         bearer: path to Bearer Token file, appends to `--bearer` key
         range_cut: Range to take hash from in the form offset1:length1,...,
                         value to pass to the `--range` parameter
-        endpoint: NeoFS endpoint to send request to, appends to `--rpc-endpoint` key
+        endpoint: FrostFS endpoint to send request to, appends to `--rpc-endpoint` key
         wallet_config: path to the wallet config
         xhdr: Request X-Headers in form of Key=Values
         session: Filepath to a JSON- or binary-encoded token of the object RANGEHASH session.
     Returns:
         None
     """
-    cli = NeofsCli(shell, NEOFS_CLI_EXEC, wallet_config or WALLET_CONFIG)
+    cli = FrostfsCli(shell, FROSTFS_CLI_EXEC, wallet_config or WALLET_CONFIG)
     result = cli.object.hash(
         rpc_endpoint=endpoint,
         wallet=wallet,
@@ -241,7 +241,7 @@ def put_object(
         shell: executor for cli command
         bearer: path to Bearer Token file, appends to `--bearer` key
         attributes: User attributes in form of Key1=Value1,Key2=Value2
-        endpoint: NeoFS endpoint to send request to, appends to `--rpc-endpoint` key
+        endpoint: FrostFS endpoint to send request to, appends to `--rpc-endpoint` key
         wallet_config: path to the wallet config
         no_progress: do not show progress bar
         expire_at: Last epoch in the life of the object
@@ -251,7 +251,7 @@ def put_object(
         (str): ID of uploaded Object
     """
 
-    cli = NeofsCli(shell, NEOFS_CLI_EXEC, wallet_config or WALLET_CONFIG)
+    cli = FrostfsCli(shell, FROSTFS_CLI_EXEC, wallet_config or WALLET_CONFIG)
     result = cli.object.put(
         rpc_endpoint=endpoint,
         wallet=wallet,
@@ -292,7 +292,7 @@ def delete_object(
         oid: ID of Object we are going to delete
         shell: executor for cli command
         bearer: path to Bearer Token file, appends to `--bearer` key
-        endpoint: NeoFS endpoint to send request to, appends to `--rpc-endpoint` key
+        endpoint: FrostFS endpoint to send request to, appends to `--rpc-endpoint` key
         wallet_config: path to the wallet config
         xhdr: Request X-Headers in form of Key=Value
         session: path to a JSON-encoded container session token
@@ -300,7 +300,7 @@ def delete_object(
         (str): Tombstone ID
     """
 
-    cli = NeofsCli(shell, NEOFS_CLI_EXEC, wallet_config or WALLET_CONFIG)
+    cli = FrostfsCli(shell, FROSTFS_CLI_EXEC, wallet_config or WALLET_CONFIG)
     result = cli.object.delete(
         rpc_endpoint=endpoint,
         wallet=wallet,
@@ -338,7 +338,7 @@ def get_range(
         oid: ID of Object we are going to request
         range_cut: range to take data from in the form offset:length
         shell: executor for cli command
-        endpoint: NeoFS endpoint to send request to, appends to `--rpc-endpoint` key
+        endpoint: FrostFS endpoint to send request to, appends to `--rpc-endpoint` key
         bearer: path to Bearer Token file, appends to `--bearer` key
         wallet_config: path to the wallet config
         xhdr: Request X-Headers in form of Key=Value
@@ -348,7 +348,7 @@ def get_range(
     """
     range_file_path = os.path.join(ASSETS_DIR, str(uuid.uuid4()))
 
-    cli = NeofsCli(shell, NEOFS_CLI_EXEC, wallet_config or WALLET_CONFIG)
+    cli = FrostfsCli(shell, FROSTFS_CLI_EXEC, wallet_config or WALLET_CONFIG)
     cli.object.range(
         rpc_endpoint=endpoint,
         wallet=wallet,
@@ -393,7 +393,7 @@ def lock_object(
         lifetime: Lock lifetime.
         expire_at: Lock expiration epoch.
         shell: executor for cli command
-        endpoint: NeoFS endpoint to send request to, appends to `--rpc-endpoint` key
+        endpoint: FrostFS endpoint to send request to, appends to `--rpc-endpoint` key
         session: Path to a JSON-encoded container session token.
         ttl: TTL value in request meta header (default 2).
         wallet: WIF (NEP-2) string or path to the wallet or binary key.
@@ -403,7 +403,7 @@ def lock_object(
         Lock object ID
     """
 
-    cli = NeofsCli(shell, NEOFS_CLI_EXEC, wallet_config or WALLET_CONFIG)
+    cli = FrostfsCli(shell, FROSTFS_CLI_EXEC, wallet_config or WALLET_CONFIG)
     result = cli.object.lock(
         rpc_endpoint=endpoint,
         lifetime=lifetime,
@@ -447,7 +447,7 @@ def search_object(
         cid: ID of Container where we get the Object from
         shell: executor for cli command
         bearer: path to Bearer Token file, appends to `--bearer` key
-        endpoint: NeoFS endpoint to send request to, appends to `--rpc-endpoint` key
+        endpoint: FrostFS endpoint to send request to, appends to `--rpc-endpoint` key
         filters: key=value pairs to filter Objects
         expected_objects_list: a list of ObjectIDs to compare found Objects with
         wallet_config: path to the wallet config
@@ -460,7 +460,7 @@ def search_object(
         list of found ObjectIDs
     """
 
-    cli = NeofsCli(shell, NEOFS_CLI_EXEC, wallet_config or WALLET_CONFIG)
+    cli = FrostfsCli(shell, FROSTFS_CLI_EXEC, wallet_config or WALLET_CONFIG)
     result = cli.object.search(
         rpc_endpoint=endpoint,
         wallet=wallet,
@@ -508,7 +508,7 @@ def get_netmap_netinfo(
     Args:
         wallet (str): wallet on whose behalf request is done
         shell: executor for cli command
-        endpoint (optional, str): NeoFS endpoint to send request to, appends to `--rpc-endpoint` key
+        endpoint (optional, str): FrostFS endpoint to send request to, appends to `--rpc-endpoint` key
         address: Address of wallet account
         ttl: TTL value in request meta header (default 2)
         wallet: Path to the wallet or binary key
@@ -518,7 +518,7 @@ def get_netmap_netinfo(
         (dict): dict of parsed command output
     """
 
-    cli = NeofsCli(shell, NEOFS_CLI_EXEC, wallet_config or WALLET_CONFIG)
+    cli = FrostfsCli(shell, FROSTFS_CLI_EXEC, wallet_config or WALLET_CONFIG)
     output = cli.netmap.netinfo(
         wallet=wallet,
         rpc_endpoint=endpoint,
@@ -565,7 +565,7 @@ def head_object(
         oid (str): ObjectID to HEAD
         shell: executor for cli command
         bearer (optional, str): path to Bearer Token file, appends to `--bearer` key
-        endpoint(optional, str): NeoFS endpoint to send request to
+        endpoint(optional, str): FrostFS endpoint to send request to
         json_output(optional, bool): return response in JSON format or not; this flag
                                     turns into `--json` key
         is_raw(optional, bool): send "raw" request or not; this flag
@@ -582,7 +582,7 @@ def head_object(
         (str): HEAD response as a plain text
     """
 
-    cli = NeofsCli(shell, NEOFS_CLI_EXEC, wallet_config or WALLET_CONFIG)
+    cli = FrostfsCli(shell, FROSTFS_CLI_EXEC, wallet_config or WALLET_CONFIG)
     result = cli.object.head(
         rpc_endpoint=endpoint,
         wallet=wallet,

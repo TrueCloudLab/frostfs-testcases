@@ -10,10 +10,10 @@ from typing import List
 
 import allure
 import complex_object_actions
-import neofs_verbs
+import frostfs_verbs
 from cluster import StorageNode
+from frostfs_testlib.shell import Shell
 from grpc_responses import OBJECT_NOT_FOUND, error_matches_status
-from neofs_testlib.shell import Shell
 
 logger = logging.getLogger("NeoLogger")
 
@@ -66,7 +66,7 @@ def get_simple_object_copies(
     copies = 0
     for node in nodes:
         try:
-            response = neofs_verbs.head_object(
+            response = frostfs_verbs.head_object(
                 wallet, cid, oid, shell=shell, endpoint=node.get_rpc_endpoint(), is_direct=True
             )
             if response:
@@ -123,7 +123,7 @@ def get_nodes_with_object(
         wallet = node.get_wallet_path()
         wallet_config = node.get_wallet_config_path()
         try:
-            res = neofs_verbs.head_object(
+            res = frostfs_verbs.head_object(
                 wallet,
                 cid,
                 oid,
@@ -160,7 +160,7 @@ def get_nodes_without_object(
     nodes_list = []
     for node in nodes:
         try:
-            res = neofs_verbs.head_object(
+            res = frostfs_verbs.head_object(
                 wallet, cid, oid, shell=shell, endpoint=node.get_rpc_endpoint(), is_direct=True
             )
             if res is None:

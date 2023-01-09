@@ -8,7 +8,7 @@ from neo3.wallet import wallet
 def dict_to_attrs(attrs: dict) -> str:
     """
     This function takes a dictionary of object's attributes and converts them
-    into string. The string is passed to `--attributes` key of neofs-cli.
+    into string. The string is passed to `--attributes` key of frostfs-cli.
 
     Args:
         attrs (dict): object attributes in {"a": "b", "c": "d"} format.

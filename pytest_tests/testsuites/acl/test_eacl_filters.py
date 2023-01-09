@@ -20,7 +20,7 @@ from python_keywords.container_access import (
     check_full_access_to_container,
     check_no_access_to_container,
 )
-from python_keywords.neofs_verbs import put_object_to_random_node
+from python_keywords.frostfs_verbs import put_object_to_random_node
 from python_keywords.object_access import can_get_head_object, can_get_object, can_put_object
 from wellknown_acl import PUBLIC_ACL
 
@@ -128,7 +128,7 @@ class TestEACLFilters(ClusterTestBase):
         "match_type", [EACLMatchType.STRING_EQUAL, EACLMatchType.STRING_NOT_EQUAL]
     )
     def test_extended_acl_filters_request(self, wallets, eacl_container_with_objects, match_type):
-        allure.dynamic.title(f"Validate NeoFS operations with request filter: {match_type.name}")
+        allure.dynamic.title(f"Validate FrostFS operations with request filter: {match_type.name}")
         user_wallet = wallets.get_wallet()
         other_wallet = wallets.get_wallet(EACLRole.OTHERS)
         (
@@ -243,7 +243,7 @@ class TestEACLFilters(ClusterTestBase):
         self, wallets, eacl_container_with_objects, match_type
     ):
         allure.dynamic.title(
-            f"Validate NeoFS operations with deny user headers filter: {match_type.name}"
+            f"Validate FrostFS operations with deny user headers filter: {match_type.name}"
         )
         user_wallet = wallets.get_wallet()
         other_wallet = wallets.get_wallet(EACLRole.OTHERS)
@@ -425,7 +425,7 @@ class TestEACLFilters(ClusterTestBase):
         self, wallets, eacl_container_with_objects, match_type
     ):
         allure.dynamic.title(
-            "Testcase to validate NeoFS operation with allow eACL user headers filters:"
+            "Testcase to validate FrostFS operation with allow eACL user headers filters:"
             f"{match_type.name}"
         )
         user_wallet = wallets.get_wallet()

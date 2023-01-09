@@ -7,10 +7,10 @@ from typing import Optional
 
 import allure
 from cluster import Cluster, StorageNode
-from common import MORPH_BLOCK_TIME, NEOFS_CLI_EXEC
+from common import FROSTFS_CLI_EXEC, MORPH_BLOCK_TIME
 from epoch import tick_epoch
-from neofs_testlib.cli import NeofsCli
-from neofs_testlib.shell import Shell
+from frostfs_testlib.cli import FrostfsCli
+from frostfs_testlib.shell import Shell
 from utility import parse_time
 
 logger = logging.getLogger("NeoLogger")
@@ -107,7 +107,7 @@ def get_netmap_snapshot(node: StorageNode, shell: Shell) -> str:
     storage_wallet_config = node.get_wallet_config_path()
     storage_wallet_path = node.get_wallet_path()
 
-    cli = NeofsCli(shell, NEOFS_CLI_EXEC, config_file=storage_wallet_config)
+    cli = FrostfsCli(shell, FROSTFS_CLI_EXEC, config_file=storage_wallet_config)
     return cli.netmap.snapshot(
         rpc_endpoint=node.get_rpc_endpoint(),
         wallet=storage_wallet_path,
@@ -187,7 +187,7 @@ def include_node_to_network_map(
     storage_node_set_status(node_to_include, status="online")
 
     # Per suggestion of @fyrchik we need to wait for 2 blocks after we set status and after tick epoch.
-    # First sleep can be omitted after https://github.com/nspcc-dev/neofs-node/issues/1790 complete.
+    # First sleep can be omitted after https://github.com/nspcc-dev/frostfs-node/issues/1790 complete.
 
     time.sleep(parse_time(MORPH_BLOCK_TIME) * 2)
     tick_epoch(shell, cluster)
@@ -235,10 +235,10 @@ def _run_control_command(node: StorageNode, command: str) -> None:
     wallet_config = f'password: "{wallet_password}"'
     shell.exec(f"echo '{wallet_config}' > {wallet_config_path}")
 
-    cli_config = host.get_cli_config("neofs-cli")
+    cli_config = host.get_cli_config("frostfs-cli")
 
     # TODO: implement cli.control
-    # cli = NeofsCli(shell, cli_config.exec_path, wallet_config_path)
+    # cli = frostfsCli(shell, cli_config.exec_path, wallet_config_path)
     result = shell.exec(
         f"{cli_config.exec_path} {command} --endpoint {control_endpoint} "
         f"--wallet {wallet_path} --config {wallet_config_path}"

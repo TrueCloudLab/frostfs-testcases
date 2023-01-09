@@ -2,9 +2,9 @@ import json
 import logging
 
 import allure
+from frostfs_testlib.shell import Shell
+from frostfs_verbs import head_object
 from neo3.wallet import wallet
-from neofs_testlib.shell import Shell
-from neofs_verbs import head_object
 
 logger = logging.getLogger("NeoLogger")
 

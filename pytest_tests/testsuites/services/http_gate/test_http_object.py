@@ -10,7 +10,7 @@ from http_gate import (
     get_object_by_attr_and_verify_hashes,
     try_to_get_object_via_passed_request_and_expect_error,
 )
-from python_keywords.neofs_verbs import put_object_to_random_node
+from python_keywords.frostfs_verbs import put_object_to_random_node
 from wellknown_acl import PUBLIC_ACL
 
 from steps.cluster_test_base import ClusterTestBase
@@ -40,8 +40,8 @@ class Test_http_object(ClusterTestBase):
 
         Steps:
         1. Create object;
-        2. Put objects using gRPC (neofs-cli) with attributes [--attributes chapter1=peace,chapter2=war];
-        3. Download object using HTTP gate (https://github.com/nspcc-dev/neofs-http-gw#downloading);
+        2. Put objects using gRPC (frostfs-cli) with attributes [--attributes chapter1=peace,chapter2=war];
+        3. Download object using HTTP gate (https://github.com/TrueCloudLab/frostfs-http-gw#downloading);
         4. Compare hashes between original and downloaded object;
         5. [Negative] Try to the get object with specified attributes and `get` request: [get/$CID/chapter1/peace];
         6. Download the object with specified attributes and `get_by_attribute` request: [get_by_attribute/$CID/chapter1/peace];

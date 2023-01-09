@@ -5,9 +5,9 @@ import allure
 import pytest
 import yaml
 from cluster_test_base import ClusterTestBase
-from common import FREE_STORAGE, NEOFS_CLI_EXEC, WALLET_CONFIG
-from neofs_testlib.cli import NeofsCli
-from neofs_testlib.shell import CommandResult, Shell
+from common import FREE_STORAGE, FROSTFS_CLI_EXEC, WALLET_CONFIG
+from frostfs_testlib.cli import FrostfsCli
+from frostfs_testlib.shell import CommandResult, Shell
 from wallet import WalletFactory, WalletFile
 
 logger = logging.getLogger("NeoLogger")
@@ -27,8 +27,8 @@ class TestBalanceAccounting(ClusterTestBase):
         return wallet_factory.create_wallet()
 
     @pytest.fixture(scope="class")
-    def cli(self, client_shell: Shell) -> NeofsCli:
-        return NeofsCli(client_shell, NEOFS_CLI_EXEC, WALLET_CONFIG)
+    def cli(self, client_shell: Shell) -> FrostfsCli:
+        return FrostfsCli(client_shell, FROSTFS_CLI_EXEC, WALLET_CONFIG)
 
     @allure.step("Check deposit amount")
     def check_amount(self, result: CommandResult) -> None:
@@ -53,13 +53,13 @@ class TestBalanceAccounting(ClusterTestBase):
             "rpc-endpoint": endpoint,
             "wallet": wallet,
         }
-        api_config_file = os.path.join(config_dir, "neofs-cli-api-config.yaml")
+        api_config_file = os.path.join(config_dir, "frostfs-cli-api-config.yaml")
         with open(api_config_file, "w") as file:
             yaml.dump(api_config, file)
         return api_config_file
 
     @allure.title("Test balance request with wallet and address")
-    def test_balance_wallet_address(self, main_wallet: WalletFile, cli: NeofsCli):
+    def test_balance_wallet_address(self, main_wallet: WalletFile, cli: FrostfsCli):
         result = cli.accounting.balance(
             wallet=main_wallet.path,
             rpc_endpoint=self.cluster.default_rpc_endpoint,
@@ -69,7 +69,7 @@ class TestBalanceAccounting(ClusterTestBase):
         self.check_amount(result)
 
     @allure.title("Test balance request with wallet only")
-    def test_balance_wallet(self, main_wallet: WalletFile, cli: NeofsCli):
+    def test_balance_wallet(self, main_wallet: WalletFile, cli: FrostfsCli):
         result = cli.accounting.balance(
             wallet=main_wallet.path, rpc_endpoint=self.cluster.default_rpc_endpoint
         )
@@ -77,7 +77,7 @@ class TestBalanceAccounting(ClusterTestBase):
 
     @allure.title("Test balance request with wallet and wrong address")
     def test_balance_wrong_address(
-        self, main_wallet: WalletFile, other_wallet: WalletFile, cli: NeofsCli
+        self, main_wallet: WalletFile, other_wallet: WalletFile, cli: FrostfsCli
     ):
         with pytest.raises(Exception, match="address option must be specified and valid"):
             cli.accounting.balance(
@@ -95,7 +95,7 @@ class TestBalanceAccounting(ClusterTestBase):
         )
         logger.info(f"Config with API endpoint: {config_file}")
 
-        cli = NeofsCli(client_shell, NEOFS_CLI_EXEC, config_file=config_file)
+        cli = FrostfsCli(client_shell, FROSTFS_CLI_EXEC, config_file=config_file)
         result = cli.accounting.balance()
 
         self.check_amount(result)

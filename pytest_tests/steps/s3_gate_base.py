@@ -17,8 +17,8 @@ from botocore.exceptions import ClientError
 from cli_helpers import _cmd_run, _configure_aws_cli, _run_with_passwd
 from cluster import Cluster
 from cluster_test_base import ClusterTestBase
-from common import NEOFS_AUTHMATE_EXEC
-from neofs_testlib.shell import Shell
+from common import FROSTFS_AUTHMATE_EXEC
+from frostfs_testlib.shell import Shell
 from pytest import FixtureRequest
 from python_keywords.container import list_containers
 
@@ -128,7 +128,7 @@ def init_s3_credentials(
     s3gate_node = cluster.s3gates[0]
     gate_public_key = s3gate_node.get_wallet_public_key()
     cmd = (
-        f"{NEOFS_AUTHMATE_EXEC} --debug --with-log --timeout {CREDENTIALS_CREATE_TIMEOUT} "
+        f"{FROSTFS_AUTHMATE_EXEC} --debug --with-log --timeout {CREDENTIALS_CREATE_TIMEOUT} "
         f"issue-secret --wallet {wallet_path} --gate-public-key={gate_public_key} "
         f"--peer {cluster.default_rpc_endpoint} --container-friendly-name {bucket} "
         f"--bearer-rules {s3_bearer_rules}"

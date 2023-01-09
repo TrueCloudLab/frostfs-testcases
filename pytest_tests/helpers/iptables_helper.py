@@ -1,4 +1,4 @@
-from neofs_testlib.shell import Shell
+from frostfs_testlib.shell import Shell
 
 
 class IpTablesHelper:

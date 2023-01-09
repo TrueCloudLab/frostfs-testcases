@@ -4,8 +4,8 @@ from typing import Optional
 import allure
 from cluster import Cluster
 from file_helper import generate_file, get_file_hash
-from neofs_testlib.shell import Shell
-from neofs_verbs import put_object, put_object_to_random_node
+from frostfs_testlib.shell import Shell
+from frostfs_verbs import put_object, put_object_to_random_node
 from storage_object import StorageObjectInfo
 from wallet import WalletFile
 

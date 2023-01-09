@@ -3,7 +3,7 @@ from time import sleep
 
 import allure
 from cluster import Cluster, StorageNode
-from neofs_testlib.shell import Shell
+from frostfs_testlib.shell import Shell
 from python_keywords.node_management import storage_node_healthcheck
 from storage_policy import get_nodes_with_object
 

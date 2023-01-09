@@ -1,5 +1,5 @@
 """
-    When doing requests to NeoFS, we get JSON output as an automatically decoded
+    When doing requests to FrostFS, we get JSON output as an automatically decoded
     structure from protobuf. Some fields are decoded with boilerplates and binary
     values are Base64-encoded.
 

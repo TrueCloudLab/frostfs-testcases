@@ -7,13 +7,13 @@ import allure
 import pytest
 from cluster import StorageNode
 from cluster_test_base import ClusterTestBase
-from common import MORPH_BLOCK_TIME, NEOFS_CONTRACT_CACHE_TIMEOUT
+from common import FROSTFS_CONTRACT_CACHE_TIMEOUT, MORPH_BLOCK_TIME
 from epoch import tick_epoch
 from file_helper import generate_file
 from grpc_responses import OBJECT_NOT_FOUND, error_matches_status
 from python_keywords.container import create_container, get_container
 from python_keywords.failover_utils import wait_object_replication
-from python_keywords.neofs_verbs import (
+from python_keywords.frostfs_verbs import (
     delete_object,
     get_object,
     get_object_from_random_node,
@@ -324,10 +324,10 @@ class TestNodeManagement(ClusterTestBase):
             self.validate_object_copies(wallet, placement_rule, file_path, expected_copies)
 
     @pytest.mark.node_mgmt
-    @allure.title("NeoFS object could be dropped using control command")
+    @allure.title("FrostFS object could be dropped using control command")
     def test_drop_object(self, default_wallet, complex_object_size, simple_object_size):
         """
-        Test checks object could be dropped using `neofs-cli control drop-objects` command.
+        Test checks object could be dropped using `frostfs-cli control drop-objects` command.
         """
         wallet = default_wallet
         endpoint = self.cluster.default_rpc_endpoint
@@ -474,7 +474,7 @@ class TestNodeManagement(ClusterTestBase):
             if copies == expected_copies:
                 break
             tick_epoch(self.shell, self.cluster)
-            sleep(parse_time(NEOFS_CONTRACT_CACHE_TIMEOUT))
+            sleep(parse_time(FROSTFS_CONTRACT_CACHE_TIMEOUT))
         else:
             raise AssertionError(f"There are no {expected_copies} copies during time")
 

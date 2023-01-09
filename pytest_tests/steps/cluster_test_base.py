@@ -2,7 +2,7 @@ import allure
 import epoch
 import pytest
 from cluster import Cluster
-from neofs_testlib.shell import Shell
+from frostfs_testlib.shell import Shell
 
 
 # To skip adding every mandatory singleton dependency to EACH test function

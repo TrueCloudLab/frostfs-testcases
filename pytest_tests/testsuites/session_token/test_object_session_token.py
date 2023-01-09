@@ -5,10 +5,10 @@ import pytest
 from cluster_test_base import ClusterTestBase
 from common import WALLET_PASS
 from file_helper import generate_file
+from frostfs_testlib.utils.wallet import get_last_address_from_wallet
 from grpc_responses import SESSION_NOT_FOUND
-from neofs_testlib.utils.wallet import get_last_address_from_wallet
 from python_keywords.container import create_container
-from python_keywords.neofs_verbs import delete_object, put_object, put_object_to_random_node
+from python_keywords.frostfs_verbs import delete_object, put_object, put_object_to_random_node
 
 from steps.session_token import create_session_token
 

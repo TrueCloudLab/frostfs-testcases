@@ -33,7 +33,9 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize("s3_client", ["aws cli", "boto3"], indirect=True)
 
 
-@allure.link("https://github.com/nspcc-dev/neofs-s3-gw#neofs-s3-gateway", name="neofs-s3-gateway")
+@allure.link(
+    "https://github.com/TrueCloudLab/frostfs-s3-gw#frostfs-s3-gw", name="frostfs-s3-gateway"
+)
 @pytest.mark.sanity
 @pytest.mark.s3_gate
 @pytest.mark.s3_gate_base

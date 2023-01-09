@@ -10,14 +10,14 @@ from typing import Any, Dict, List, Optional, Union
 
 import allure
 import base58
-from common import ASSETS_DIR, NEOFS_CLI_EXEC, WALLET_CONFIG
+from common import ASSETS_DIR, FROSTFS_CLI_EXEC, WALLET_CONFIG
 from data_formatters import get_wallet_public_key
-from neofs_testlib.cli import NeofsCli
-from neofs_testlib.shell import Shell
+from frostfs_testlib.cli import FrostfsCli
+from frostfs_testlib.shell import Shell
 
 logger = logging.getLogger("NeoLogger")
 EACL_LIFETIME = 100500
-NEOFS_CONTRACT_CACHE_TIMEOUT = 30
+FROSTFS_CONTRACT_CACHE_TIMEOUT = 30
 
 
 class EACLOperation(Enum):
@@ -44,7 +44,7 @@ class EACLRole(Enum):
 class EACLHeaderType(Enum):
     REQUEST = "req"  # Filter request headers
     OBJECT = "obj"  # Filter object headers
-    SERVICE = "SERVICE"  # Filter service headers. These are not processed by NeoFS nodes and exist for service use only
+    SERVICE = "SERVICE"  # Filter service headers. These are not processed by FrostFS nodes and exist for service use only
 
 
 class EACLMatchType(Enum):
@@ -117,7 +117,7 @@ class EACLRule:
 
 @allure.title("Get extended ACL")
 def get_eacl(wallet_path: str, cid: str, shell: Shell, endpoint: str) -> Optional[str]:
-    cli = NeofsCli(shell, NEOFS_CLI_EXEC, WALLET_CONFIG)
+    cli = FrostfsCli(shell, FROSTFS_CLI_EXEC, WALLET_CONFIG)
     try:
         result = cli.container.get_eacl(wallet=wallet_path, rpc_endpoint=endpoint, cid=cid)
     except RuntimeError as exc:
@@ -138,7 +138,7 @@ def set_eacl(
     endpoint: str,
     session_token: Optional[str] = None,
 ) -> None:
-    cli = NeofsCli(shell, NEOFS_CLI_EXEC, WALLET_CONFIG)
+    cli = FrostfsCli(shell, FROSTFS_CLI_EXEC, WALLET_CONFIG)
     cli.container.set_eacl(
         wallet=wallet_path,
         rpc_endpoint=endpoint,
@@ -156,7 +156,7 @@ def _encode_cid_for_eacl(cid: str) -> str:
 
 def create_eacl(cid: str, rules_list: List[EACLRule], shell: Shell) -> str:
     table_file_path = os.path.join(os.getcwd(), ASSETS_DIR, f"eacl_table_{str(uuid.uuid4())}.json")
-    cli = NeofsCli(shell, NEOFS_CLI_EXEC, WALLET_CONFIG)
+    cli = FrostfsCli(shell, FROSTFS_CLI_EXEC, WALLET_CONFIG)
     cli.acl.extended_create(cid=cid, out=table_file_path, rule=rules_list)
 
     with open(table_file_path, "r") as file:
@@ -257,15 +257,17 @@ def eacl_rules(access: str, verbs: list, user: str) -> list[str]:
 def sign_bearer(
     shell: Shell, wallet_path: str, eacl_rules_file_from: str, eacl_rules_file_to: str, json: bool
 ) -> None:
-    neofscli = NeofsCli(shell=shell, neofs_cli_exec_path=NEOFS_CLI_EXEC, config_file=WALLET_CONFIG)
-    neofscli.util.sign_bearer_token(
+    frostfscli = FrostfsCli(
+        shell=shell, frostfs_cli_exec_path=FROSTFS_CLI_EXEC, config_file=WALLET_CONFIG
+    )
+    frostfscli.util.sign_bearer_token(
         wallet=wallet_path, from_file=eacl_rules_file_from, to_file=eacl_rules_file_to, json=json
     )
 
 
 @allure.title("Wait for eACL cache expired")
 def wait_for_cache_expired():
-    sleep(NEOFS_CONTRACT_CACHE_TIMEOUT)
+    sleep(FROSTFS_CONTRACT_CACHE_TIMEOUT)
     return
 
 

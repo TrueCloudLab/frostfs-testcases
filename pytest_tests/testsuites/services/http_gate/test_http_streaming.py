@@ -35,7 +35,7 @@ class Test_http_streaming(ClusterTestBase):
         Steps:
         1. Create big object;
         2. Put object using curl with pipe (streaming);
-        3. Download object using HTTP gate (https://github.com/nspcc-dev/neofs-http-gw#downloading);
+        3. Download object using HTTP gate (https://github.com/TrueCloudLab/frostfs-http-gw#downloading);
         4. Compare hashes between original and downloaded object;
 
         Expected result:

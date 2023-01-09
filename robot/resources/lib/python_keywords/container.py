@@ -1,7 +1,7 @@
 #!/usr/bin/python3.9
 
 """
-    This module contains keywords that utilize `neofs-cli container` commands.
+    This module contains keywords that utilize `frostfs-cli container` commands.
 """
 
 import json
@@ -11,9 +11,9 @@ from typing import Optional, Union
 
 import allure
 import json_transformers
-from common import NEOFS_CLI_EXEC, WALLET_CONFIG
-from neofs_testlib.cli import NeofsCli
-from neofs_testlib.shell import Shell
+from common import FROSTFS_CLI_EXEC, WALLET_CONFIG
+from frostfs_testlib.cli import FrostfsCli
+from frostfs_testlib.shell import Shell
 
 logger = logging.getLogger("NeoLogger")
 
@@ -38,7 +38,7 @@ def create_container(
     wait_for_creation: bool = True,
 ) -> str:
     """
-    A wrapper for `neofs-cli container create` call.
+    A wrapper for `frostfs-cli container create` call.
 
     Args:
         wallet (str): a wallet on whose behalf a container is created
@@ -52,7 +52,7 @@ def create_container(
                             the session token; this parameter makes sense
                             when paired with `session_token`
         shell: executor for cli command
-        endpoint: NeoFS endpoint to send request to, appends to `--rpc-endpoint` key
+        endpoint: FrostFS endpoint to send request to, appends to `--rpc-endpoint` key
         options (optional, dict): any other options to pass to the call
         name (optional, str): container name attribute
         await_mode (bool): block execution until container is persisted
@@ -62,7 +62,7 @@ def create_container(
         (str): CID of the created container
     """
 
-    cli = NeofsCli(shell, NEOFS_CLI_EXEC, WALLET_CONFIG)
+    cli = FrostfsCli(shell, FROSTFS_CLI_EXEC, WALLET_CONFIG)
     result = cli.container.create(
         rpc_endpoint=endpoint,
         wallet=session_wallet if session_wallet else wallet,
@@ -117,16 +117,16 @@ def wait_for_container_deletion(
 @allure.step("List Containers")
 def list_containers(wallet: str, shell: Shell, endpoint: str) -> list[str]:
     """
-    A wrapper for `neofs-cli container list` call. It returns all the
+    A wrapper for `frostfs-cli container list` call. It returns all the
     available containers for the given wallet.
     Args:
         wallet (str): a wallet on whose behalf we list the containers
         shell: executor for cli command
-        endpoint: NeoFS endpoint to send request to, appends to `--rpc-endpoint` key
+        endpoint: FrostFS endpoint to send request to, appends to `--rpc-endpoint` key
     Returns:
         (list): list of containers
     """
-    cli = NeofsCli(shell, NEOFS_CLI_EXEC, WALLET_CONFIG)
+    cli = FrostfsCli(shell, FROSTFS_CLI_EXEC, WALLET_CONFIG)
     result = cli.container.list(rpc_endpoint=endpoint, wallet=wallet)
     logger.info(f"Containers: \n{result}")
     return result.stdout.split()
@@ -141,19 +141,19 @@ def get_container(
     json_mode: bool = True,
 ) -> Union[dict, str]:
     """
-    A wrapper for `neofs-cli container get` call. It extracts container's
+    A wrapper for `frostfs-cli container get` call. It extracts container's
     attributes and rearranges them into a more compact view.
     Args:
         wallet (str): path to a wallet on whose behalf we get the container
         cid (str): ID of the container to get
         shell: executor for cli command
-        endpoint: NeoFS endpoint to send request to, appends to `--rpc-endpoint` key
+        endpoint: FrostFS endpoint to send request to, appends to `--rpc-endpoint` key
         json_mode (bool): return container in JSON format
     Returns:
         (dict, str): dict of container attributes
     """
 
-    cli = NeofsCli(shell, NEOFS_CLI_EXEC, WALLET_CONFIG)
+    cli = FrostfsCli(shell, FROSTFS_CLI_EXEC, WALLET_CONFIG)
     result = cli.container.get(rpc_endpoint=endpoint, wallet=wallet, cid=cid, json_mode=json_mode)
 
     if not json_mode:
@@ -170,7 +170,7 @@ def get_container(
 
 @allure.step("Delete Container")
 # TODO: make the error message about a non-found container more user-friendly
-# https://github.com/nspcc-dev/neofs-contract/issues/121
+# https://github.com/nspcc-dev/frostfs-contract/issues/121
 def delete_container(
     wallet: str,
     cid: str,
@@ -181,18 +181,18 @@ def delete_container(
     await_mode: bool = False,
 ) -> None:
     """
-    A wrapper for `neofs-cli container delete` call.
+    A wrapper for `frostfs-cli container delete` call.
     Args:
         wallet (str): path to a wallet on whose behalf we delete the container
         cid (str): ID of the container to delete
         shell: executor for cli command
-        endpoint: NeoFS endpoint to send request to, appends to `--rpc-endpoint` key
+        endpoint: FrostFS endpoint to send request to, appends to `--rpc-endpoint` key
         force (bool): do not check whether container contains locks and remove immediately
         session_token: a path to session token file
     This function doesn't return anything.
     """
 
-    cli = NeofsCli(shell, NEOFS_CLI_EXEC, WALLET_CONFIG)
+    cli = FrostfsCli(shell, FROSTFS_CLI_EXEC, WALLET_CONFIG)
     cli.container.delete(
         wallet=wallet,
         cid=cid,

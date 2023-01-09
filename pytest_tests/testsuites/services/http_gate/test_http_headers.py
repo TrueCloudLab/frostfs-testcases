@@ -19,7 +19,7 @@ from http_gate import (
     upload_via_http_gate_curl,
 )
 from pytest import FixtureRequest
-from python_keywords.neofs_verbs import delete_object
+from python_keywords.frostfs_verbs import delete_object
 from wellknown_acl import PUBLIC_ACL
 
 from helpers.storage_object_info import StorageObjectInfo

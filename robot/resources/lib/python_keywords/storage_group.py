@@ -1,17 +1,17 @@
 """
     This module contains keywords for work with Storage Groups.
-    It contains wrappers for `neofs-cli storagegroup` verbs.
+    It contains wrappers for `frostfs-cli storagegroup` verbs.
 """
 import logging
 from typing import Optional
 
 import allure
 from cluster import Cluster
-from common import NEOFS_CLI_EXEC, WALLET_CONFIG
+from common import FROSTFS_CLI_EXEC, WALLET_CONFIG
 from complex_object_actions import get_link_object
-from neofs_testlib.cli import NeofsCli
-from neofs_testlib.shell import Shell
-from neofs_verbs import head_object
+from frostfs_testlib.cli import FrostfsCli
+from frostfs_testlib.shell import Shell
+from frostfs_verbs import head_object
 
 logger = logging.getLogger("NeoLogger")
 
@@ -28,8 +28,8 @@ def put_storagegroup(
     lifetime: int = 10,
 ) -> str:
     """
-    Wrapper for `neofs-cli storagegroup put`. Before the SG is created,
-    neofs-cli performs HEAD on `objects`, so this verb must be allowed
+    Wrapper for `frostfs-cli storagegroup put`. Before the SG is created,
+    frostfs-cli performs HEAD on `objects`, so this verb must be allowed
     for `wallet` in `cid`.
     Args:
         shell: Shell instance.
@@ -38,12 +38,14 @@ def put_storagegroup(
         lifetime: Storage group lifetime in epochs.
         objects: List of Object IDs to include into the SG.
         bearer: Path to Bearer token file.
-        wallet_config: Path to neofs-cli config file.
+        wallet_config: Path to frostfs-cli config file.
     Returns:
         Object ID of created Storage Group.
     """
-    neofscli = NeofsCli(shell=shell, neofs_cli_exec_path=NEOFS_CLI_EXEC, config_file=wallet_config)
-    result = neofscli.storagegroup.put(
+    frostfscli = FrostfsCli(
+        shell=shell, frostfs_cli_exec_path=FROSTFS_CLI_EXEC, config_file=wallet_config
+    )
+    result = frostfscli.storagegroup.put(
         wallet=wallet,
         cid=cid,
         lifetime=lifetime,
@@ -65,19 +67,21 @@ def list_storagegroup(
     wallet_config: str = WALLET_CONFIG,
 ) -> list:
     """
-    Wrapper for `neofs-cli storagegroup list`.  This operation
+    Wrapper for `frostfs-cli storagegroup list`.  This operation
     requires SEARCH allowed for `wallet` in `cid`.
     Args:
         shell: Shell instance.
         wallet: Path to wallet on whose behalf the SGs are listed in the container
         cid: ID of Container to list.
         bearer: Path to Bearer token file.
-        wallet_config: Path to neofs-cli config file.
+        wallet_config: Path to frostfs-cli config file.
     Returns:
         Object IDs of found Storage Groups.
     """
-    neofscli = NeofsCli(shell=shell, neofs_cli_exec_path=NEOFS_CLI_EXEC, config_file=wallet_config)
-    result = neofscli.storagegroup.list(
+    frostfscli = FrostfsCli(
+        shell=shell, frostfs_cli_exec_path=FROSTFS_CLI_EXEC, config_file=wallet_config
+    )
+    result = frostfscli.storagegroup.list(
         wallet=wallet,
         cid=cid,
         bearer=bearer,
@@ -99,19 +103,21 @@ def get_storagegroup(
     wallet_config: str = WALLET_CONFIG,
 ) -> dict:
     """
-    Wrapper for `neofs-cli storagegroup get`.
+    Wrapper for `frostfs-cli storagegroup get`.
     Args:
         shell: Shell instance.
         wallet: Path to wallet on whose behalf the SG is got.
         cid: ID of Container where SG is stored.
         gid: ID of the Storage Group.
         bearer: Path to Bearer token file.
-        wallet_config: Path to neofs-cli config file.
+        wallet_config: Path to frostfs-cli config file.
     Returns:
         Detailed information on the Storage Group.
     """
-    neofscli = NeofsCli(shell=shell, neofs_cli_exec_path=NEOFS_CLI_EXEC, config_file=wallet_config)
-    result = neofscli.storagegroup.get(
+    frostfscli = FrostfsCli(
+        shell=shell, frostfs_cli_exec_path=FROSTFS_CLI_EXEC, config_file=wallet_config
+    )
+    result = frostfscli.storagegroup.get(
         wallet=wallet,
         cid=cid,
         bearer=bearer,
@@ -120,7 +126,7 @@ def get_storagegroup(
     )
 
     # TODO: temporary solution for parsing output. Needs to be replaced with
-    # JSON parsing when https://github.com/nspcc-dev/neofs-node/issues/1355
+    # JSON parsing when https://github.com/nspcc-dev/frostfs-node/issues/1355
     # is done.
     strings = result.stdout.strip().split("\n")
     # first three strings go to `data`;
@@ -148,19 +154,21 @@ def delete_storagegroup(
     wallet_config: str = WALLET_CONFIG,
 ) -> str:
     """
-    Wrapper for `neofs-cli storagegroup delete`.
+    Wrapper for `frostfs-cli storagegroup delete`.
     Args:
         shell: Shell instance.
         wallet: Path to wallet on whose behalf the SG is deleted.
         cid: ID of Container where SG is stored.
         gid: ID of the Storage Group.
         bearer: Path to Bearer token file.
-        wallet_config: Path to neofs-cli config file.
+        wallet_config: Path to frostfs-cli config file.
     Returns:
         Tombstone ID of the deleted Storage Group.
     """
-    neofscli = NeofsCli(shell=shell, neofs_cli_exec_path=NEOFS_CLI_EXEC, config_file=wallet_config)
-    result = neofscli.storagegroup.delete(
+    frostfscli = FrostfsCli(
+        shell=shell, frostfs_cli_exec_path=FROSTFS_CLI_EXEC, config_file=wallet_config
+    )
+    result = frostfscli.storagegroup.delete(
         wallet=wallet,
         cid=cid,
         bearer=bearer,

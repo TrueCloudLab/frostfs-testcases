@@ -14,32 +14,32 @@ These tests rely on resources and utility modules that have been originally deve
 
 ### Initial preparation
 
-1. Install neofs-cli
-    - `git clone git@github.com:nspcc-dev/neofs-node.git`
-    - `cd neofs-node`
+1. Install frostfs-cli
+    - `git clone git@github.com:nspcc-dev/frostfs-node.git`
+    - `cd frostfs-node`
     - `make`
-    - `sudo cp bin/neofs-cli /usr/local/bin/neofs-cli`
+    - `sudo cp bin/frostfs-cli /usr/local/bin/frostfs-cli`
 
-2. Install neofs-authmate
-    - `git clone git@github.com:nspcc-dev/neofs-s3-gw.git`
-    - `cd neofs-s3-gw`
+2. Install frostfs-authmate
+    - `git clone git@github.com:nspcc-dev/frostfs-s3-gw.git`
+    - `cd frostfs-s3-gw`
     - `make`
-    - `sudo cp bin/neofs-authmate /usr/local/bin/neofs-authmate`
+    - `sudo cp bin/frostfs-authmate /usr/local/bin/frostfs-authmate`
 
 3. Install neo-go
     - `git clone git@github.com:nspcc-dev/neo-go.git`
     - `cd neo-go`
-    - `git checkout v0.92.0` (or the current version in the neofs-dev-env)
+    - `git checkout v0.92.0` (or the current version in the frostfs-dev-env)
     - `make`
     - `sudo cp bin/neo-go /usr/local/bin/neo-go`
     or download binary from releases: https://github.com/nspcc-dev/neo-go/releases
 
-4. Clone neofs-dev-env
-`git clone git@github.com:nspcc-dev/neofs-dev-env.git`
+4. Clone frostfs-dev-env
+`git clone git@github.com:nspcc-dev/frostfs-dev-env.git`
 
-Note that we expect neofs-dev-env to be located under
-the `<testcases_root_dir>/../neofs-dev-env` directory. If you put this repo in any other place,
-manually set the full path to neofs-dev-env in the environment variable `DEVENV_PATH` at this step.
+Note that we expect frostfs-dev-env to be located under
+the `<testcases_root_dir>/../frostfs-dev-env` directory. If you put this repo in any other place,
+manually set the full path to frostfs-dev-env in the environment variable `DEVENV_PATH` at this step.
 
 5. Make sure you have installed all of the following prerequisites on your machine
 
@@ -49,8 +49,8 @@ python3.9
 python3.9-dev
 libssl-dev
 ```
-As we use neofs-dev-env, you'll also need to install
-[prerequisites](https://github.com/nspcc-dev/neofs-dev-env#prerequisites) of this repository.
+As we use frostfs-dev-env, you'll also need to install
+[prerequisites](https://github.com/nspcc-dev/frostfs-dev-env#prerequisites) of this repository.
 
 6. Prepare virtualenv
 
@@ -122,7 +122,7 @@ $ docker run -p 5050:5050 -e CHECK_RESULTS_EVERY_SECONDS=30 -e KEEP_HISTORY=1 \
 
 Then, you can check the allure report in your browser [by this link](http://localhost:5050/allure-docker-service/projects/default/reports/latest/index.html?redirect=false)
 
-NOTE: feel free to select a different location for `allure-reports` directory, there is no requirement to have it inside `neofs-testcases`. For example, you can place it under `/tmp` path.
+NOTE: feel free to select a different location for `allure-reports` directory, there is no requirement to have it inside `frostfs-testcases`. For example, you can place it under `/tmp` path.
 
 # Contributing
 

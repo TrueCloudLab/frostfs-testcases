@@ -6,6 +6,7 @@ from common import (
     S3_GATE_SERVICE_NAME_REGEX,
     STORAGE_NODE_SERVICE_NAME_REGEX,
 )
+from frostfs_testlib.hosting import Hosting
 from k6 import LoadParams
 from load import (
     clear_cache_and_data,
@@ -33,7 +34,6 @@ from load_params import (
     STORAGE_NODE_COUNT,
     WRITERS,
 )
-from neofs_testlib.hosting import Hosting
 
 ENDPOINTS_ATTRIBUTES = {
     "http": {"regex": HTTP_GATE_SERVICE_NAME_REGEX, "endpoint_attribute": "endpoint"},

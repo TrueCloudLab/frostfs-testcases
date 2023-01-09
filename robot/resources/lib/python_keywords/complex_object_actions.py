@@ -14,11 +14,11 @@ import logging
 from typing import Optional, Tuple
 
 import allure
-import neofs_verbs
+import frostfs_verbs
 from cluster import Cluster, StorageNode
 from common import WALLET_CONFIG
-from neofs_testlib.shell import Shell
-from neofs_verbs import head_object
+from frostfs_testlib.shell import Shell
+from frostfs_verbs import head_object
 from storage_object import StorageObjectInfo
 
 logger = logging.getLogger("NeoLogger")
@@ -122,7 +122,7 @@ def get_link_object(
         shell: executor for cli command
         nodes: list of nodes to do search on
         bearer (optional, str): path to Bearer token file
-        wallet_config (optional, str): path to the neofs-cli config file
+        wallet_config (optional, str): path to the frostfs-cli config file
         is_direct: send request directly to the node or not; this flag
                    turns into `--ttl 1` key
     Returns:
@@ -133,7 +133,7 @@ def get_link_object(
     for node in nodes:
         endpoint = node.get_rpc_endpoint()
         try:
-            resp = neofs_verbs.head_object(
+            resp = frostfs_verbs.head_object(
                 wallet,
                 cid,
                 oid,
@@ -172,7 +172,7 @@ def get_last_object(
     for node in nodes:
         endpoint = node.get_rpc_endpoint()
         try:
-            resp = neofs_verbs.head_object(
+            resp = frostfs_verbs.head_object(
                 wallet, cid, oid, shell=shell, endpoint=endpoint, is_raw=True, is_direct=True
             )
             if resp["lastPart"]:

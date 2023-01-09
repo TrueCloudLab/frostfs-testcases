@@ -7,7 +7,7 @@ from file_helper import generate_file, get_file_hash
 from grpc_responses import OBJECT_NOT_FOUND
 from pytest import FixtureRequest
 from python_keywords.container import create_container
-from python_keywords.neofs_verbs import get_object_from_random_node, put_object_to_random_node
+from python_keywords.frostfs_verbs import get_object_from_random_node, put_object_to_random_node
 from utility import wait_for_gc_pass_on_storage_nodes
 
 from steps.cluster_test_base import ClusterTestBase

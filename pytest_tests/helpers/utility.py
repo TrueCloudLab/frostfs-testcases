@@ -47,7 +47,7 @@ def placement_policy_from_container(container_info: str) -> str:
         FILTER Country EQ Sweden AS LOC_SW
 
     Args:
-        container_info: output from neofs-cli container get command
+        container_info: output from frostfs-cli container get command
 
     Returns:
         placement policy as a string

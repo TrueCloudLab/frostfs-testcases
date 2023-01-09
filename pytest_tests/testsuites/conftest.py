@@ -21,6 +21,10 @@ from common import (
     WALLET_PASS,
 )
 from env_properties import save_env_properties
+from frostfs_testlib.hosting import Hosting
+from frostfs_testlib.reporter import AllureHandler, get_reporter
+from frostfs_testlib.shell import LocalShell, Shell
+from frostfs_testlib.utils.wallet import init_wallet
 from k6 import LoadParams
 from load import get_services_endpoints, prepare_k6_instances
 from load_params import (
@@ -32,12 +36,8 @@ from load_params import (
     LOAD_NODE_SSH_USER,
     LOAD_NODES,
 )
-from neofs_testlib.hosting import Hosting
-from neofs_testlib.reporter import AllureHandler, get_reporter
-from neofs_testlib.shell import LocalShell, Shell
-from neofs_testlib.utils.wallet import init_wallet
 from payment_neogo import deposit_gas, transfer_gas
-from python_keywords.neofs_verbs import get_netmap_netinfo
+from python_keywords.frostfs_verbs import get_netmap_netinfo
 from python_keywords.node_management import storage_node_healthcheck
 
 from helpers.wallet import WalletFactory

@@ -5,14 +5,14 @@ from time import sleep
 from typing import Optional
 
 import allure
-from neofs_testlib.shell import Shell
+from frostfs_testlib.shell import Shell
 from remote_process import RemoteProcess
 
 EXIT_RESULT_CODE = 0
 LOAD_RESULTS_PATTERNS = {
     "grpc": {
-        "write_ops": r"neofs_obj_put_total\W*\d*\W*(?P<write_ops>\d*\.\d*)",
-        "read_ops": r"neofs_obj_get_total\W*\d*\W*(?P<read_ops>\d*\.\d*)",
+        "write_ops": r"frostfs_obj_put_total\W*\d*\W*(?P<write_ops>\d*\.\d*)",
+        "read_ops": r"frostfs_obj_get_total\W*\d*\W*(?P<read_ops>\d*\.\d*)",
     },
     "s3": {
         "write_ops": r"aws_obj_put_total\W*\d*\W*(?P<write_ops>\d*\.\d*)",

@@ -1,7 +1,7 @@
 import allure
 import pytest
 from file_helper import generate_file
-from neofs_testlib.shell import Shell
+from frostfs_testlib.shell import Shell
 from python_keywords.acl import (
     EACLAccess,
     EACLOperation,

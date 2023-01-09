@@ -8,8 +8,8 @@ import pytest
 from cluster_test_base import ClusterTestBase
 from common import ASSETS_DIR, FREE_STORAGE, WALLET_PASS
 from file_helper import generate_file
+from frostfs_testlib.utils.wallet import init_wallet
 from grpc_responses import OBJECT_ACCESS_DENIED, OBJECT_NOT_FOUND
-from neofs_testlib.utils.wallet import init_wallet
 from python_keywords.acl import (
     EACLAccess,
     EACLOperation,
@@ -20,7 +20,7 @@ from python_keywords.acl import (
     set_eacl,
 )
 from python_keywords.container import create_container
-from python_keywords.neofs_verbs import put_object_to_random_node
+from python_keywords.frostfs_verbs import put_object_to_random_node
 from python_keywords.payment_neogo import deposit_gas, transfer_gas
 from python_keywords.storage_group import (
     delete_storagegroup,

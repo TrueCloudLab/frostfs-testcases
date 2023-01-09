@@ -5,9 +5,9 @@ from typing import Any
 
 import data_formatters
 import yaml
-from neofs_testlib.blockchain import RPCClient
-from neofs_testlib.hosting import Host, Hosting
-from neofs_testlib.hosting.config import ServiceConfig
+from frostfs_testlib.blockchain import RPCClient
+from frostfs_testlib.hosting import Host, Hosting
+from frostfs_testlib.hosting.config import ServiceConfig
 from test_control import wait_for_success
 
 
@@ -108,7 +108,7 @@ class InnerRingNode(NodeBase):
     Inner ring node is not always the same as physical host (or physical node, if you will):
         It can be service running in a container or on physical host
     For testing perspective, it's not relevant how it is actually running,
-        since neofs network will still treat it as "node"
+        since frostfs network will still treat it as "node"
     """
 
     pass
@@ -147,7 +147,7 @@ class MorphChain(NodeBase):
     Consensus node is not always the same as physical host (or physical node, if you will):
         It can be service running in a container or on physical host
     For testing perspective, it's not relevant how it is actually running,
-        since neofs network will still treat it as "node"
+        since frostfs network will still treat it as "node"
     """
 
     rpc_client: RPCClient = None
@@ -170,7 +170,7 @@ class MainChain(NodeBase):
     Consensus node is not always the same as physical host:
         It can be service running in a container or on physical host (or physical node, if you will):
     For testing perspective, it's not relevant how it is actually running,
-        since neofs network will still treat it as "node"
+        since frostfs network will still treat it as "node"
     """
 
     rpc_client: RPCClient = None
@@ -193,7 +193,7 @@ class StorageNode(NodeBase):
     Storage node is not always the same as physical host:
         It can be service running in a container or on physical host (or physical node, if you will):
     For testing perspective, it's not relevant how it is actually running,
-        since neofs network will still treat it as "node"
+        since frostfs network will still treat it as "node"
     """
 
     def get_rpc_endpoint(self) -> str:

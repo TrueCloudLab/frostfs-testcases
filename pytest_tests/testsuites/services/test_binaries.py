@@ -8,7 +8,7 @@ import requests
 from binary_version_helper import get_remote_binaries_versions
 from common import BIN_VERSIONS_FILE
 from env_properties import read_env_properties, save_env_properties
-from neofs_testlib.hosting import Hosting
+from frostfs_testlib.hosting import Hosting
 
 logger = logging.getLogger("NeoLogger")
 

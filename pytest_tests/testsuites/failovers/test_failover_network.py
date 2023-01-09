@@ -9,7 +9,7 @@ from failover_utils import wait_all_storage_nodes_returned, wait_object_replicat
 from file_helper import generate_file, get_file_hash
 from iptables_helper import IpTablesHelper
 from python_keywords.container import create_container
-from python_keywords.neofs_verbs import get_object, put_object_to_random_node
+from python_keywords.frostfs_verbs import get_object, put_object_to_random_node
 from wellknown_acl import PUBLIC_ACL
 
 from steps.cluster_test_base import ClusterTestBase

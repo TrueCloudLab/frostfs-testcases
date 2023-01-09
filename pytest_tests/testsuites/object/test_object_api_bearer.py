@@ -3,8 +3,8 @@ import pytest
 from cluster import Cluster
 from container import REP_2_FOR_3_NODES_PLACEMENT_RULE, SINGLE_PLACEMENT_RULE, create_container
 from epoch import get_epoch
-from neofs_testlib.shell import Shell
-from neofs_verbs import delete_object, get_object
+from frostfs_testlib.shell import Shell
+from frostfs_verbs import delete_object, get_object
 from pytest import FixtureRequest
 from python_keywords.acl import EACLAccess, EACLOperation, EACLRole, EACLRule, form_bearertoken_file
 from wellknown_acl import EACL_PUBLIC_READ_WRITE

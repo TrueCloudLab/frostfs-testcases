@@ -10,9 +10,9 @@ import yaml
 from cluster import Cluster, StorageNode
 from common import WALLET_CONFIG
 from configobj import ConfigObj
-from neofs_testlib.cli import NeofsCli
+from frostfs_testlib.cli import FrostfsCli
 
-SHARD_PREFIX = "NEOFS_STORAGE_SHARD_"
+SHARD_PREFIX = "FROSTFS_STORAGE_SHARD_"
 BLOBSTOR_PREFIX = "_BLOBSTOR_"
 
 
@@ -134,9 +134,9 @@ class TestControlShard:
         wallet_password = node.get_wallet_password()
         control_endpoint = node.get_control_endpoint()
 
-        cli_config = node.host.get_cli_config("neofs-cli")
+        cli_config = node.host.get_cli_config("frostfs-cli")
 
-        cli = NeofsCli(node.host.get_shell(), cli_config.exec_path, WALLET_CONFIG)
+        cli = FrostfsCli(node.host.get_shell(), cli_config.exec_path, WALLET_CONFIG)
         result = cli.shards.list(
             endpoint=control_endpoint,
             wallet=wallet_path,

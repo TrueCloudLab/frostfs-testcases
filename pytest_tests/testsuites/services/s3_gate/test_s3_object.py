@@ -10,7 +10,7 @@ from aws_cli_client import AwsCliClient
 from common import ASSETS_DIR, FREE_STORAGE, WALLET_PASS
 from data_formatters import get_wallet_public_key
 from file_helper import concat_files, generate_file, generate_file_with_content, get_file_hash
-from neofs_testlib.utils.wallet import init_wallet
+from frostfs_testlib.utils.wallet import init_wallet
 from python_keywords.payment_neogo import deposit_gas, transfer_gas
 from s3_helper import (
     assert_object_lock_mode,

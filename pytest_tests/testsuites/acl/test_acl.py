@@ -8,7 +8,7 @@ from python_keywords.container_access import (
     check_no_access_to_container,
     check_read_only_container,
 )
-from python_keywords.neofs_verbs import put_object_to_random_node
+from python_keywords.frostfs_verbs import put_object_to_random_node
 from wellknown_acl import PRIVATE_ACL_F, PUBLIC_ACL_F, READONLY_ACL_F
 
 

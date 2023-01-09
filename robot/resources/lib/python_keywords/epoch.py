@@ -5,15 +5,15 @@ from typing import Optional
 import allure
 from cluster import Cluster, StorageNode
 from common import (
+    FROSTFS_ADM_CONFIG_PATH,
+    FROSTFS_ADM_EXEC,
+    FROSTFS_CLI_EXEC,
     MAINNET_BLOCK_TIME,
-    NEOFS_ADM_CONFIG_PATH,
-    NEOFS_ADM_EXEC,
-    NEOFS_CLI_EXEC,
     NEOGO_EXECUTABLE,
 )
-from neofs_testlib.cli import NeofsAdm, NeofsCli, NeoGo
-from neofs_testlib.shell import Shell
-from neofs_testlib.utils.wallet import get_last_address_from_wallet
+from frostfs_testlib.cli import FrostfsAdm, FrostfsCli, NeoGo
+from frostfs_testlib.shell import Shell
+from frostfs_testlib.utils.wallet import get_last_address_from_wallet
 from payment_neogo import get_contract_hash
 from test_control import wait_for_success
 from utility import parse_time
@@ -53,7 +53,7 @@ def get_epoch(shell: Shell, cluster: Cluster, alive_node: Optional[StorageNode] 
     wallet_path = alive_node.get_wallet_path()
     wallet_config = alive_node.get_wallet_config_path()
 
-    cli = NeofsCli(shell=shell, neofs_cli_exec_path=NEOFS_CLI_EXEC, config_file=wallet_config)
+    cli = FrostfsCli(shell=shell, frostfs_cli_exec_path=FROSTFS_CLI_EXEC, config_file=wallet_config)
 
     epoch = cli.netmap.epoch(endpoint, wallet_path)
     return int(epoch.stdout)
@@ -62,7 +62,7 @@ def get_epoch(shell: Shell, cluster: Cluster, alive_node: Optional[StorageNode] 
 @allure.step("Tick Epoch")
 def tick_epoch(shell: Shell, cluster: Cluster, alive_node: Optional[StorageNode] = None):
     """
-    Tick epoch using neofs-adm or NeoGo if neofs-adm is not available (DevEnv)
+    Tick epoch using frostfs-adm or NeoGo if frostfs-adm is not available (DevEnv)
     Args:
         shell: local shell to make queries about current epoch. Remote shell will be used to tick new one
         cluster: cluster instance under test
@@ -72,14 +72,14 @@ def tick_epoch(shell: Shell, cluster: Cluster, alive_node: Optional[StorageNode]
     alive_node = alive_node if alive_node else cluster.storage_nodes[0]
     remote_shell = alive_node.host.get_shell()
 
-    if NEOFS_ADM_EXEC and NEOFS_ADM_CONFIG_PATH:
-        # If neofs-adm is available, then we tick epoch with it (to be consistent with UAT tests)
-        neofsadm = NeofsAdm(
+    if FROSTFS_ADM_EXEC and FROSTFS_ADM_CONFIG_PATH:
+        # If frostfs-adm is available, then we tick epoch with it (to be consistent with UAT tests)
+        frostfsadm = FrostfsAdm(
             shell=remote_shell,
-            neofs_adm_exec_path=NEOFS_ADM_EXEC,
-            config_file=NEOFS_ADM_CONFIG_PATH,
+            frostfs_adm_exec_path=FROSTFS_ADM_EXEC,
+            config_file=FROSTFS_ADM_CONFIG_PATH,
         )
-        neofsadm.morph.force_new_epoch()
+        frostfsadm.morph.force_new_epoch()
         return
 
     # Otherwise we tick epoch using transaction
@@ -99,7 +99,7 @@ def tick_epoch(shell: Shell, cluster: Cluster, alive_node: Optional[StorageNode]
     neogo.contract.invokefunction(
         wallet=ir_wallet_path,
         wallet_password=ir_wallet_pass,
-        scripthash=get_contract_hash(morph_chain, "netmap.neofs", shell=shell),
+        scripthash=get_contract_hash(morph_chain, "netmap.frostfs", shell=shell),
         method="newEpoch",
         arguments=f"int:{cur_epoch + 1}",
         multisig_hash=f"{ir_address}:Global",

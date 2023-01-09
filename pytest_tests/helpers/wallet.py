@@ -4,8 +4,8 @@ from dataclasses import dataclass
 
 from cluster import Cluster, NodeBase
 from common import FREE_STORAGE, WALLET_CONFIG, WALLET_PASS
-from neofs_testlib.shell import Shell
-from neofs_testlib.utils.wallet import get_last_address_from_wallet, init_wallet
+from frostfs_testlib.shell import Shell
+from frostfs_testlib.utils.wallet import get_last_address_from_wallet, init_wallet
 from python_keywords.payment_neogo import deposit_gas, transfer_gas
 
 

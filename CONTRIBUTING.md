@@ -3,8 +3,8 @@
 First, thank you for contributing! We love and encourage pull requests from
 everyone. Please follow the guidelines:
 
-- Check the open [issues](https://github.com/nspcc-dev/neofs-testcases/issues) and
-  [pull requests](https://github.com/nspcc-dev/neofs-testcases/pulls) for existing
+- Check the open [issues](https://github.com/TrueCloudLab/frostfs-testcases/issues) and
+  [pull requests](https://github.com/TrueCloudLab/frostfs-testcases/pulls) for existing
   discussions.
 
 - Open an issue first, to discuss a new feature or enhancement.
@@ -22,13 +22,13 @@ everyone. Please follow the guidelines:
 
 ## Development Workflow
 
-Start by forking the `neofs-testcases` repository, make changes in a branch and then
+Start by forking the `frostfs-testcases` repository, make changes in a branch and then
 send a pull request. We encourage pull requests to discuss code changes. Here
 are the steps in details:
 
 ### Set up your GitHub Repository
 
-Fork [NeoFS testcases upstream](https://github.com/nspcc-dev/neofs-testcases/fork) source
+Fork [FrosfFS testcases upstream](https://github.com/TrueCloudLab/frostfs-testcases/fork) source
 repository to your own personal repository. Copy the URL of your fork and clone it:
 
 ```shell
@@ -36,16 +36,15 @@ $ git clone <url of your fork>
 ```
 
 ### Set up git remote as ``upstream``
-
-```shell
-$ cd neofs-testcases
-$ git remote add upstream https://github.com/nspcc-dev/neofs-testcases
+```sh
+$ cd frostfs-testcases
+$ git remote add upstream https://github.com/TrueCloudLab/frostfs-testcases
 $ git fetch upstream
 ```
 
 ### Set up development environment
 
-To setup development environment for `neofs-testcases`, please, take the following steps:
+To setup development environment for `frosfs-testcases`, please, take the following steps:
 1. Prepare virtualenv
 
 ```shell

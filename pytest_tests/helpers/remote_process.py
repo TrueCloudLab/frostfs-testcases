@@ -4,8 +4,8 @@ import uuid
 from typing import Optional
 
 import allure
-from neofs_testlib.shell import Shell
-from neofs_testlib.shell.interfaces import CommandOptions
+from frostfs_testlib.shell import Shell
+from frostfs_testlib.shell.interfaces import CommandOptions
 from tenacity import retry, stop_after_attempt, wait_fixed
 
 

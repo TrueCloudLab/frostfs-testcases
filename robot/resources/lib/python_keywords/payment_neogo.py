@@ -7,13 +7,13 @@ from typing import Optional
 
 import allure
 from cluster import MainChain, MorphChain
-from common import GAS_HASH, MAINNET_BLOCK_TIME, NEOFS_CONTRACT, NEOGO_EXECUTABLE
+from common import FROSTFS_CONTRACT, GAS_HASH, MAINNET_BLOCK_TIME, NEOGO_EXECUTABLE
+from frostfs_testlib.cli import NeoGo
+from frostfs_testlib.shell import Shell
+from frostfs_testlib.utils.converters import contract_hash_to_address
+from frostfs_testlib.utils.wallet import get_last_address_from_wallet
 from neo3.wallet import utils as neo3_utils
 from neo3.wallet import wallet as neo3_wallet
-from neofs_testlib.cli import NeoGo
-from neofs_testlib.shell import Shell
-from neofs_testlib.utils.converters import contract_hash_to_address
-from neofs_testlib.utils.wallet import get_last_address_from_wallet
 from utility import parse_time
 
 logger = logging.getLogger("NeoLogger")
@@ -51,7 +51,7 @@ def withdraw_mainnet_gas(shell: Shell, main_chain: MainChain, wlt: str, amount: 
         wallet=wlt,
         address=address,
         rpc_endpoint=main_chain.get_endpoint(),
-        scripthash=NEOFS_CONTRACT,
+        scripthash=FROSTFS_CONTRACT,
         method="withdraw",
         arguments=f"{scripthash} int:{amount}",
         multisig_hash=f"{scripthash}:Global",
@@ -88,10 +88,10 @@ def transaction_accepted(main_chain: MainChain, tx_id: str):
     return False
 
 
-@allure.step("Get NeoFS Balance")
+@allure.step("Get FrostFS Balance")
 def get_balance(shell: Shell, morph_chain: MorphChain, wallet_path: str, wallet_password: str = ""):
     """
-    This function returns NeoFS balance for given wallet.
+    This function returns FrostFS balance for given wallet.
     """
     with open(wallet_path) as wallet_file:
         wallet = neo3_wallet.Wallet.from_json(json.load(wallet_file), password=wallet_password)
@@ -99,7 +99,7 @@ def get_balance(shell: Shell, morph_chain: MorphChain, wallet_path: str, wallet_
     payload = [{"type": "Hash160", "value": str(acc.script_hash)}]
     try:
         resp = morph_chain.rpc_client.invoke_function(
-            get_contract_hash(morph_chain, "balance.neofs", shell=shell), "balanceOf", payload
+            get_contract_hash(morph_chain, "balance.frostfs", shell=shell), "balanceOf", payload
         )
         logger.info(f"Got response \n{resp}")
         value = int(resp["stack"][0]["value"])
@@ -166,7 +166,7 @@ def transfer_gas(
     time.sleep(parse_time(MAINNET_BLOCK_TIME))
 
 
-@allure.step("NeoFS Deposit")
+@allure.step("FrostFS Deposit")
 def deposit_gas(
     shell: Shell,
     main_chain: MainChain,
@@ -175,11 +175,11 @@ def deposit_gas(
     wallet_from_password: str,
 ):
     """
-    Transferring GAS from given wallet to NeoFS contract address.
+    Transferring GAS from given wallet to FrostFS contract address.
     """
-    # get NeoFS contract address
-    deposit_addr = contract_hash_to_address(NEOFS_CONTRACT)
-    logger.info(f"NeoFS contract address: {deposit_addr}")
+    # get FrostFS contract address
+    deposit_addr = contract_hash_to_address(FROSTFS_CONTRACT)
+    logger.info(f"FrostFS contract address: {deposit_addr}")
     address_from = get_last_address_from_wallet(
         wallet_path=wallet_from_path, wallet_password=wallet_from_password
     )
