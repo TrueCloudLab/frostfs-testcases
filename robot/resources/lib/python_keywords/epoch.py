@@ -15,6 +15,7 @@ from neofs_testlib.cli import NeofsAdm, NeofsCli, NeoGo
 from neofs_testlib.shell import Shell
 from neofs_testlib.utils.wallet import get_last_address_from_wallet
 from payment_neogo import get_contract_hash
+from test_control import wait_for_success
 from utility import parse_time
 
 logger = logging.getLogger("NeoLogger")
@@ -33,15 +34,28 @@ def ensure_fresh_epoch(
     return epoch
 
 
+@allure.step("Align epochs for the whole cluster")
+@wait_for_success(60, 5)
+def align_epochs(shell: Shell, cluster: Cluster) -> bool:
+    epochs = []
+    for node in cluster.storage_nodes:
+        epochs.append(get_epoch(shell, cluster, node))
+    unique_epochs = list(set(epochs))
+    assert (
+        len(unique_epochs) == 1
+    ), f"unaligned epochs found,  {epochs}, count of unique epochs {len(unique_epochs)}"
+
+
 @allure.step("Get Epoch")
 def get_epoch(shell: Shell, cluster: Cluster, alive_node: Optional[StorageNode] = None):
     alive_node = alive_node if alive_node else cluster.storage_nodes[0]
+    endpoint = alive_node.get_rpc_endpoint()
     wallet_path = alive_node.get_wallet_path()
     wallet_config = alive_node.get_wallet_config_path()
 
     cli = NeofsCli(shell=shell, neofs_cli_exec_path=NEOFS_CLI_EXEC, config_file=wallet_config)
 
-    epoch = cli.netmap.epoch(cluster.default_rpc_endpoint, wallet_path)
+    epoch = cli.netmap.epoch(endpoint, wallet_path)
     return int(epoch.stdout)
 
 

@@ -6,15 +6,16 @@ from typing import Optional
 import allure
 import pytest
 from container import create_container
-from epoch import get_epoch
+from epoch import align_epochs, get_epoch
 from file_helper import generate_file
+from grpc_responses import OBJECT_NOT_FOUND
 from http_gate import (
     attr_into_str_header_curl,
     get_object_and_verify_hashes,
     try_to_get_object_and_expect_error,
     upload_via_http_gate_curl,
 )
-from python_keywords.neofs_verbs import get_netmap_netinfo, head_object
+from python_keywords.neofs_verbs import get_netmap_netinfo, get_object_from_random_node, head_object
 from wellknown_acl import PUBLIC_ACL
 
 from steps.cluster_test_base import ClusterTestBase
@@ -230,12 +231,19 @@ class Test_http_system_header(ClusterTestBase):
                 get_epoch(self.shell, self.cluster) == expected_epoch + 1
             ), f"Epochs should be equal: {get_epoch(self.shell, self.cluster)} != {expected_epoch + 1}"
 
-            try_to_get_object_and_expect_error(
-                cid=user_container,
-                oid=oid,
-                error_pattern="404 Not Found",
-                endpoint=self.cluster.default_http_gate_endpoint,
-            )
+            with allure.step("Check object deleted because it expires-on epoch"):
+                align_epochs(self.shell, self.cluster)
+                try_to_get_object_and_expect_error(
+                    cid=user_container,
+                    oid=oid,
+                    error_pattern="404 Not Found",
+                    endpoint=self.cluster.default_http_gate_endpoint,
+                )
+                # check that object is not available via grpc
+                with pytest.raises(Exception, match=OBJECT_NOT_FOUND):
+                    get_object_from_random_node(
+                        self.wallet, user_container, oid, self.shell, self.cluster
+                    )
 
     @allure.title(
         f"priority of attributes duration>timestamp, duration time has higher priority and should be converted {EXPIRATION_EPOCH_HEADER}"
@@ -277,12 +285,19 @@ class Test_http_system_header(ClusterTestBase):
                 get_epoch(self.shell, self.cluster) == expected_epoch + 1
             ), f"Epochs should be equal: {get_epoch(self.shell, self.cluster)} != {expected_epoch + 1}"
 
-            try_to_get_object_and_expect_error(
-                cid=user_container,
-                oid=oid,
-                error_pattern="404 Not Found",
-                endpoint=self.cluster.default_http_gate_endpoint,
-            )
+            with allure.step("Check object deleted because it expires-on epoch"):
+                align_epochs(self.shell, self.cluster)
+                try_to_get_object_and_expect_error(
+                    cid=user_container,
+                    oid=oid,
+                    error_pattern="404 Not Found",
+                    endpoint=self.cluster.default_http_gate_endpoint,
+                )
+                # check that object is not available via grpc
+                with pytest.raises(Exception, match=OBJECT_NOT_FOUND):
+                    get_object_from_random_node(
+                        self.wallet, user_container, oid, self.shell, self.cluster
+                    )
 
     @allure.title(
         f"priority of attributes timestamp>Expiration-RFC, timestamp has higher priority and should be converted {EXPIRATION_EPOCH_HEADER}"
@@ -324,12 +339,19 @@ class Test_http_system_header(ClusterTestBase):
                 get_epoch(self.shell, self.cluster) == expected_epoch + 1
             ), f"Epochs should be equal: {get_epoch(self.shell, self.cluster)} != {expected_epoch + 1}"
 
-            try_to_get_object_and_expect_error(
-                cid=user_container,
-                oid=oid,
-                error_pattern="404 Not Found",
-                endpoint=self.cluster.default_http_gate_endpoint,
-            )
+            with allure.step("Check object deleted because it expires-on epoch"):
+                align_epochs(self.shell, self.cluster)
+                try_to_get_object_and_expect_error(
+                    cid=user_container,
+                    oid=oid,
+                    error_pattern="404 Not Found",
+                    endpoint=self.cluster.default_http_gate_endpoint,
+                )
+                # check that object is not available via grpc
+                with pytest.raises(Exception, match=OBJECT_NOT_FOUND):
+                    get_object_from_random_node(
+                        self.wallet, user_container, oid, self.shell, self.cluster
+                    )
 
     @allure.title("Test that object is automatically delete when expiration passed")
     @pytest.mark.parametrize(
@@ -368,9 +390,17 @@ class Test_http_system_header(ClusterTestBase):
             assert (
                 get_epoch(self.shell, self.cluster) == expected_epoch + 1
             ), f"Epochs should be equal: {get_epoch(self.shell, self.cluster)} != {expected_epoch + 1}"
-            try_to_get_object_and_expect_error(
-                cid=user_container,
-                oid=oid,
-                error_pattern="404 Not Found",
-                endpoint=self.cluster.default_http_gate_endpoint,
-            )
+
+            with allure.step("Check object deleted because it expires-on epoch"):
+                align_epochs(self.shell, self.cluster)
+                try_to_get_object_and_expect_error(
+                    cid=user_container,
+                    oid=oid,
+                    error_pattern="404 Not Found",
+                    endpoint=self.cluster.default_http_gate_endpoint,
+                )
+                # check that object is not available via grpc
+                with pytest.raises(Exception, match=OBJECT_NOT_FOUND):
+                    get_object_from_random_node(
+                        self.wallet, user_container, oid, self.shell, self.cluster
+                    )
