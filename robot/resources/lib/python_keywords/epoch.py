@@ -34,9 +34,9 @@ def ensure_fresh_epoch(
     return epoch
 
 
-@allure.step("Align epochs for the whole cluster")
+@allure.step("Wait for epochs align in whole cluster")
 @wait_for_success(60, 5)
-def align_epochs(shell: Shell, cluster: Cluster) -> bool:
+def wait_for_epochs_align(shell: Shell, cluster: Cluster) -> bool:
     epochs = []
     for node in cluster.storage_nodes:
         epochs.append(get_epoch(shell, cluster, node))

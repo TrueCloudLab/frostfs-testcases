@@ -6,7 +6,7 @@ from typing import Optional
 import allure
 import pytest
 from container import create_container
-from epoch import align_epochs, get_epoch
+from epoch import get_epoch, wait_for_epochs_align
 from file_helper import generate_file
 from grpc_responses import OBJECT_NOT_FOUND
 from http_gate import (
@@ -232,7 +232,7 @@ class Test_http_system_header(ClusterTestBase):
             ), f"Epochs should be equal: {get_epoch(self.shell, self.cluster)} != {expected_epoch + 1}"
 
             with allure.step("Check object deleted because it expires-on epoch"):
-                align_epochs(self.shell, self.cluster)
+                wait_for_epochs_align(self.shell, self.cluster)
                 try_to_get_object_and_expect_error(
                     cid=user_container,
                     oid=oid,
@@ -286,7 +286,7 @@ class Test_http_system_header(ClusterTestBase):
             ), f"Epochs should be equal: {get_epoch(self.shell, self.cluster)} != {expected_epoch + 1}"
 
             with allure.step("Check object deleted because it expires-on epoch"):
-                align_epochs(self.shell, self.cluster)
+                wait_for_epochs_align(self.shell, self.cluster)
                 try_to_get_object_and_expect_error(
                     cid=user_container,
                     oid=oid,
@@ -340,7 +340,7 @@ class Test_http_system_header(ClusterTestBase):
             ), f"Epochs should be equal: {get_epoch(self.shell, self.cluster)} != {expected_epoch + 1}"
 
             with allure.step("Check object deleted because it expires-on epoch"):
-                align_epochs(self.shell, self.cluster)
+                wait_for_epochs_align(self.shell, self.cluster)
                 try_to_get_object_and_expect_error(
                     cid=user_container,
                     oid=oid,
@@ -392,7 +392,7 @@ class Test_http_system_header(ClusterTestBase):
             ), f"Epochs should be equal: {get_epoch(self.shell, self.cluster)} != {expected_epoch + 1}"
 
             with allure.step("Check object deleted because it expires-on epoch"):
-                align_epochs(self.shell, self.cluster)
+                wait_for_epochs_align(self.shell, self.cluster)
                 try_to_get_object_and_expect_error(
                     cid=user_container,
                     oid=oid,

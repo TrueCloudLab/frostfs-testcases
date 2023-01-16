@@ -253,6 +253,7 @@ class TestStorageGroup(ClusterTestBase):
         with allure.step("Tick two epochs"):
             for _ in range(2):
                 self.tick_epoch()
+        self.wait_for_epochs_align()
         with pytest.raises(Exception, match=OBJECT_NOT_FOUND):
             get_storagegroup(
                 shell=self.shell,

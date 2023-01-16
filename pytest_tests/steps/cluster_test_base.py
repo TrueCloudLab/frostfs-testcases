@@ -24,6 +24,9 @@ class ClusterTestBase:
     def tick_epoch(self):
         epoch.tick_epoch(self.shell, self.cluster)
 
+    def wait_for_epochs_align(self):
+        epoch.wait_for_epochs_align(self.shell, self.cluster)
+
     def get_epoch(self):
         return epoch.get_epoch(self.shell, self.cluster)
 
