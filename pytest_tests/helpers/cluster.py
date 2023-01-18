@@ -272,7 +272,7 @@ class Cluster:
         return self._get_nodes(_ServicesNames.S3_GATE)
 
     @property
-    def http_gates(self) -> list[S3Gate]:
+    def http_gates(self) -> list[HTTPGate]:
         """
         Returns list of HTTP gates
         """
