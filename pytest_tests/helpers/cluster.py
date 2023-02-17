@@ -8,7 +8,6 @@ import yaml
 from frostfs_testlib.blockchain import RPCClient
 from frostfs_testlib.hosting import Host, Hosting
 from frostfs_testlib.hosting.config import ServiceConfig
-from test_control import wait_for_success
 
 
 @dataclass

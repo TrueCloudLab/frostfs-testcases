@@ -2,7 +2,7 @@ import json
 
 import allure
 import pytest
-from epoch import tick_epoch
+from frostfs_testlib.resources.common import PRIVATE_ACL_F
 from python_keywords.container import (
     create_container,
     delete_container,
@@ -12,7 +12,6 @@ from python_keywords.container import (
     wait_for_container_deletion,
 )
 from utility import placement_policy_from_container
-from wellknown_acl import PRIVATE_ACL_F
 
 from steps.cluster_test_base import ClusterTestBase
 

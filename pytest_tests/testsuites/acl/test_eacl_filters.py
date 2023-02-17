@@ -1,6 +1,7 @@
 import allure
 import pytest
 from cluster_test_base import ClusterTestBase
+from frostfs_testlib.resources.common import PUBLIC_ACL
 from python_keywords.acl import (
     EACLAccess,
     EACLFilter,
@@ -22,7 +23,6 @@ from python_keywords.container_access import (
 )
 from python_keywords.frostfs_verbs import put_object_to_random_node
 from python_keywords.object_access import can_get_head_object, can_get_object, can_put_object
-from wellknown_acl import PUBLIC_ACL
 
 
 @pytest.mark.sanity

@@ -4,8 +4,8 @@ import allure
 import pytest
 from container import create_container
 from file_helper import generate_file
+from frostfs_testlib.resources.common import PUBLIC_ACL
 from http_gate import get_object_and_verify_hashes, upload_via_http_gate_curl
-from wellknown_acl import PUBLIC_ACL
 
 from steps.cluster_test_base import ClusterTestBase
 

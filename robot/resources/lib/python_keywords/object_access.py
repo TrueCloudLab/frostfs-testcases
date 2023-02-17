@@ -3,8 +3,9 @@ from typing import Optional
 import allure
 from cluster import Cluster
 from file_helper import get_file_hash
+from frostfs_testlib.resources.common import OBJECT_ACCESS_DENIED
 from frostfs_testlib.shell import Shell
-from grpc_responses import OBJECT_ACCESS_DENIED, error_matches_status
+from frostfs_testlib.utils.errors import error_matches_status
 from python_keywords.frostfs_verbs import (
     delete_object,
     get_object_from_random_node,

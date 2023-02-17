@@ -8,7 +8,7 @@ import pytest
 from container import create_container
 from epoch import get_epoch, wait_for_epochs_align
 from file_helper import generate_file
-from grpc_responses import OBJECT_NOT_FOUND
+from frostfs_testlib.resources.common import OBJECT_NOT_FOUND, PUBLIC_ACL
 from http_gate import (
     attr_into_str_header_curl,
     get_object_and_verify_hashes,
@@ -20,7 +20,6 @@ from python_keywords.frostfs_verbs import (
     get_object_from_random_node,
     head_object,
 )
-from wellknown_acl import PUBLIC_ACL
 
 from steps.cluster_test_base import ClusterTestBase
 
@@ -29,10 +28,10 @@ EXPIRATION_TIMESTAMP_HEADER = "__FROSRFS__EXPIRATION_TIMESTAMP"
 EXPIRATION_EPOCH_HEADER = "__FROSRFS__EXPIRATION_EPOCH"
 EXPIRATION_DURATION_HEADER = "__FROSRFS__EXPIRATION_DURATION"
 EXPIRATION_EXPIRATION_RFC = "__FROSRFS__EXPIRATION_RFC3339"
-FROSRFS_EXPIRATION_EPOCH = "Frostfs-Expiration-Epoch"
-FROSRFS_EXPIRATION_DURATION = "Frostfs-Expiration-Duration"
-FROSRFS_EXPIRATION_TIMESTAMP = "Frostfs-Expiration-Timestamp"
-FROSRFS_EXIPRATION_RFC3339 = "Frostfs-Expiration-RFC3339"
+FROSTFS_EXPIRATION_EPOCH = "Frostfs-Expiration-Epoch"
+FROSTFS_EXPIRATION_DURATION = "Frostfs-Expiration-Duration"
+FROSTFS_EXPIRATION_TIMESTAMP = "Frostfs-Expiration-Timestamp"
+FROSTFS_EXPIRATION_RFC3339 = "Frostfs-Expiration-RFC3339"
 
 
 @pytest.mark.sanity
@@ -324,7 +323,7 @@ class Test_http_system_header(ClusterTestBase):
             FROSTFS_EXPIRATION_TIMESTAMP: self.epoch_count_into_timestamp(
                 epoch_duration=epoch_duration, epoch=2
             ),
-            FROSTFS_EXIPRATION_RFC3339: self.epoch_count_into_timestamp(
+            FROSTFS_EXPIRATION_RFC3339: self.epoch_count_into_timestamp(
                 epoch_duration=epoch_duration, epoch=1, rfc3339=True
             ),
         }
@@ -373,7 +372,7 @@ class Test_http_system_header(ClusterTestBase):
             f"epoch duration={epoch_duration}, current_epoch= {get_epoch(self.shell, self.cluster)} expected_epoch {expected_epoch}"
         )
         attributes = {
-            FROSTFS_EXIPRATION_RFC3339: self.epoch_count_into_timestamp(
+            FROSTFS_EXPIRATION_RFC3339: self.epoch_count_into_timestamp(
                 epoch_duration=epoch_duration, epoch=2, rfc3339=True
             )
         }

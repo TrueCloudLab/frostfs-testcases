@@ -1,6 +1,7 @@
 import allure
 import pytest
 from file_helper import generate_file
+from frostfs_testlib.resources.common import PUBLIC_ACL
 from frostfs_testlib.shell import Shell
 from python_keywords.acl import (
     EACLAccess,
@@ -19,7 +20,6 @@ from python_keywords.container import (
 )
 from python_keywords.object_access import can_put_object
 from wallet import WalletFile
-from wellknown_acl import PUBLIC_ACL
 
 from steps.cluster_test_base import ClusterTestBase
 from steps.session_token import ContainerVerb, get_container_signed_token

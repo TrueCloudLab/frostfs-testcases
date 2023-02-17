@@ -7,14 +7,14 @@ import pytest
 from cluster import Cluster
 from complex_object_actions import get_complex_object_split_ranges
 from file_helper import generate_file, get_file_content, get_file_hash
-from frostfs_testlib.shell import Shell
-from grpc_responses import (
+from frostfs_testlib.resources.common import (
     INVALID_LENGTH_SPECIFIER,
     INVALID_OFFSET_SPECIFIER,
     INVALID_RANGE_OVERFLOW,
     INVALID_RANGE_ZERO_LENGTH,
     OUT_OF_RANGE,
 )
+from frostfs_testlib.shell import Shell
 from pytest import FixtureRequest
 from python_keywords.container import create_container
 from python_keywords.frostfs_verbs import (

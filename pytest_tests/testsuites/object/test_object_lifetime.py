@@ -2,9 +2,9 @@ import logging
 
 import allure
 import pytest
-from epoch import get_epoch, tick_epoch
+from epoch import get_epoch
 from file_helper import generate_file, get_file_hash
-from grpc_responses import OBJECT_NOT_FOUND
+from frostfs_testlib.resources.common import OBJECT_NOT_FOUND
 from pytest import FixtureRequest
 from python_keywords.container import create_container
 from python_keywords.frostfs_verbs import get_object_from_random_node, put_object_to_random_node

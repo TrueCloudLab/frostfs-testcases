@@ -8,12 +8,12 @@ import pytest
 from cluster import Cluster
 from common import WALLET_CONFIG, WALLET_PASS
 from file_helper import generate_file
+from frostfs_testlib.resources.common import PUBLIC_ACL
 from frostfs_testlib.shell import Shell
 from frostfs_testlib.utils.wallet import init_wallet
 from python_keywords.acl import EACLRole
 from python_keywords.container import create_container
 from python_keywords.frostfs_verbs import put_object_to_random_node
-from wellknown_acl import PUBLIC_ACL
 
 OBJECT_COUNT = 5
 

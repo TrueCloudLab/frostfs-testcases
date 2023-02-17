@@ -5,8 +5,8 @@ import allure
 import pytest
 from cluster import Cluster
 from epoch import tick_epoch
+from frostfs_testlib.resources.common import OBJECT_ALREADY_REMOVED
 from frostfs_testlib.shell import Shell
-from grpc_responses import OBJECT_ALREADY_REMOVED
 from python_keywords.frostfs_verbs import delete_object, get_object
 from storage_object_info import StorageObjectInfo
 from tombstone import verify_head_tombstone
