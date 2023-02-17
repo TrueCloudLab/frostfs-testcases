@@ -2,7 +2,7 @@ import allure
 import pytest
 from cluster_test_base import ClusterTestBase
 from failover_utils import wait_object_replication
-from frostfs_testlib.shell import Shell
+from frostfs_testlib.resources.common import PUBLIC_ACL
 from python_keywords.acl import (
     EACLAccess,
     EACLOperation,
@@ -28,7 +28,6 @@ from python_keywords.object_access import (
     can_put_object,
     can_search_object,
 )
-from wellknown_acl import PUBLIC_ACL
 
 
 @pytest.mark.sanity

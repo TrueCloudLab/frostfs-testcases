@@ -4,6 +4,8 @@
 
 .DS_Store
 
+venv_macos
+
 
 # ignore test results
 **/log.html

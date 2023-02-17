@@ -6,14 +6,14 @@
 """
 
 import logging
-from typing import List
 
 import allure
 import complex_object_actions
 import frostfs_verbs
 from cluster import StorageNode
+from frostfs_testlib.resources.common import OBJECT_NOT_FOUND
 from frostfs_testlib.shell import Shell
-from grpc_responses import OBJECT_NOT_FOUND, error_matches_status
+from frostfs_testlib.utils.errors import error_matches_status
 
 logger = logging.getLogger("NeoLogger")
 

@@ -9,8 +9,8 @@ from container import (
     list_containers,
     wait_for_container_deletion,
 )
-from epoch import tick_epoch
 from file_helper import generate_file
+from frostfs_testlib.resources.common import PUBLIC_ACL
 from http_gate import (
     attr_into_str_header_curl,
     get_object_by_attr_and_verify_hashes,
@@ -20,7 +20,6 @@ from http_gate import (
 )
 from pytest import FixtureRequest
 from python_keywords.frostfs_verbs import delete_object
-from wellknown_acl import PUBLIC_ACL
 
 from helpers.storage_object_info import StorageObjectInfo
 from steps.cluster_test_base import ClusterTestBase

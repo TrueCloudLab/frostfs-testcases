@@ -3,11 +3,11 @@ import pytest
 from cluster import Cluster
 from container import REP_2_FOR_3_NODES_PLACEMENT_RULE, SINGLE_PLACEMENT_RULE, create_container
 from epoch import get_epoch
+from frostfs_testlib.resources.common import EACL_PUBLIC_READ_WRITE
 from frostfs_testlib.shell import Shell
 from frostfs_verbs import delete_object, get_object
 from pytest import FixtureRequest
 from python_keywords.acl import EACLAccess, EACLOperation, EACLRole, EACLRule, form_bearertoken_file
-from wellknown_acl import EACL_PUBLIC_READ_WRITE
 
 from helpers.container import StorageContainer, StorageContainerInfo
 from helpers.test_control import expect_not_raises

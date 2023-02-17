@@ -8,8 +8,8 @@ import pytest
 from cluster_test_base import ClusterTestBase
 from common import ASSETS_DIR, FREE_STORAGE, WALLET_PASS
 from file_helper import generate_file
+from frostfs_testlib.resources.common import OBJECT_ACCESS_DENIED, OBJECT_NOT_FOUND
 from frostfs_testlib.utils.wallet import init_wallet
-from grpc_responses import OBJECT_ACCESS_DENIED, OBJECT_NOT_FOUND
 from python_keywords.acl import (
     EACLAccess,
     EACLOperation,

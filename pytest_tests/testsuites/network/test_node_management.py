@@ -10,7 +10,8 @@ from cluster_test_base import ClusterTestBase
 from common import FROSTFS_CONTRACT_CACHE_TIMEOUT, MORPH_BLOCK_TIME
 from epoch import tick_epoch
 from file_helper import generate_file
-from grpc_responses import OBJECT_NOT_FOUND, error_matches_status
+from frostfs_testlib.resources.common import OBJECT_NOT_FOUND, PUBLIC_ACL
+from frostfs_testlib.utils.errors import error_matches_status
 from python_keywords.container import create_container, get_container
 from python_keywords.failover_utils import wait_object_replication
 from python_keywords.frostfs_verbs import (
@@ -27,17 +28,14 @@ from python_keywords.node_management import (
     drop_object,
     exclude_node_from_network_map,
     get_locode_from_random_node,
-    get_netmap_snapshot,
     include_node_to_network_map,
     node_shard_list,
     node_shard_set_mode,
-    start_storage_nodes,
     storage_node_healthcheck,
     storage_node_set_status,
 )
 from storage_policy import get_nodes_with_object, get_simple_object_copies
 from utility import parse_time, placement_policy_from_container, wait_for_gc_pass_on_storage_nodes
-from wellknown_acl import PUBLIC_ACL
 
 logger = logging.getLogger("NeoLogger")
 check_nodes: list[StorageNode] = []

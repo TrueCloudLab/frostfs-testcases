@@ -6,13 +6,13 @@ from cluster import Cluster
 from cluster_test_base import ClusterTestBase
 from epoch import ensure_fresh_epoch
 from file_helper import generate_file
-from frostfs_testlib.shell import Shell
-from grpc_responses import (
+from frostfs_testlib.resources.common import (
     EXPIRED_SESSION_TOKEN,
     MALFORMED_REQUEST,
     OBJECT_ACCESS_DENIED,
     OBJECT_NOT_FOUND,
 )
+from frostfs_testlib.shell import Shell
 from pytest import FixtureRequest
 from python_keywords.container import create_container
 from python_keywords.frostfs_verbs import (

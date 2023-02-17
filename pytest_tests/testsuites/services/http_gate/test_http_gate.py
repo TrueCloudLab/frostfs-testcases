@@ -3,8 +3,9 @@ import os
 
 import allure
 import pytest
-from epoch import get_epoch, tick_epoch
+from epoch import get_epoch
 from file_helper import generate_file, get_file_hash
+from frostfs_testlib.resources.common import PUBLIC_ACL
 from python_keywords.container import create_container
 from python_keywords.frostfs_verbs import put_object_to_random_node
 from python_keywords.http_gate import (
@@ -19,7 +20,6 @@ from python_keywords.http_gate import (
     upload_via_http_gate_curl,
 )
 from utility import wait_for_gc_pass_on_storage_nodes
-from wellknown_acl import PUBLIC_ACL
 
 from steps.cluster_test_base import ClusterTestBase
 
