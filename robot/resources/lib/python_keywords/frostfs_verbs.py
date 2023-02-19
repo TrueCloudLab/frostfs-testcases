@@ -6,11 +6,11 @@ import uuid
 from typing import Any, Optional
 
 import allure
-import json_transformers
 from cluster import Cluster
 from common import ASSETS_DIR, FROSTFS_CLI_EXEC, WALLET_CONFIG
 from frostfs_testlib.cli import FrostfsCli
 from frostfs_testlib.shell import Shell
+from frostfs_testlib.utils import json_utils
 
 logger = logging.getLogger("NeoLogger")
 
@@ -613,22 +613,22 @@ def head_object(
     # If response is Complex Object header, it has `splitId` key
     if "splitId" in decoded.keys():
         logger.info("decoding split header")
-        return json_transformers.decode_split_header(decoded)
+        return json_utils.decode_split_header(decoded)
 
     # If response is Last or Linking Object header,
     # it has `header` dictionary and non-null `split` dictionary
     if "split" in decoded["header"].keys():
         if decoded["header"]["split"]:
             logger.info("decoding linking object")
-            return json_transformers.decode_linking_object(decoded)
+            return json_utils.decode_linking_object(decoded)
 
     if decoded["header"]["objectType"] == "STORAGE_GROUP":
         logger.info("decoding storage group")
-        return json_transformers.decode_storage_group(decoded)
+        return json_utils.decode_storage_group(decoded)
 
     if decoded["header"]["objectType"] == "TOMBSTONE":
         logger.info("decoding tombstone")
-        return json_transformers.decode_tombstone(decoded)
+        return json_utils.decode_tombstone(decoded)
 
     logger.info("decoding simple header")
-    return json_transformers.decode_simple_header(decoded)
+    return json_utils.decode_simple_header(decoded)

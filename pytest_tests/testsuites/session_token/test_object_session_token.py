@@ -6,7 +6,7 @@ from cluster_test_base import ClusterTestBase
 from common import WALLET_PASS
 from file_helper import generate_file
 from frostfs_testlib.resources.common import SESSION_NOT_FOUND
-from frostfs_testlib.utils.wallet import get_last_address_from_wallet
+from frostfs_testlib.utils import wallet_utils
 from python_keywords.container import create_container
 from python_keywords.frostfs_verbs import delete_object, put_object, put_object_to_random_node
 
@@ -38,7 +38,7 @@ class TestDynamicObjectSession(ClusterTestBase):
 
         with allure.step("Init wallet"):
             wallet = default_wallet
-            address = get_last_address_from_wallet(wallet, "")
+            address = wallet_utils.get_last_address_from_wallet(wallet, "")
 
         with allure.step("Nodes Settlements"):
             (

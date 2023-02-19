@@ -10,7 +10,7 @@ from common import WALLET_CONFIG, WALLET_PASS
 from file_helper import generate_file
 from frostfs_testlib.resources.common import PUBLIC_ACL
 from frostfs_testlib.shell import Shell
-from frostfs_testlib.utils.wallet import init_wallet
+from frostfs_testlib.utils import wallet_utils
 from python_keywords.acl import EACLRole
 from python_keywords.container import create_container
 from python_keywords.frostfs_verbs import put_object_to_random_node
@@ -41,7 +41,7 @@ def wallets(default_wallet, temp_directory, cluster: Cluster) -> Wallets:
         os.path.join(temp_directory, f"{str(uuid.uuid4())}.json") for _ in range(2)
     ]
     for other_wallet_path in other_wallets_paths:
-        init_wallet(other_wallet_path, WALLET_PASS)
+        wallet_utils.init_wallet(other_wallet_path, WALLET_PASS)
 
     ir_node = cluster.ir_nodes[0]
     storage_node = cluster.storage_nodes[0]

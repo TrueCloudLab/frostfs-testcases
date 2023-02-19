@@ -3,11 +3,11 @@ import re
 from dataclasses import dataclass
 from typing import Any
 
-import data_formatters
 import yaml
 from frostfs_testlib.blockchain import RPCClient
 from frostfs_testlib.hosting import Host, Hosting
 from frostfs_testlib.hosting.config import ServiceConfig
+from frostfs_testlib.utils import wallet_utils
 
 
 @dataclass
@@ -85,7 +85,7 @@ class NodeBase:
     def get_wallet_public_key(self):
         storage_wallet_path = self.get_wallet_path()
         storage_wallet_pass = self.get_wallet_password()
-        return data_formatters.get_wallet_public_key(storage_wallet_path, storage_wallet_pass)
+        return wallet_utils.get_wallet_public_key(storage_wallet_path, storage_wallet_pass)
 
     def _get_attribute(self, attribute_name: str, default_attribute_name: str = None) -> list[str]:
         config = self.host.get_service_config(self.name)

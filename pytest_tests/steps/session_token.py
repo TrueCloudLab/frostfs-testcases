@@ -8,12 +8,10 @@ from enum import Enum
 from typing import Any, Optional
 
 import allure
-import json_transformers
 from common import ASSETS_DIR, FROSTFS_CLI_EXEC, WALLET_CONFIG
-from data_formatters import get_wallet_public_key
 from frostfs_testlib.cli import FrostfsCli
 from frostfs_testlib.shell import Shell
-from json_transformers import encode_for_json
+from frostfs_testlib.utils import json_utils, wallet_utils
 from storage_object_info import StorageObjectInfo
 from wallet import WalletFile
 
@@ -71,16 +69,16 @@ def generate_session_token(
 
     file_path = os.path.join(tokens_dir, str(uuid.uuid4()))
 
-    pub_key_64 = get_wallet_public_key(session_wallet.path, session_wallet.password, "base64")
+    pub_key_64 = wallet_utils.get_wallet_public_key(
+        session_wallet.path, session_wallet.password, "base64"
+    )
 
     lifetime = lifetime or Lifetime()
 
     session_token = {
         "body": {
             "id": f"{base64.b64encode(uuid.uuid4().bytes).decode('utf-8')}",
-            "ownerID": {
-                "value": f"{json_transformers.encode_for_json(owner_wallet.get_address())}"
-            },
+            "ownerID": {"value": f"{json_utils.encode_for_json(owner_wallet.get_address())}"},
             "lifetime": {
                 "exp": f"{lifetime.exp}",
                 "nbf": f"{lifetime.nbf}",
@@ -125,7 +123,11 @@ def generate_container_session_token(
         "container": {
             "verb": verb.value,
             "wildcard": cid is None,
-            **({"containerID": {"value": f"{encode_for_json(cid)}"}} if cid is not None else {}),
+            **(
+                {"containerID": {"value": f"{json_utils.encode_for_json(cid)}"}}
+                if cid is not None
+                else {}
+            ),
         },
     }
 
@@ -165,8 +167,8 @@ def generate_object_session_token(
         "object": {
             "verb": verb.value,
             "target": {
-                "container": {"value": encode_for_json(cid)},
-                "objects": [{"value": encode_for_json(oid)} for oid in oids],
+                "container": {"value": json_utils.encode_for_json(cid)},
+                "objects": [{"value": json_utils.encode_for_json(oid)} for oid in oids],
             },
         },
     }

@@ -2,32 +2,7 @@ import time
 
 import allure
 from common import STORAGE_GC_TIME
-
-
-def parse_time(value: str) -> int:
-    """Converts time interval in text form into time interval as number of seconds.
-
-    Args:
-        value: time interval as text.
-
-    Returns:
-        Number of seconds in the parsed time interval.
-    """
-    value = value.lower()
-
-    for suffix in ["s", "sec"]:
-        if value.endswith(suffix):
-            return int(value[: -len(suffix)])
-
-    for suffix in ["m", "min"]:
-        if value.endswith(suffix):
-            return int(value[: -len(suffix)]) * 60
-
-    for suffix in ["h", "hr", "hour"]:
-        if value.endswith(suffix):
-            return int(value[: -len(suffix)]) * 60 * 60
-
-    raise ValueError(f"Unknown units in time value '{value}'")
+from frostfs_testlib.utils import datetime_utils
 
 
 def placement_policy_from_container(container_info: str) -> str:
@@ -57,6 +32,6 @@ def placement_policy_from_container(container_info: str) -> str:
 
 
 def wait_for_gc_pass_on_storage_nodes() -> None:
-    wait_time = parse_time(STORAGE_GC_TIME)
+    wait_time = datetime_utils.parse_time(STORAGE_GC_TIME)
     with allure.step(f"Wait {wait_time}s until GC completes on storage nodes"):
         time.sleep(wait_time)

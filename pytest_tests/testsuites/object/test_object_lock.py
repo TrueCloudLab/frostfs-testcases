@@ -18,13 +18,14 @@ from frostfs_testlib.resources.common import (
     OBJECT_NOT_FOUND,
 )
 from frostfs_testlib.shell import Shell
+from frostfs_testlib.utils import datetime_utils
 from node_management import drop_object
 from pytest import FixtureRequest
 from python_keywords.container import create_container
 from python_keywords.frostfs_verbs import delete_object, head_object, lock_object
 from storage_policy import get_nodes_with_object
 from test_control import expect_not_raises, wait_for_success
-from utility import parse_time, wait_for_gc_pass_on_storage_nodes
+from utility import wait_for_gc_pass_on_storage_nodes
 
 from helpers.container import StorageContainer, StorageContainerInfo
 from helpers.storage_object_info import LockObjectInfo, StorageObjectInfo
@@ -321,7 +322,7 @@ class TestObjectLockWithGrpc(ClusterTestBase):
                     self.cluster.default_rpc_endpoint,
                 )
 
-        @wait_for_success(parse_time(STORAGE_GC_TIME))
+        @wait_for_success(datetime_utils.parse_time(STORAGE_GC_TIME))
         def check_object_not_found():
             with pytest.raises(Exception, match=OBJECT_NOT_FOUND):
                 head_object(

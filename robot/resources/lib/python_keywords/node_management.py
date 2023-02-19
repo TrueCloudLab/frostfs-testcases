@@ -11,7 +11,7 @@ from common import FROSTFS_CLI_EXEC, MORPH_BLOCK_TIME
 from epoch import tick_epoch
 from frostfs_testlib.cli import FrostfsCli
 from frostfs_testlib.shell import Shell
-from utility import parse_time
+from frostfs_testlib.utils import datetime_utils
 
 logger = logging.getLogger("NeoLogger")
 
@@ -154,7 +154,7 @@ def drop_object(node: StorageNode, cid: str, oid: str) -> str:
 def delete_node_data(node: StorageNode) -> None:
     node.stop_service()
     node.host.delete_storage_node_data(node.name)
-    time.sleep(parse_time(MORPH_BLOCK_TIME))
+    time.sleep(datetime_utils.parse_time(MORPH_BLOCK_TIME))
 
 
 @allure.step("Exclude node {node_to_exclude} from network map")
@@ -168,7 +168,7 @@ def exclude_node_from_network_map(
 
     storage_node_set_status(node_to_exclude, status="offline")
 
-    time.sleep(parse_time(MORPH_BLOCK_TIME))
+    time.sleep(datetime_utils.parse_time(MORPH_BLOCK_TIME))
     tick_epoch(shell, cluster)
 
     snapshot = get_netmap_snapshot(node=alive_node, shell=shell)
@@ -189,9 +189,9 @@ def include_node_to_network_map(
     # Per suggestion of @fyrchik we need to wait for 2 blocks after we set status and after tick epoch.
     # First sleep can be omitted after https://github.com/nspcc-dev/frostfs-node/issues/1790 complete.
 
-    time.sleep(parse_time(MORPH_BLOCK_TIME) * 2)
+    time.sleep(datetime_utils.parse_time(MORPH_BLOCK_TIME) * 2)
     tick_epoch(shell, cluster)
-    time.sleep(parse_time(MORPH_BLOCK_TIME) * 2)
+    time.sleep(datetime_utils.parse_time(MORPH_BLOCK_TIME) * 2)
 
     check_node_in_map(node_to_include, shell, alive_node)
 

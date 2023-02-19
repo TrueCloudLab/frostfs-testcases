@@ -10,11 +10,9 @@ from cluster import MainChain, MorphChain
 from common import FROSTFS_CONTRACT, GAS_HASH, MAINNET_BLOCK_TIME, NEOGO_EXECUTABLE
 from frostfs_testlib.cli import NeoGo
 from frostfs_testlib.shell import Shell
-from frostfs_testlib.utils.converters import contract_hash_to_address
-from frostfs_testlib.utils.wallet import get_last_address_from_wallet
+from frostfs_testlib.utils import converting_utils, datetime_utils, wallet_utils
 from neo3.wallet import utils as neo3_utils
 from neo3.wallet import wallet as neo3_wallet
-from utility import parse_time
 
 logger = logging.getLogger("NeoLogger")
 
@@ -43,7 +41,7 @@ def get_contract_hash(morph_chain: MorphChain, resolve_name: str, shell: Shell) 
 
 @allure.step("Withdraw Mainnet Gas")
 def withdraw_mainnet_gas(shell: Shell, main_chain: MainChain, wlt: str, amount: int):
-    address = get_last_address_from_wallet(wlt, EMPTY_PASSWORD)
+    address = wallet_utils.get_last_address_from_wallet(wlt, EMPTY_PASSWORD)
     scripthash = neo3_utils.address_to_script_hash(address)
 
     neogo = NeoGo(shell=shell, neo_go_exec_path=NEOGO_EXECUTABLE)
@@ -142,10 +140,12 @@ def transfer_gas(
         if wallet_from_password is not None
         else main_chain.get_wallet_password()
     )
-    address_from = address_from or get_last_address_from_wallet(
+    address_from = address_from or wallet_utils.get_last_address_from_wallet(
         wallet_from_path, wallet_from_password
     )
-    address_to = address_to or get_last_address_from_wallet(wallet_to_path, wallet_to_password)
+    address_to = address_to or wallet_utils.get_last_address_from_wallet(
+        wallet_to_path, wallet_to_password
+    )
 
     neogo = NeoGo(shell, neo_go_exec_path=NEOGO_EXECUTABLE)
     out = neogo.nep17.transfer(
@@ -163,7 +163,7 @@ def transfer_gas(
         raise Exception("Got no TXID after run the command")
     if not transaction_accepted(main_chain, txid):
         raise AssertionError(f"TX {txid} hasn't been processed")
-    time.sleep(parse_time(MAINNET_BLOCK_TIME))
+    time.sleep(datetime_utils.parse_time(MAINNET_BLOCK_TIME))
 
 
 @allure.step("FrostFS Deposit")
@@ -178,9 +178,9 @@ def deposit_gas(
     Transferring GAS from given wallet to FrostFS contract address.
     """
     # get FrostFS contract address
-    deposit_addr = contract_hash_to_address(FROSTFS_CONTRACT)
+    deposit_addr = converting_utils.contract_hash_to_address(FROSTFS_CONTRACT)
     logger.info(f"FrostFS contract address: {deposit_addr}")
-    address_from = get_last_address_from_wallet(
+    address_from = wallet_utils.get_last_address_from_wallet(
         wallet_path=wallet_from_path, wallet_password=wallet_from_password
     )
     transfer_gas(
