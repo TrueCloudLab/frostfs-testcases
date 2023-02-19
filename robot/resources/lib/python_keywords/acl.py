@@ -11,9 +11,9 @@ from typing import Any, Dict, List, Optional, Union
 import allure
 import base58
 from common import ASSETS_DIR, FROSTFS_CLI_EXEC, WALLET_CONFIG
-from data_formatters import get_wallet_public_key
 from frostfs_testlib.cli import FrostfsCli
 from frostfs_testlib.shell import Shell
+from frostfs_testlib.utils import wallet_utils
 
 logger = logging.getLogger("NeoLogger")
 EACL_LIFETIME = 100500
@@ -110,7 +110,7 @@ class EACLRule:
         role = (
             self.role.value
             if isinstance(self.role, EACLRole)
-            else f'pubkey:{get_wallet_public_key(self.role, "")}'
+            else f'pubkey:{wallet_utils.get_wallet_public_key(self.role, "")}'
         )
         return f'{self.access.value} {self.operation.value} {self.filters or ""} {role}'
 
@@ -244,7 +244,7 @@ def eacl_rules(access: str, verbs: list, user: str) -> list[str]:
         (list): a list of eACL rules
     """
     if user not in ("others", "user"):
-        pubkey = get_wallet_public_key(user, wallet_password="")
+        pubkey = wallet_utils.get_wallet_public_key(user, wallet_password="")
         user = f"pubkey:{pubkey}"
 
     rules = []

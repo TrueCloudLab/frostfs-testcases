@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from cluster import Cluster, NodeBase
 from common import FREE_STORAGE, WALLET_CONFIG, WALLET_PASS
 from frostfs_testlib.shell import Shell
-from frostfs_testlib.utils.wallet import get_last_address_from_wallet, init_wallet
+from frostfs_testlib.utils import wallet_utils
 from python_keywords.payment_neogo import deposit_gas, transfer_gas
 
 
@@ -28,7 +28,7 @@ class WalletFile:
         Returns:
             The address of the wallet.
         """
-        return get_last_address_from_wallet(self.path, self.password)
+        return wallet_utils.get_last_address_from_wallet(self.path, self.password)
 
 
 class WalletFactory:
@@ -47,7 +47,7 @@ class WalletFactory:
             WalletFile object of new wallet
         """
         wallet_path = os.path.join(self.wallets_dir, f"{str(uuid.uuid4())}.json")
-        init_wallet(wallet_path, password)
+        wallet_utils.init_wallet(wallet_path, password)
 
         if not FREE_STORAGE:
             main_chain = self.cluster.main_chain_nodes[0]

@@ -9,7 +9,7 @@ from cluster_test_base import ClusterTestBase
 from common import ASSETS_DIR, FREE_STORAGE, WALLET_PASS
 from file_helper import generate_file
 from frostfs_testlib.resources.common import OBJECT_ACCESS_DENIED, OBJECT_NOT_FOUND
-from frostfs_testlib.utils.wallet import init_wallet
+from frostfs_testlib.utils import wallet_utils
 from python_keywords.acl import (
     EACLAccess,
     EACLOperation,
@@ -48,7 +48,7 @@ class TestStorageGroup(ClusterTestBase):
     def prepare_two_wallets(self, default_wallet):
         self.main_wallet = default_wallet
         self.other_wallet = os.path.join(os.getcwd(), ASSETS_DIR, f"{str(uuid.uuid4())}.json")
-        init_wallet(self.other_wallet, WALLET_PASS)
+        wallet_utils.init_wallet(self.other_wallet, WALLET_PASS)
         if not FREE_STORAGE:
             main_chain = self.cluster.main_chain_nodes[0]
             deposit = 30

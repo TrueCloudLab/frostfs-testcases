@@ -8,9 +8,8 @@ import allure
 import pytest
 from aws_cli_client import AwsCliClient
 from common import ASSETS_DIR, FREE_STORAGE, WALLET_PASS
-from data_formatters import get_wallet_public_key
 from file_helper import concat_files, generate_file, generate_file_with_content, get_file_hash
-from frostfs_testlib.utils.wallet import init_wallet
+from frostfs_testlib.utils import wallet_utils
 from python_keywords.payment_neogo import deposit_gas, transfer_gas
 from s3_helper import (
     assert_object_lock_mode,
@@ -661,10 +660,10 @@ class TestS3GateObject(TestS3GateBase):
     @pytest.fixture
     def prepare_two_wallets(self, default_wallet, client_shell):
         self.main_wallet = default_wallet
-        self.main_public_key = get_wallet_public_key(self.main_wallet, WALLET_PASS)
+        self.main_public_key = wallet_utils.get_wallet_public_key(self.main_wallet, WALLET_PASS)
         self.other_wallet = os.path.join(os.getcwd(), ASSETS_DIR, f"{str(uuid.uuid4())}.json")
-        init_wallet(self.other_wallet, WALLET_PASS)
-        self.other_public_key = get_wallet_public_key(self.other_wallet, WALLET_PASS)
+        wallet_utils.init_wallet(self.other_wallet, WALLET_PASS)
+        self.other_public_key = wallet_utils.get_wallet_public_key(self.other_wallet, WALLET_PASS)
 
         if not FREE_STORAGE:
             main_chain = self.cluster.main_chain_nodes[0]

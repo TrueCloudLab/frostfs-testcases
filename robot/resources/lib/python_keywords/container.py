@@ -10,10 +10,10 @@ from time import sleep
 from typing import Optional, Union
 
 import allure
-import json_transformers
 from common import FROSTFS_CLI_EXEC, WALLET_CONFIG
 from frostfs_testlib.cli import FrostfsCli
 from frostfs_testlib.shell import Shell
+from frostfs_testlib.utils import json_utils
 
 logger = logging.getLogger("NeoLogger")
 
@@ -164,7 +164,7 @@ def get_container(
     for attr in container_info["attributes"]:
         attributes[attr["key"]] = attr["value"]
     container_info["attributes"] = attributes
-    container_info["ownerID"] = json_transformers.json_reencode(container_info["ownerID"]["value"])
+    container_info["ownerID"] = json_utils.json_reencode(container_info["ownerID"]["value"])
     return container_info
 
 

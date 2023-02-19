@@ -11,7 +11,7 @@ from common import FROSTFS_CONTRACT_CACHE_TIMEOUT, MORPH_BLOCK_TIME
 from epoch import tick_epoch
 from file_helper import generate_file
 from frostfs_testlib.resources.common import OBJECT_NOT_FOUND, PUBLIC_ACL
-from frostfs_testlib.utils.errors import error_matches_status
+from frostfs_testlib.utils import datetime_utils, string_utils
 from python_keywords.container import create_container, get_container
 from python_keywords.failover_utils import wait_object_replication
 from python_keywords.frostfs_verbs import (
@@ -35,7 +35,7 @@ from python_keywords.node_management import (
     storage_node_set_status,
 )
 from storage_policy import get_nodes_with_object, get_simple_object_copies
-from utility import parse_time, placement_policy_from_container, wait_for_gc_pass_on_storage_nodes
+from utility import placement_policy_from_container, wait_for_gc_pass_on_storage_nodes
 
 logger = logging.getLogger("NeoLogger")
 check_nodes: list[StorageNode] = []
@@ -109,13 +109,13 @@ class TestNodeManagement(ClusterTestBase):
 
             # We need to wait for node to establish notifications from morph-chain
             # Otherwise it will hang up when we will try to set status
-            sleep(parse_time(MORPH_BLOCK_TIME))
+            sleep(datetime_utils.parse_time(MORPH_BLOCK_TIME))
 
             with allure.step(f"Move node {node} to online state"):
                 storage_node_set_status(node, status="online", retries=2)
 
             check_nodes.remove(node)
-            sleep(parse_time(MORPH_BLOCK_TIME))
+            sleep(datetime_utils.parse_time(MORPH_BLOCK_TIME))
             self.tick_epoch_with_retries(3)
             check_node_in_map(node, shell=self.shell, alive_node=alive_node)
 
@@ -472,7 +472,7 @@ class TestNodeManagement(ClusterTestBase):
             if copies == expected_copies:
                 break
             tick_epoch(self.shell, self.cluster)
-            sleep(parse_time(FROSTFS_CONTRACT_CACHE_TIMEOUT))
+            sleep(datetime_utils.parse_time(FROSTFS_CONTRACT_CACHE_TIMEOUT))
         else:
             raise AssertionError(f"There are no {expected_copies} copies during time")
 
@@ -483,7 +483,7 @@ class TestNodeManagement(ClusterTestBase):
                 checker(wallet, cid, oid, shell=self.shell, endpoint=endpoint)
                 wait_for_gc_pass_on_storage_nodes()
             except Exception as err:
-                if error_matches_status(err, OBJECT_NOT_FOUND):
+                if string_utils.is_str_match_pattern(err, OBJECT_NOT_FOUND):
                     return
                 raise AssertionError(f'Expected "{OBJECT_NOT_FOUND}" error, got\n{err}')
 

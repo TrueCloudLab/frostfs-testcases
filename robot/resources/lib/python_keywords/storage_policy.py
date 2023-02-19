@@ -13,7 +13,7 @@ import frostfs_verbs
 from cluster import StorageNode
 from frostfs_testlib.resources.common import OBJECT_NOT_FOUND
 from frostfs_testlib.shell import Shell
-from frostfs_testlib.utils.errors import error_matches_status
+from frostfs_testlib.utils import string_utils
 
 logger = logging.getLogger("NeoLogger")
 
@@ -166,7 +166,7 @@ def get_nodes_without_object(
             if res is None:
                 nodes_list.append(node)
         except Exception as err:
-            if error_matches_status(err, OBJECT_NOT_FOUND):
+            if string_utils.is_str_match_pattern(err, OBJECT_NOT_FOUND):
                 nodes_list.append(node)
             else:
                 raise Exception(f"Got error {err} on head object command") from err

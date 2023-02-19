@@ -5,7 +5,7 @@ from cluster import Cluster
 from file_helper import get_file_hash
 from frostfs_testlib.resources.common import OBJECT_ACCESS_DENIED
 from frostfs_testlib.shell import Shell
-from frostfs_testlib.utils.errors import error_matches_status
+from frostfs_testlib.utils import string_utils
 from python_keywords.frostfs_verbs import (
     delete_object,
     get_object_from_random_node,
@@ -43,7 +43,7 @@ def can_get_object(
                 cluster=cluster,
             )
         except OPERATION_ERROR_TYPE as err:
-            assert error_matches_status(
+            assert string_utils.is_str_match_pattern(
                 err, OBJECT_ACCESS_DENIED
             ), f"Expected {err} to match {OBJECT_ACCESS_DENIED}"
             return False
@@ -76,7 +76,7 @@ def can_put_object(
                 cluster=cluster,
             )
         except OPERATION_ERROR_TYPE as err:
-            assert error_matches_status(
+            assert string_utils.is_str_match_pattern(
                 err, OBJECT_ACCESS_DENIED
             ), f"Expected {err} to match {OBJECT_ACCESS_DENIED}"
             return False
@@ -106,7 +106,7 @@ def can_delete_object(
                 endpoint=endpoint,
             )
         except OPERATION_ERROR_TYPE as err:
-            assert error_matches_status(
+            assert string_utils.is_str_match_pattern(
                 err, OBJECT_ACCESS_DENIED
             ), f"Expected {err} to match {OBJECT_ACCESS_DENIED}"
             return False
@@ -136,7 +136,7 @@ def can_get_head_object(
                 endpoint=endpoint,
             )
         except OPERATION_ERROR_TYPE as err:
-            assert error_matches_status(
+            assert string_utils.is_str_match_pattern(
                 err, OBJECT_ACCESS_DENIED
             ), f"Expected {err} to match {OBJECT_ACCESS_DENIED}"
             return False
@@ -167,7 +167,7 @@ def can_get_range_of_object(
                 endpoint=endpoint,
             )
         except OPERATION_ERROR_TYPE as err:
-            assert error_matches_status(
+            assert string_utils.is_str_match_pattern(
                 err, OBJECT_ACCESS_DENIED
             ), f"Expected {err} to match {OBJECT_ACCESS_DENIED}"
             return False
@@ -198,7 +198,7 @@ def can_get_range_hash_of_object(
                 endpoint=endpoint,
             )
         except OPERATION_ERROR_TYPE as err:
-            assert error_matches_status(
+            assert string_utils.is_str_match_pattern(
                 err, OBJECT_ACCESS_DENIED
             ), f"Expected {err} to match {OBJECT_ACCESS_DENIED}"
             return False
@@ -227,7 +227,7 @@ def can_search_object(
                 endpoint=endpoint,
             )
         except OPERATION_ERROR_TYPE as err:
-            assert error_matches_status(
+            assert string_utils.is_str_match_pattern(
                 err, OBJECT_ACCESS_DENIED
             ), f"Expected {err} to match {OBJECT_ACCESS_DENIED}"
             return False

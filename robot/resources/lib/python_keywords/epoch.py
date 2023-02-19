@@ -13,10 +13,9 @@ from common import (
 )
 from frostfs_testlib.cli import FrostfsAdm, FrostfsCli, NeoGo
 from frostfs_testlib.shell import Shell
-from frostfs_testlib.utils.wallet import get_last_address_from_wallet
+from frostfs_testlib.utils import datetime_utils, wallet_utils
 from payment_neogo import get_contract_hash
 from test_control import wait_for_success
-from utility import parse_time
 
 logger = logging.getLogger("NeoLogger")
 
@@ -90,7 +89,7 @@ def tick_epoch(shell: Shell, cluster: Cluster, alive_node: Optional[StorageNode]
     # In case if no local_wallet_path is provided, we use wallet_path
     ir_wallet_path = ir_node.get_wallet_path()
     ir_wallet_pass = ir_node.get_wallet_password()
-    ir_address = get_last_address_from_wallet(ir_wallet_path, ir_wallet_pass)
+    ir_address = wallet_utils.get_last_address_from_wallet(ir_wallet_path, ir_wallet_pass)
 
     morph_chain = cluster.morph_chain_nodes[0]
     morph_endpoint = morph_chain.get_endpoint()
@@ -108,4 +107,4 @@ def tick_epoch(shell: Shell, cluster: Cluster, alive_node: Optional[StorageNode]
         force=True,
         gas=1,
     )
-    sleep(parse_time(MAINNET_BLOCK_TIME))
+    sleep(datetime_utils.parse_time(MAINNET_BLOCK_TIME))

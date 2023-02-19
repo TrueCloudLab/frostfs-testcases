@@ -24,7 +24,7 @@ from env_properties import save_env_properties
 from frostfs_testlib.hosting import Hosting
 from frostfs_testlib.reporter import AllureHandler, get_reporter
 from frostfs_testlib.shell import LocalShell, Shell
-from frostfs_testlib.utils.wallet import init_wallet
+from frostfs_testlib.utils import wallet_utils
 from k6 import LoadParams
 from load import get_services_endpoints, prepare_k6_instances
 from load_params import (
@@ -242,7 +242,7 @@ def background_grpc_load(client_shell: Shell, hosting: Hosting):
 @allure.title("Prepare wallet and deposit")
 def default_wallet(client_shell: Shell, temp_directory: str, cluster: Cluster):
     wallet_path = os.path.join(os.getcwd(), ASSETS_DIR, f"{str(uuid.uuid4())}.json")
-    init_wallet(wallet_path, WALLET_PASS)
+    wallet_utils.init_wallet(wallet_path, WALLET_PASS)
     allure.attach.file(wallet_path, os.path.basename(wallet_path), allure.attachment_type.JSON)
 
     if not FREE_STORAGE:
