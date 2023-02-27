@@ -12,7 +12,7 @@ from frostfs_testlib.shell.interfaces import InteractiveInput
 from pytest_tests.helpers.k6 import K6, LoadParams, LoadResults
 from pytest_tests.resources.common import STORAGE_NODE_SERVICE_NAME_REGEX
 
-FROSTFS_AUTHMATE_PATH = "frostfs-s3-authmate"
+FROSTFS_AUTHMATE_PATH = "frostfs-authmate"
 STOPPED_HOSTS = []
 
 
