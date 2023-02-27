@@ -31,7 +31,7 @@ def can_get_object(
     wallet_config: Optional[str] = None,
     xhdr: Optional[dict] = None,
 ) -> bool:
-    with allure.step("Try get object from pytest_tests.helpers.container"):
+    with allure.step("Try get object from container"):
         try:
             got_file_path = get_object_from_random_node(
                 wallet,
@@ -94,7 +94,7 @@ def can_delete_object(
     wallet_config: Optional[str] = None,
     xhdr: Optional[dict] = None,
 ) -> bool:
-    with allure.step("Try delete object from pytest_tests.helpers.container"):
+    with allure.step("Try delete object from container"):
         try:
             delete_object(
                 wallet,
