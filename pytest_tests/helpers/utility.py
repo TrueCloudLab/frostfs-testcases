@@ -8,7 +8,7 @@ from pytest_tests.resources.common import STORAGE_GC_TIME
 
 def placement_policy_from_container(container_info: str) -> str:
     """
-    Get placement policy from pytest_tests.helpers.container info:
+    Get placement policy from container info:
 
         container ID: j7k4auNHRmiPMSmnH2qENLECD2au2y675fvTX6csDwd
         version: 2.12
