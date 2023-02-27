@@ -2,17 +2,17 @@ import logging
 
 import allure
 import pytest
-from container import create_container
-from file_helper import generate_file
 from frostfs_testlib.resources.common import PUBLIC_ACL
-from http_gate import (
+
+from pytest_tests.helpers.container import create_container
+from pytest_tests.helpers.file_helper import generate_file
+from pytest_tests.helpers.frostfs_verbs import put_object_to_random_node
+from pytest_tests.helpers.http_gate import (
     get_object_and_verify_hashes,
     get_object_by_attr_and_verify_hashes,
     try_to_get_object_via_passed_request_and_expect_error,
 )
-from python_keywords.frostfs_verbs import put_object_to_random_node
-
-from steps.cluster_test_base import ClusterTestBase
+from pytest_tests.steps.cluster_test_base import ClusterTestBase
 
 logger = logging.getLogger("NeoLogger")
 

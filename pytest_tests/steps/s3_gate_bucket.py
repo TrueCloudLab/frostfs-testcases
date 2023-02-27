@@ -7,7 +7,8 @@ from typing import Optional
 
 import allure
 from botocore.exceptions import ClientError
-from cli_helpers import log_command_execution
+
+from pytest_tests.helpers.cli_helpers import log_command_execution
 
 logger = logging.getLogger("NeoLogger")
 

@@ -2,11 +2,12 @@ import os
 import uuid
 from dataclasses import dataclass
 
-from cluster import Cluster, NodeBase
-from common import FREE_STORAGE, WALLET_CONFIG, WALLET_PASS
 from frostfs_testlib.shell import Shell
 from frostfs_testlib.utils import wallet_utils
-from python_keywords.payment_neogo import deposit_gas, transfer_gas
+
+from pytest_tests.helpers.cluster import Cluster, NodeBase
+from pytest_tests.helpers.payment_neogo import deposit_gas, transfer_gas
+from pytest_tests.resources.common import FREE_STORAGE, WALLET_CONFIG, WALLET_PASS
 
 
 @dataclass

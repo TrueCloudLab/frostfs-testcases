@@ -5,12 +5,10 @@ from typing import Optional
 
 import allure
 import pytest
-from cluster_test_base import ClusterTestBase
-from common import ASSETS_DIR, FREE_STORAGE, WALLET_PASS
-from file_helper import generate_file
 from frostfs_testlib.resources.common import OBJECT_ACCESS_DENIED, OBJECT_NOT_FOUND
 from frostfs_testlib.utils import wallet_utils
-from python_keywords.acl import (
+
+from pytest_tests.helpers.acl import (
     EACLAccess,
     EACLOperation,
     EACLRole,
@@ -19,10 +17,11 @@ from python_keywords.acl import (
     form_bearertoken_file,
     set_eacl,
 )
-from python_keywords.container import create_container
-from python_keywords.frostfs_verbs import put_object_to_random_node
-from python_keywords.payment_neogo import deposit_gas, transfer_gas
-from python_keywords.storage_group import (
+from pytest_tests.helpers.container import create_container
+from pytest_tests.helpers.file_helper import generate_file
+from pytest_tests.helpers.frostfs_verbs import put_object_to_random_node
+from pytest_tests.helpers.payment_neogo import deposit_gas, transfer_gas
+from pytest_tests.helpers.storage_group import (
     delete_storagegroup,
     get_storagegroup,
     list_storagegroup,
@@ -30,6 +29,8 @@ from python_keywords.storage_group import (
     verify_get_storage_group,
     verify_list_storage_group,
 )
+from pytest_tests.resources.common import ASSETS_DIR, FREE_STORAGE, WALLET_PASS
+from pytest_tests.steps.cluster_test_base import ClusterTestBase
 
 logger = logging.getLogger("NeoLogger")
 deposit = 30

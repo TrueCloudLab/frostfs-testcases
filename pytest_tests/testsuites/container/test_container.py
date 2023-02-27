@@ -3,7 +3,8 @@ import json
 import allure
 import pytest
 from frostfs_testlib.resources.common import PRIVATE_ACL_F
-from python_keywords.container import (
+
+from pytest_tests.helpers.container import (
     create_container,
     delete_container,
     get_container,
@@ -11,9 +12,8 @@ from python_keywords.container import (
     wait_for_container_creation,
     wait_for_container_deletion,
 )
-from utility import placement_policy_from_container
-
-from steps.cluster_test_base import ClusterTestBase
+from pytest_tests.helpers.utility import placement_policy_from_container
+from pytest_tests.steps.cluster_test_base import ClusterTestBase
 
 
 @pytest.mark.container

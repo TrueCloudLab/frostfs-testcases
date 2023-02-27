@@ -1,12 +1,13 @@
 from typing import Optional
 
 import allure
-from cluster import Cluster
-from file_helper import get_file_hash
 from frostfs_testlib.resources.common import OBJECT_ACCESS_DENIED
 from frostfs_testlib.shell import Shell
 from frostfs_testlib.utils import string_utils
-from python_keywords.frostfs_verbs import (
+
+from pytest_tests.helpers.cluster import Cluster
+from pytest_tests.helpers.file_helper import get_file_hash
+from pytest_tests.helpers.frostfs_verbs import (
     delete_object,
     get_object_from_random_node,
     get_range,
@@ -30,7 +31,7 @@ def can_get_object(
     wallet_config: Optional[str] = None,
     xhdr: Optional[dict] = None,
 ) -> bool:
-    with allure.step("Try get object from container"):
+    with allure.step("Try get object from pytest_tests.helpers.container"):
         try:
             got_file_path = get_object_from_random_node(
                 wallet,
@@ -93,7 +94,7 @@ def can_delete_object(
     wallet_config: Optional[str] = None,
     xhdr: Optional[dict] = None,
 ) -> bool:
-    with allure.step("Try delete object from container"):
+    with allure.step("Try delete object from pytest_tests.helpers.container"):
         try:
             delete_object(
                 wallet,

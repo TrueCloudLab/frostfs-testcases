@@ -11,16 +11,17 @@ import pytest
 import s3_gate_bucket
 import s3_gate_object
 import urllib3
-from aws_cli_client import AwsCliClient
 from botocore.config import Config
 from botocore.exceptions import ClientError
-from cli_helpers import _cmd_run, _configure_aws_cli, _run_with_passwd
-from cluster import Cluster
-from cluster_test_base import ClusterTestBase
-from common import FROSTFS_AUTHMATE_EXEC
 from frostfs_testlib.shell import Shell
 from pytest import FixtureRequest
-from python_keywords.container import list_containers
+
+from pytest_tests.helpers.aws_cli_client import AwsCliClient
+from pytest_tests.helpers.cli_helpers import _cmd_run, _configure_aws_cli, _run_with_passwd
+from pytest_tests.helpers.cluster import Cluster
+from pytest_tests.helpers.container import list_containers
+from pytest_tests.resources.common import FROSTFS_AUTHMATE_EXEC
+from pytest_tests.steps.cluster_test_base import ClusterTestBase
 
 # Disable warnings on self-signed certificate which the
 # boto library produces on requests to S3-gate in dev-env
@@ -44,7 +45,7 @@ class TestS3GateBase(ClusterTestBase):
         self, default_wallet, client_shell: Shell, request: FixtureRequest, cluster: Cluster
     ) -> Any:
         wallet = default_wallet
-        s3_bearer_rules_file = f"{os.getcwd()}/robot/resources/files/s3_bearer_rules.json"
+        s3_bearer_rules_file = f"{os.getcwd()}/pytest_tests/resources/files/s3_bearer_rules.json"
         policy = None if isinstance(request.param, str) else request.param[1]
         (cid, bucket, access_key_id, secret_access_key, owner_private_key,) = init_s3_credentials(
             wallet, cluster, s3_bearer_rules_file=s3_bearer_rules_file, policy=policy
@@ -123,7 +124,7 @@ def init_s3_credentials(
     policy: Optional[dict] = None,
 ):
     bucket = str(uuid.uuid4())
-    s3_bearer_rules = s3_bearer_rules_file or "robot/resources/files/s3_bearer_rules.json"
+    s3_bearer_rules = s3_bearer_rules_file or "pytest_tests/resources/files/s3_bearer_rules.json"
 
     s3gate_node = cluster.s3gates[0]
     gate_public_key = s3gate_node.get_wallet_public_key()

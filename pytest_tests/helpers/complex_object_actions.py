@@ -14,12 +14,13 @@ import logging
 from typing import Optional, Tuple
 
 import allure
-import frostfs_verbs
-from cluster import Cluster, StorageNode
-from common import WALLET_CONFIG
 from frostfs_testlib.shell import Shell
-from frostfs_verbs import head_object
-from storage_object import StorageObjectInfo
+
+from pytest_tests.helpers import frostfs_verbs
+from pytest_tests.helpers.cluster import Cluster, StorageNode
+from pytest_tests.helpers.frostfs_verbs import head_object
+from pytest_tests.helpers.storage_object_info import StorageObjectInfo
+from pytest_tests.resources.common import WALLET_CONFIG
 
 logger = logging.getLogger("NeoLogger")
 

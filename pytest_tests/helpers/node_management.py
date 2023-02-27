@@ -6,12 +6,13 @@ from dataclasses import dataclass
 from typing import Optional
 
 import allure
-from cluster import Cluster, StorageNode
-from common import FROSTFS_CLI_EXEC, MORPH_BLOCK_TIME
-from epoch import tick_epoch
 from frostfs_testlib.cli import FrostfsCli
 from frostfs_testlib.shell import Shell
 from frostfs_testlib.utils import datetime_utils
+
+from pytest_tests.helpers.cluster import Cluster, StorageNode
+from pytest_tests.helpers.epoch import tick_epoch
+from pytest_tests.resources.common import FROSTFS_CLI_EXEC, MORPH_BLOCK_TIME
 
 logger = logging.getLogger("NeoLogger")
 

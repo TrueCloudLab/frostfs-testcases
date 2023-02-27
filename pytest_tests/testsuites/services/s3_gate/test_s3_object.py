@@ -6,20 +6,25 @@ from random import choices, sample
 
 import allure
 import pytest
-from aws_cli_client import AwsCliClient
-from common import ASSETS_DIR, FREE_STORAGE, WALLET_PASS
-from file_helper import concat_files, generate_file, generate_file_with_content, get_file_hash
 from frostfs_testlib.utils import wallet_utils
-from python_keywords.payment_neogo import deposit_gas, transfer_gas
-from s3_helper import (
+
+from pytest_tests.helpers.aws_cli_client import AwsCliClient
+from pytest_tests.helpers.file_helper import (
+    concat_files,
+    generate_file,
+    generate_file_with_content,
+    get_file_hash,
+)
+from pytest_tests.helpers.payment_neogo import deposit_gas, transfer_gas
+from pytest_tests.helpers.s3_helper import (
     assert_object_lock_mode,
     assert_s3_acl,
     check_objects_in_bucket,
     set_bucket_versioning,
 )
-
-from steps import s3_gate_bucket, s3_gate_object
-from steps.s3_gate_base import TestS3GateBase
+from pytest_tests.resources.common import ASSETS_DIR, FREE_STORAGE, WALLET_PASS
+from pytest_tests.steps import s3_gate_bucket, s3_gate_object
+from pytest_tests.steps.s3_gate_base import TestS3GateBase
 
 
 def pytest_generate_tests(metafunc):

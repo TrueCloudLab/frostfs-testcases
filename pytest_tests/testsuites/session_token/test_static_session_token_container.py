@@ -1,9 +1,9 @@
 import allure
 import pytest
-from file_helper import generate_file
 from frostfs_testlib.resources.common import PUBLIC_ACL
 from frostfs_testlib.shell import Shell
-from python_keywords.acl import (
+
+from pytest_tests.helpers.acl import (
     EACLAccess,
     EACLOperation,
     EACLRole,
@@ -12,17 +12,17 @@ from python_keywords.acl import (
     set_eacl,
     wait_for_cache_expired,
 )
-from python_keywords.container import (
+from pytest_tests.helpers.container import (
     create_container,
     delete_container,
     get_container,
     list_containers,
 )
-from python_keywords.object_access import can_put_object
-from wallet import WalletFile
-
-from steps.cluster_test_base import ClusterTestBase
-from steps.session_token import ContainerVerb, get_container_signed_token
+from pytest_tests.helpers.file_helper import generate_file
+from pytest_tests.helpers.object_access import can_put_object
+from pytest_tests.helpers.wallet import WalletFile
+from pytest_tests.steps.cluster_test_base import ClusterTestBase
+from pytest_tests.steps.session_token import ContainerVerb, get_container_signed_token
 
 
 @pytest.mark.static_session_container

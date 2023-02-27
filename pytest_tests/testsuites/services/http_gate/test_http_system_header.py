@@ -5,23 +5,23 @@ from typing import Optional
 
 import allure
 import pytest
-from container import create_container
-from epoch import get_epoch, wait_for_epochs_align
-from file_helper import generate_file
 from frostfs_testlib.resources.common import OBJECT_NOT_FOUND, PUBLIC_ACL
-from http_gate import (
+
+from pytest_tests.helpers.container import create_container
+from pytest_tests.helpers.epoch import get_epoch, wait_for_epochs_align
+from pytest_tests.helpers.file_helper import generate_file
+from pytest_tests.helpers.frostfs_verbs import (
+    get_netmap_netinfo,
+    get_object_from_random_node,
+    head_object,
+)
+from pytest_tests.helpers.http_gate import (
     attr_into_str_header_curl,
     get_object_and_verify_hashes,
     try_to_get_object_and_expect_error,
     upload_via_http_gate_curl,
 )
-from python_keywords.frostfs_verbs import (
-    get_netmap_netinfo,
-    get_object_from_random_node,
-    head_object,
-)
-
-from steps.cluster_test_base import ClusterTestBase
+from pytest_tests.steps.cluster_test_base import ClusterTestBase
 
 logger = logging.getLogger("NeoLogger")
 EXPIRATION_TIMESTAMP_HEADER = "__FROSRFS__EXPIRATION_TIMESTAMP"

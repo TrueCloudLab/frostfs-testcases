@@ -4,9 +4,6 @@ import sys
 
 import allure
 import pytest
-from cluster import Cluster
-from complex_object_actions import get_complex_object_split_ranges
-from file_helper import generate_file, get_file_content, get_file_hash
 from frostfs_testlib.resources.common import (
     INVALID_LENGTH_SPECIFIER,
     INVALID_OFFSET_SPECIFIER,
@@ -16,8 +13,12 @@ from frostfs_testlib.resources.common import (
 )
 from frostfs_testlib.shell import Shell
 from pytest import FixtureRequest
-from python_keywords.container import create_container
-from python_keywords.frostfs_verbs import (
+
+from pytest_tests.helpers.cluster import Cluster
+from pytest_tests.helpers.complex_object_actions import get_complex_object_split_ranges
+from pytest_tests.helpers.container import create_container
+from pytest_tests.helpers.file_helper import generate_file, get_file_content, get_file_hash
+from pytest_tests.helpers.frostfs_verbs import (
     get_object_from_random_node,
     get_range,
     get_range_hash,
@@ -25,11 +26,10 @@ from python_keywords.frostfs_verbs import (
     put_object_to_random_node,
     search_object,
 )
-from python_keywords.storage_policy import get_complex_object_copies, get_simple_object_copies
-
-from helpers.storage_object_info import StorageObjectInfo
-from steps.cluster_test_base import ClusterTestBase
-from steps.storage_object import delete_objects
+from pytest_tests.helpers.storage_object_info import StorageObjectInfo
+from pytest_tests.helpers.storage_policy import get_complex_object_copies, get_simple_object_copies
+from pytest_tests.steps.cluster_test_base import ClusterTestBase
+from pytest_tests.steps.storage_object import delete_objects
 
 logger = logging.getLogger("NeoLogger")
 

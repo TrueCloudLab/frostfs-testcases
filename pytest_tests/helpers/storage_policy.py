@@ -8,12 +8,12 @@
 import logging
 
 import allure
-import complex_object_actions
-import frostfs_verbs
-from cluster import StorageNode
 from frostfs_testlib.resources.common import OBJECT_NOT_FOUND
 from frostfs_testlib.shell import Shell
 from frostfs_testlib.utils import string_utils
+
+from pytest_tests.helpers import complex_object_actions, frostfs_verbs
+from pytest_tests.helpers.cluster import StorageNode
 
 logger = logging.getLogger("NeoLogger")
 

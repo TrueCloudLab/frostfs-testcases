@@ -2,15 +2,18 @@ import logging
 
 import allure
 import pytest
-from epoch import get_epoch
-from file_helper import generate_file, get_file_hash
 from frostfs_testlib.resources.common import OBJECT_NOT_FOUND
 from pytest import FixtureRequest
-from python_keywords.container import create_container
-from python_keywords.frostfs_verbs import get_object_from_random_node, put_object_to_random_node
-from utility import wait_for_gc_pass_on_storage_nodes
 
-from steps.cluster_test_base import ClusterTestBase
+from pytest_tests.helpers.container import create_container
+from pytest_tests.helpers.epoch import get_epoch
+from pytest_tests.helpers.file_helper import generate_file, get_file_hash
+from pytest_tests.helpers.frostfs_verbs import (
+    get_object_from_random_node,
+    put_object_to_random_node,
+)
+from pytest_tests.helpers.utility import wait_for_gc_pass_on_storage_nodes
+from pytest_tests.steps.cluster_test_base import ClusterTestBase
 
 logger = logging.getLogger("NeoLogger")
 

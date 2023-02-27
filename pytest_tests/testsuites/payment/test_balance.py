@@ -4,11 +4,12 @@ import os
 import allure
 import pytest
 import yaml
-from cluster_test_base import ClusterTestBase
-from common import FREE_STORAGE, FROSTFS_CLI_EXEC, WALLET_CONFIG
 from frostfs_testlib.cli import FrostfsCli
 from frostfs_testlib.shell import CommandResult, Shell
-from wallet import WalletFactory, WalletFile
+
+from pytest_tests.helpers.wallet import WalletFactory, WalletFile
+from pytest_tests.resources.common import FREE_STORAGE, FROSTFS_CLI_EXEC, WALLET_CONFIG
+from pytest_tests.steps.cluster_test_base import ClusterTestBase
 
 logger = logging.getLogger("NeoLogger")
 DEPOSIT_AMOUNT = 30

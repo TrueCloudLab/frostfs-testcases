@@ -22,7 +22,7 @@ GAS_HASH = os.getenv("GAS_HASH", "0xd2a4cff31913016155e38e474a2c06d08be276cf")
 FROSTFS_CONTRACT = os.getenv("FROSTFS_IR_CONTRACTS_FROSTFS")
 
 ASSETS_DIR = os.getenv("ASSETS_DIR", "TemporaryDir")
-DEVENV_PATH = os.getenv("DEVENV_PATH", os.path.join("..", "frostfs-dev-env"))
+DEVENV_PATH = os.getenv("DEVENV_PATH", os.path.join("../../pytest_tests", "frostfs-dev-env"))
 
 # Password of wallet owned by user on behalf of whom we are running tests
 WALLET_PASS = os.getenv("WALLET_PASS", "")

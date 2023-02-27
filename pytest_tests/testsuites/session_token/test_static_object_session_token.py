@@ -2,10 +2,6 @@ import logging
 
 import allure
 import pytest
-from cluster import Cluster
-from cluster_test_base import ClusterTestBase
-from epoch import ensure_fresh_epoch
-from file_helper import generate_file
 from frostfs_testlib.resources.common import (
     EXPIRED_SESSION_TOKEN,
     MALFORMED_REQUEST,
@@ -14,8 +10,12 @@ from frostfs_testlib.resources.common import (
 )
 from frostfs_testlib.shell import Shell
 from pytest import FixtureRequest
-from python_keywords.container import create_container
-from python_keywords.frostfs_verbs import (
+
+from pytest_tests.helpers.cluster import Cluster
+from pytest_tests.helpers.container import create_container
+from pytest_tests.helpers.epoch import ensure_fresh_epoch
+from pytest_tests.helpers.file_helper import generate_file
+from pytest_tests.helpers.frostfs_verbs import (
     delete_object,
     get_object,
     get_object_from_random_node,
@@ -25,11 +25,11 @@ from python_keywords.frostfs_verbs import (
     put_object_to_random_node,
     search_object,
 )
-from test_control import expect_not_raises
-from wallet import WalletFile
-
-from helpers.storage_object_info import StorageObjectInfo
-from steps.session_token import (
+from pytest_tests.helpers.storage_object_info import StorageObjectInfo
+from pytest_tests.helpers.test_control import expect_not_raises
+from pytest_tests.helpers.wallet import WalletFile
+from pytest_tests.steps.cluster_test_base import ClusterTestBase
+from pytest_tests.steps.session_token import (
     INVALID_SIGNATURE,
     UNRELATED_CONTAINER,
     UNRELATED_KEY,
@@ -41,7 +41,7 @@ from steps.session_token import (
     get_object_signed_token,
     sign_session_token,
 )
-from steps.storage_object import delete_objects
+from pytest_tests.steps.storage_object import delete_objects
 
 logger = logging.getLogger("NeoLogger")
 

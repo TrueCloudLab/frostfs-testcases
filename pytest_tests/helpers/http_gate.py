@@ -1,4 +1,3 @@
-import base64
 import logging
 import os
 import random
@@ -12,13 +11,14 @@ from urllib.parse import quote_plus
 import allure
 import requests
 from aws_cli_client import LONG_TIMEOUT
-from cli_helpers import _cmd_run
-from cluster import StorageNode
-from common import SIMPLE_OBJECT_SIZE
-from file_helper import get_file_hash
 from frostfs_testlib.shell import Shell
-from python_keywords.frostfs_verbs import get_object
-from python_keywords.storage_policy import get_nodes_without_object
+
+from pytest_tests.helpers.cli_helpers import _cmd_run
+from pytest_tests.helpers.cluster import StorageNode
+from pytest_tests.helpers.file_helper import get_file_hash
+from pytest_tests.helpers.frostfs_verbs import get_object
+from pytest_tests.helpers.storage_policy import get_nodes_without_object
+from pytest_tests.resources.common import SIMPLE_OBJECT_SIZE
 
 logger = logging.getLogger("NeoLogger")
 

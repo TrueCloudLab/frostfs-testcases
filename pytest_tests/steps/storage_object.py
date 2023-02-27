@@ -3,13 +3,14 @@ from time import sleep
 
 import allure
 import pytest
-from cluster import Cluster
-from epoch import tick_epoch
 from frostfs_testlib.resources.common import OBJECT_ALREADY_REMOVED
 from frostfs_testlib.shell import Shell
-from python_keywords.frostfs_verbs import delete_object, get_object
-from storage_object_info import StorageObjectInfo
-from tombstone import verify_head_tombstone
+
+from pytest_tests.helpers.cluster import Cluster
+from pytest_tests.helpers.epoch import tick_epoch
+from pytest_tests.helpers.frostfs_verbs import delete_object, get_object
+from pytest_tests.helpers.storage_object_info import StorageObjectInfo
+from pytest_tests.helpers.tombstone import verify_head_tombstone
 
 logger = logging.getLogger("NeoLogger")
 

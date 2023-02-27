@@ -3,26 +3,26 @@ import os
 
 import allure
 import pytest
-from container import (
+from frostfs_testlib.resources.common import PUBLIC_ACL
+from pytest import FixtureRequest
+
+from pytest_tests.helpers.container import (
     create_container,
     delete_container,
     list_containers,
     wait_for_container_deletion,
 )
-from file_helper import generate_file
-from frostfs_testlib.resources.common import PUBLIC_ACL
-from http_gate import (
+from pytest_tests.helpers.file_helper import generate_file
+from pytest_tests.helpers.frostfs_verbs import delete_object
+from pytest_tests.helpers.http_gate import (
     attr_into_str_header_curl,
     get_object_by_attr_and_verify_hashes,
     try_to_get_object_and_expect_error,
     try_to_get_object_via_passed_request_and_expect_error,
     upload_via_http_gate_curl,
 )
-from pytest import FixtureRequest
-from python_keywords.frostfs_verbs import delete_object
-
-from helpers.storage_object_info import StorageObjectInfo
-from steps.cluster_test_base import ClusterTestBase
+from pytest_tests.helpers.storage_object_info import StorageObjectInfo
+from pytest_tests.steps.cluster_test_base import ClusterTestBase
 
 OBJECT_ALREADY_REMOVED_ERROR = "object already removed"
 logger = logging.getLogger("NeoLogger")

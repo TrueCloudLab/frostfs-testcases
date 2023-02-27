@@ -3,12 +3,13 @@ import os
 
 import allure
 import pytest
-from epoch import get_epoch
-from file_helper import generate_file, get_file_hash
 from frostfs_testlib.resources.common import PUBLIC_ACL
-from python_keywords.container import create_container
-from python_keywords.frostfs_verbs import put_object_to_random_node
-from python_keywords.http_gate import (
+
+from pytest_tests.helpers.container import create_container
+from pytest_tests.helpers.epoch import get_epoch
+from pytest_tests.helpers.file_helper import generate_file, get_file_hash
+from pytest_tests.helpers.frostfs_verbs import put_object_to_random_node
+from pytest_tests.helpers.http_gate import (
     attr_into_header,
     get_object_and_verify_hashes,
     get_object_by_attr_and_verify_hashes,
@@ -19,9 +20,8 @@ from python_keywords.http_gate import (
     upload_via_http_gate,
     upload_via_http_gate_curl,
 )
-from utility import wait_for_gc_pass_on_storage_nodes
-
-from steps.cluster_test_base import ClusterTestBase
+from pytest_tests.helpers.utility import wait_for_gc_pass_on_storage_nodes
+from pytest_tests.steps.cluster_test_base import ClusterTestBase
 
 logger = logging.getLogger("NeoLogger")
 OBJECT_NOT_FOUND_ERROR = "not found"

@@ -1,23 +1,14 @@
 import allure
 import pytest
-from cluster_test_base import ClusterTestBase
-from common import (
+from frostfs_testlib.hosting import Hosting
+
+from pytest_tests.helpers.k6 import LoadParams
+from pytest_tests.resources.common import (
     HTTP_GATE_SERVICE_NAME_REGEX,
     S3_GATE_SERVICE_NAME_REGEX,
     STORAGE_NODE_SERVICE_NAME_REGEX,
 )
-from frostfs_testlib.hosting import Hosting
-from k6 import LoadParams
-from load import (
-    clear_cache_and_data,
-    get_services_endpoints,
-    init_s3_client,
-    multi_node_k6_run,
-    prepare_k6_instances,
-    start_stopped_nodes,
-    stop_unused_nodes,
-)
-from load_params import (
+from pytest_tests.resources.load_params import (
     CONTAINER_PLACEMENT_POLICY,
     CONTAINERS_COUNT,
     DELETERS,
@@ -33,6 +24,16 @@ from load_params import (
     READERS,
     STORAGE_NODE_COUNT,
     WRITERS,
+)
+from pytest_tests.steps.cluster_test_base import ClusterTestBase
+from pytest_tests.steps.load import (
+    clear_cache_and_data,
+    get_services_endpoints,
+    init_s3_client,
+    multi_node_k6_run,
+    prepare_k6_instances,
+    start_stopped_nodes,
+    stop_unused_nodes,
 )
 
 ENDPOINTS_ATTRIBUTES = {

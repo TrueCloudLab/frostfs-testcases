@@ -1,10 +1,14 @@
 import allure
 import pytest
-from file_helper import generate_file, get_file_hash, split_file
-from s3_helper import check_objects_in_bucket, object_key_from_file_path, set_bucket_versioning
 
-from steps import s3_gate_bucket, s3_gate_object
-from steps.s3_gate_base import TestS3GateBase
+from pytest_tests.helpers.file_helper import generate_file, get_file_hash, split_file
+from pytest_tests.helpers.s3_helper import (
+    check_objects_in_bucket,
+    object_key_from_file_path,
+    set_bucket_versioning,
+)
+from pytest_tests.steps import s3_gate_bucket, s3_gate_object
+from pytest_tests.steps.s3_gate_base import TestS3GateBase
 
 PART_SIZE = 5 * 1024 * 1024
 

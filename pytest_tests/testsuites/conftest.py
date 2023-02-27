@@ -8,9 +8,19 @@ from datetime import datetime
 import allure
 import pytest
 import yaml
-from binary_version_helper import get_local_binaries_versions, get_remote_binaries_versions
-from cluster import Cluster
-from common import (
+from frostfs_testlib.hosting import Hosting
+from frostfs_testlib.reporter import AllureHandler, get_reporter
+from frostfs_testlib.shell import LocalShell, Shell
+from frostfs_testlib.utils import wallet_utils
+
+from pytest_tests.helpers import binary_version, env_properties
+from pytest_tests.helpers.cluster import Cluster
+from pytest_tests.helpers.frostfs_verbs import get_netmap_netinfo
+from pytest_tests.helpers.k6 import LoadParams
+from pytest_tests.helpers.node_management import storage_node_healthcheck
+from pytest_tests.helpers.payment_neogo import deposit_gas, transfer_gas
+from pytest_tests.helpers.wallet import WalletFactory
+from pytest_tests.resources.common import (
     ASSETS_DIR,
     COMPLEX_OBJECT_CHUNKS_COUNT,
     COMPLEX_OBJECT_TAIL_SIZE,
@@ -20,14 +30,7 @@ from common import (
     STORAGE_NODE_SERVICE_NAME_REGEX,
     WALLET_PASS,
 )
-from env_properties import save_env_properties
-from frostfs_testlib.hosting import Hosting
-from frostfs_testlib.reporter import AllureHandler, get_reporter
-from frostfs_testlib.shell import LocalShell, Shell
-from frostfs_testlib.utils import wallet_utils
-from k6 import LoadParams
-from load import get_services_endpoints, prepare_k6_instances
-from load_params import (
+from pytest_tests.resources.load_params import (
     BACKGROUND_LOAD_MAX_TIME,
     BACKGROUND_OBJ_SIZE,
     BACKGROUND_READERS_COUNT,
@@ -36,11 +39,7 @@ from load_params import (
     LOAD_NODE_SSH_USER,
     LOAD_NODES,
 )
-from payment_neogo import deposit_gas, transfer_gas
-from python_keywords.frostfs_verbs import get_netmap_netinfo
-from python_keywords.node_management import storage_node_healthcheck
-
-from helpers.wallet import WalletFactory
+from pytest_tests.steps.load import get_services_endpoints, prepare_k6_instances
 
 logger = logging.getLogger("NeoLogger")
 
@@ -125,11 +124,11 @@ def cluster(temp_directory: str, hosting: Hosting) -> Cluster:
 @pytest.fixture(scope="session", autouse=True)
 @allure.title("Check binary versions")
 def check_binary_versions(request, hosting: Hosting, client_shell: Shell):
-    local_versions = get_local_binaries_versions(client_shell)
-    remote_versions = get_remote_binaries_versions(hosting)
+    local_versions = binary_version.get_local_binaries_versions(client_shell)
+    remote_versions = binary_version.get_remote_binaries_versions(hosting)
 
     all_versions = {**local_versions, **remote_versions}
-    save_env_properties(request.config, all_versions)
+    env_properties.save_env_properties(request.config, all_versions)
 
 
 @pytest.fixture(scope="session")

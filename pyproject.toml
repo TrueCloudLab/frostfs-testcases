@@ -1,8 +1,8 @@
 [tool.isort]
 profile = "black"
-src_paths = ["pytest_tests", "robot"]
+src_paths = ["pytest_tests"]
 line_length = 100
 
 [tool.black]
 line-length = 100
-target-version = ["py39"]
+target-version = ["py310"]
