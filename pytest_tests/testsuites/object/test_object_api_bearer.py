@@ -1,19 +1,30 @@
 import allure
 import pytest
-from cluster import Cluster
-from container import REP_2_FOR_3_NODES_PLACEMENT_RULE, SINGLE_PLACEMENT_RULE, create_container
-from epoch import get_epoch
 from frostfs_testlib.resources.common import EACL_PUBLIC_READ_WRITE
 from frostfs_testlib.shell import Shell
-from frostfs_verbs import delete_object, get_object
 from pytest import FixtureRequest
-from python_keywords.acl import EACLAccess, EACLOperation, EACLRole, EACLRule, form_bearertoken_file
 
-from helpers.container import StorageContainer, StorageContainerInfo
-from helpers.test_control import expect_not_raises
-from helpers.wallet import WalletFile
-from steps.cluster_test_base import ClusterTestBase
-from steps.storage_object import StorageObjectInfo
+from pytest_tests.helpers.acl import (
+    EACLAccess,
+    EACLOperation,
+    EACLRole,
+    EACLRule,
+    form_bearertoken_file,
+)
+from pytest_tests.helpers.cluster import Cluster
+from pytest_tests.helpers.container import (
+    REP_2_FOR_3_NODES_PLACEMENT_RULE,
+    SINGLE_PLACEMENT_RULE,
+    StorageContainer,
+    StorageContainerInfo,
+    create_container,
+)
+from pytest_tests.helpers.epoch import get_epoch
+from pytest_tests.helpers.frostfs_verbs import delete_object, get_object
+from pytest_tests.helpers.test_control import expect_not_raises
+from pytest_tests.helpers.wallet import WalletFile
+from pytest_tests.steps.cluster_test_base import ClusterTestBase
+from pytest_tests.steps.storage_object import StorageObjectInfo
 
 
 @pytest.fixture(scope="module")

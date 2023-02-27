@@ -5,8 +5,9 @@ from datetime import datetime
 from typing import Optional
 
 import allure
-from cli_helpers import _cmd_run
-from common import ASSETS_DIR
+
+from pytest_tests.helpers.cli_helpers import _cmd_run
+from pytest_tests.resources.common import ASSETS_DIR
 
 logger = logging.getLogger("NeoLogger")
 REGULAR_TIMEOUT = 90

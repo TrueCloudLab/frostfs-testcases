@@ -2,10 +2,11 @@ import logging
 from time import sleep
 
 import allure
-from cluster import Cluster, StorageNode
 from frostfs_testlib.shell import Shell
-from python_keywords.node_management import storage_node_healthcheck
-from storage_policy import get_nodes_with_object
+
+from pytest_tests.helpers.cluster import Cluster, StorageNode
+from pytest_tests.helpers.node_management import storage_node_healthcheck
+from pytest_tests.helpers.storage_policy import get_nodes_with_object
 
 logger = logging.getLogger("NeoLogger")
 

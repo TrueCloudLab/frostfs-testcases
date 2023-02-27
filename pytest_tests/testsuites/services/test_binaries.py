@@ -5,10 +5,11 @@ from re import match
 import allure
 import pytest
 import requests
-from binary_version_helper import get_remote_binaries_versions
-from common import BIN_VERSIONS_FILE
-from env_properties import read_env_properties, save_env_properties
 from frostfs_testlib.hosting import Hosting
+
+from pytest_tests.helpers.binary_version import get_remote_binaries_versions
+from pytest_tests.helpers.env_properties import read_env_properties, save_env_properties
+from pytest_tests.resources.common import BIN_VERSIONS_FILE
 
 logger = logging.getLogger("NeoLogger")
 

@@ -8,12 +8,13 @@ from enum import Enum
 from typing import Any, Optional
 
 import allure
-from common import ASSETS_DIR, FROSTFS_CLI_EXEC, WALLET_CONFIG
 from frostfs_testlib.cli import FrostfsCli
 from frostfs_testlib.shell import Shell
 from frostfs_testlib.utils import json_utils, wallet_utils
-from storage_object_info import StorageObjectInfo
-from wallet import WalletFile
+
+from pytest_tests.helpers.storage_object_info import StorageObjectInfo
+from pytest_tests.helpers.wallet import WalletFile
+from pytest_tests.resources.common import ASSETS_DIR, FROSTFS_CLI_EXEC, WALLET_CONFIG
 
 logger = logging.getLogger("NeoLogger")
 

@@ -3,8 +3,9 @@ import logging
 
 import allure
 from frostfs_testlib.shell import Shell
-from frostfs_verbs import head_object
 from neo3.wallet import wallet
+
+from pytest_tests.helpers.frostfs_verbs import head_object
 
 logger = logging.getLogger("NeoLogger")
 

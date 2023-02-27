@@ -7,10 +7,11 @@ from typing import Optional
 import allure
 import pytest
 import urllib3
-from aws_cli_client import AwsCliClient
 from botocore.exceptions import ClientError
-from cli_helpers import log_command_execution
 from s3_gate_bucket import S3_SYNC_WAIT_TIME
+
+from pytest_tests.helpers.aws_cli_client import AwsCliClient
+from pytest_tests.helpers.cli_helpers import log_command_execution
 
 ##########################################################
 # Disabling warnings on self-signed certificate which the

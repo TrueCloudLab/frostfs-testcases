@@ -2,17 +2,21 @@ import os
 
 import allure
 import pytest
-from file_helper import generate_file
-from python_keywords.container import search_container_by_name
-from python_keywords.storage_policy import get_simple_object_copies
-from s3_helper import check_objects_in_bucket, object_key_from_file_path, set_bucket_versioning
 
-from steps import s3_gate_bucket, s3_gate_object
-from steps.s3_gate_base import TestS3GateBase
+from pytest_tests.helpers.container import search_container_by_name
+from pytest_tests.helpers.file_helper import generate_file
+from pytest_tests.helpers.s3_helper import (
+    check_objects_in_bucket,
+    object_key_from_file_path,
+    set_bucket_versioning,
+)
+from pytest_tests.helpers.storage_policy import get_simple_object_copies
+from pytest_tests.steps import s3_gate_bucket, s3_gate_object
+from pytest_tests.steps.s3_gate_base import TestS3GateBase
 
 
 def pytest_generate_tests(metafunc):
-    policy = f"{os.getcwd()}/robot/resources/files/policy.json"
+    policy = f"{os.getcwd()}/pytest_tests/resources/files/policy.json"
     if "s3_client" in metafunc.fixturenames:
         metafunc.parametrize(
             "s3_client",
@@ -95,7 +99,7 @@ class TestS3GatePolicy(TestS3GateBase):
             s3_gate_bucket.get_bucket_policy(self.s3_client, bucket)
 
         with allure.step("Put new policy"):
-            custom_policy = f"file://{os.getcwd()}/robot/resources/files/bucket_policy.json"
+            custom_policy = f"file://{os.getcwd()}/pytest_tests/resources/files/bucket_policy.json"
             custom_policy = {
                 "Version": "2008-10-17",
                 "Id": "aaaa-bbbb-cccc-dddd",

@@ -5,15 +5,16 @@ from typing import Optional
 
 import allure
 import pytest
-from cluster import Cluster
-from common import WALLET_CONFIG, WALLET_PASS
-from file_helper import generate_file
 from frostfs_testlib.resources.common import PUBLIC_ACL
 from frostfs_testlib.shell import Shell
 from frostfs_testlib.utils import wallet_utils
-from python_keywords.acl import EACLRole
-from python_keywords.container import create_container
-from python_keywords.frostfs_verbs import put_object_to_random_node
+
+from pytest_tests.helpers.acl import EACLRole
+from pytest_tests.helpers.cluster import Cluster
+from pytest_tests.helpers.container import create_container
+from pytest_tests.helpers.file_helper import generate_file
+from pytest_tests.helpers.frostfs_verbs import put_object_to_random_node
+from pytest_tests.resources.common import WALLET_CONFIG, WALLET_PASS
 
 OBJECT_COUNT = 5
 

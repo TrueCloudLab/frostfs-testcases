@@ -1,7 +1,7 @@
 import allure
 import pytest
-from cluster_test_base import ClusterTestBase
-from python_keywords.acl import (
+
+from pytest_tests.helpers.acl import (
     EACLAccess,
     EACLOperation,
     EACLRole,
@@ -11,11 +11,12 @@ from python_keywords.acl import (
     set_eacl,
     wait_for_cache_expired,
 )
-from python_keywords.container_access import (
+from pytest_tests.helpers.container_access import (
     check_custom_access_to_container,
     check_full_access_to_container,
     check_no_access_to_container,
 )
+from pytest_tests.steps.cluster_test_base import ClusterTestBase
 
 
 @pytest.mark.sanity

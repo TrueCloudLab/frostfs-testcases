@@ -1,15 +1,16 @@
 import allure
 import pytest
-from cluster_test_base import ClusterTestBase
 from frostfs_testlib.resources.common import PRIVATE_ACL_F, PUBLIC_ACL_F, READONLY_ACL_F
-from python_keywords.acl import EACLRole
-from python_keywords.container import create_container
-from python_keywords.container_access import (
+
+from pytest_tests.helpers.acl import EACLRole
+from pytest_tests.helpers.container import create_container
+from pytest_tests.helpers.container_access import (
     check_full_access_to_container,
     check_no_access_to_container,
     check_read_only_container,
 )
-from python_keywords.frostfs_verbs import put_object_to_random_node
+from pytest_tests.helpers.frostfs_verbs import put_object_to_random_node
+from pytest_tests.steps.cluster_test_base import ClusterTestBase
 
 
 @pytest.mark.sanity

@@ -2,13 +2,7 @@
 
 Tests written with PyTest Framework are located under `pytest_tests/testsuites` directory.
 
-These tests rely on resources and utility modules that have been originally developed for Robot Framework:
-
-`robot/resources/files` - static files that are used in tests' commands.
-
-`robot/resources/lib/` - common Python libraries that provide utility functions used as building blocks in tests.
-
-`robot/variables/` - constants and configuration variables for tests.
+These tests rely on resources and utility modules that have been originally developed for Pytest Framework.
 
 ## Testcases execution
 
@@ -41,12 +35,12 @@ Note that we expect frostfs-dev-env to be located under
 the `<testcases_root_dir>/../frostfs-dev-env` directory. If you put this repo in any other place,
 manually set the full path to frostfs-dev-env in the environment variable `DEVENV_PATH` at this step.
 
-5. Make sure you have installed all of the following prerequisites on your machine
+5. Make sure you have installed all the following prerequisites on your machine
 
 ```
 make
-python3.9
-python3.9-dev
+python3.10
+python3.10-dev
 libssl-dev
 ```
 As we use frostfs-dev-env, you'll also need to install

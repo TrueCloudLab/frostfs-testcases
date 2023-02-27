@@ -6,13 +6,19 @@ import time
 from typing import Optional
 
 import allure
-from cluster import MainChain, MorphChain
-from common import FROSTFS_CONTRACT, GAS_HASH, MAINNET_BLOCK_TIME, NEOGO_EXECUTABLE
 from frostfs_testlib.cli import NeoGo
 from frostfs_testlib.shell import Shell
 from frostfs_testlib.utils import converting_utils, datetime_utils, wallet_utils
 from neo3.wallet import utils as neo3_utils
 from neo3.wallet import wallet as neo3_wallet
+
+from pytest_tests.helpers.cluster import MainChain, MorphChain
+from pytest_tests.resources.common import (
+    FROSTFS_CONTRACT,
+    GAS_HASH,
+    MAINNET_BLOCK_TIME,
+    NEOGO_EXECUTABLE,
+)
 
 logger = logging.getLogger("NeoLogger")
 

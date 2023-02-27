@@ -2,16 +2,16 @@ from datetime import datetime, timedelta
 
 import allure
 import pytest
-from file_helper import generate_file
-from s3_helper import (
+
+from pytest_tests.helpers.file_helper import generate_file
+from pytest_tests.helpers.s3_helper import (
     assert_object_lock_mode,
     assert_s3_acl,
     check_objects_in_bucket,
     object_key_from_file_path,
 )
-
-from steps import s3_gate_bucket, s3_gate_object
-from steps.s3_gate_base import TestS3GateBase
+from pytest_tests.steps import s3_gate_bucket, s3_gate_object
+from pytest_tests.steps.s3_gate_base import TestS3GateBase
 
 
 def pytest_generate_tests(metafunc):

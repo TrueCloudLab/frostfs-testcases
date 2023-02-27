@@ -5,7 +5,8 @@ import uuid
 from typing import Any, Optional
 
 import allure
-from common import ASSETS_DIR
+
+from pytest_tests.resources.common import ASSETS_DIR
 
 logger = logging.getLogger("NeoLogger")
 

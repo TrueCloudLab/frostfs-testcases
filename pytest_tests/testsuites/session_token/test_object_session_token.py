@@ -2,15 +2,15 @@ import random
 
 import allure
 import pytest
-from cluster_test_base import ClusterTestBase
-from common import WALLET_PASS
-from file_helper import generate_file
 from frostfs_testlib.resources.common import SESSION_NOT_FOUND
 from frostfs_testlib.utils import wallet_utils
-from python_keywords.container import create_container
-from python_keywords.frostfs_verbs import delete_object, put_object, put_object_to_random_node
 
-from steps.session_token import create_session_token
+from pytest_tests.helpers.container import create_container
+from pytest_tests.helpers.file_helper import generate_file
+from pytest_tests.helpers.frostfs_verbs import delete_object, put_object, put_object_to_random_node
+from pytest_tests.resources.common import WALLET_PASS
+from pytest_tests.steps.cluster_test_base import ClusterTestBase
+from pytest_tests.steps.session_token import create_session_token
 
 
 @pytest.mark.sanity

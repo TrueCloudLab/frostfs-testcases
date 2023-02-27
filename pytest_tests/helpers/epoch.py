@@ -3,19 +3,20 @@ from time import sleep
 from typing import Optional
 
 import allure
-from cluster import Cluster, StorageNode
-from common import (
+from frostfs_testlib.cli import FrostfsAdm, FrostfsCli, NeoGo
+from frostfs_testlib.shell import Shell
+from frostfs_testlib.utils import datetime_utils, wallet_utils
+from payment_neogo import get_contract_hash
+
+from pytest_tests.helpers.cluster import Cluster, StorageNode
+from pytest_tests.helpers.test_control import wait_for_success
+from pytest_tests.resources.common import (
     FROSTFS_ADM_CONFIG_PATH,
     FROSTFS_ADM_EXEC,
     FROSTFS_CLI_EXEC,
     MAINNET_BLOCK_TIME,
     NEOGO_EXECUTABLE,
 )
-from frostfs_testlib.cli import FrostfsAdm, FrostfsCli, NeoGo
-from frostfs_testlib.shell import Shell
-from frostfs_testlib.utils import datetime_utils, wallet_utils
-from payment_neogo import get_contract_hash
-from test_control import wait_for_success
 
 logger = logging.getLogger("NeoLogger")
 

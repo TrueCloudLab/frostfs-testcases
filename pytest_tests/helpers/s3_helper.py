@@ -1,13 +1,12 @@
-import datetime
 import logging
 import os
 from datetime import datetime, timedelta
 from typing import Optional
 
 import allure
-import s3_gate_bucket
-import s3_gate_object
 from dateutil.parser import parse
+
+from pytest_tests.steps import s3_gate_bucket, s3_gate_object
 
 logger = logging.getLogger("NeoLogger")
 

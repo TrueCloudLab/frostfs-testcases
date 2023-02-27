@@ -3,13 +3,14 @@ import re
 from dataclasses import asdict
 
 import allure
-from common import STORAGE_NODE_SERVICE_NAME_REGEX
 from frostfs_testlib.cli.frostfs_authmate import FrostfsAuthmate
 from frostfs_testlib.cli.neogo import NeoGo
 from frostfs_testlib.hosting import Hosting
 from frostfs_testlib.shell import CommandOptions, SSHShell
 from frostfs_testlib.shell.interfaces import InteractiveInput
-from k6 import K6, LoadParams, LoadResults
+
+from pytest_tests.helpers.k6 import K6, LoadParams, LoadResults
+from pytest_tests.resources.common import STORAGE_NODE_SERVICE_NAME_REGEX
 
 FROSTFS_AUTHMATE_PATH = "frostfs-s3-authmate"
 STOPPED_HOSTS = []

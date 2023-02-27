@@ -7,10 +7,11 @@ from io import StringIO
 import allure
 import pytest
 import yaml
-from cluster import Cluster, StorageNode
-from common import WALLET_CONFIG
 from configobj import ConfigObj
 from frostfs_testlib.cli import FrostfsCli
+
+from pytest_tests.helpers.cluster import Cluster, StorageNode
+from pytest_tests.resources.common import WALLET_CONFIG
 
 SHARD_PREFIX = "FROSTFS_STORAGE_SHARD_"
 BLOBSTOR_PREFIX = "_BLOBSTOR_"

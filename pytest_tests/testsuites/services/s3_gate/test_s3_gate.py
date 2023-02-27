@@ -4,26 +4,26 @@ from random import choice, choices
 
 import allure
 import pytest
-from aws_cli_client import AwsCliClient
-from common import ASSETS_DIR
-from epoch import tick_epoch
-from file_helper import (
+
+from pytest_tests.helpers.aws_cli_client import AwsCliClient
+from pytest_tests.helpers.epoch import tick_epoch
+from pytest_tests.helpers.file_helper import (
     generate_file,
     generate_file_with_content,
     get_file_content,
     get_file_hash,
     split_file,
 )
-from s3_helper import (
+from pytest_tests.helpers.s3_helper import (
     check_objects_in_bucket,
     check_tags_by_bucket,
     check_tags_by_object,
     set_bucket_versioning,
     try_to_get_objects_and_expect_error,
 )
-
-from steps import s3_gate_bucket, s3_gate_object
-from steps.s3_gate_base import TestS3GateBase
+from pytest_tests.resources.common import ASSETS_DIR
+from pytest_tests.steps import s3_gate_bucket, s3_gate_object
+from pytest_tests.steps.s3_gate_base import TestS3GateBase
 
 logger = logging.getLogger("NeoLogger")
 

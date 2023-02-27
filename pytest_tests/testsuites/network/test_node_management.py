@@ -5,16 +5,15 @@ from typing import Optional, Tuple
 
 import allure
 import pytest
-from cluster import StorageNode
-from cluster_test_base import ClusterTestBase
-from common import FROSTFS_CONTRACT_CACHE_TIMEOUT, MORPH_BLOCK_TIME
-from epoch import tick_epoch
-from file_helper import generate_file
 from frostfs_testlib.resources.common import OBJECT_NOT_FOUND, PUBLIC_ACL
 from frostfs_testlib.utils import datetime_utils, string_utils
-from python_keywords.container import create_container, get_container
-from python_keywords.failover_utils import wait_object_replication
-from python_keywords.frostfs_verbs import (
+
+from pytest_tests.helpers.cluster import StorageNode
+from pytest_tests.helpers.container import create_container, get_container
+from pytest_tests.helpers.epoch import tick_epoch
+from pytest_tests.helpers.failover_utils import wait_object_replication
+from pytest_tests.helpers.file_helper import generate_file
+from pytest_tests.helpers.frostfs_verbs import (
     delete_object,
     get_object,
     get_object_from_random_node,
@@ -22,7 +21,7 @@ from python_keywords.frostfs_verbs import (
     put_object,
     put_object_to_random_node,
 )
-from python_keywords.node_management import (
+from pytest_tests.helpers.node_management import (
     check_node_in_map,
     delete_node_data,
     drop_object,
@@ -34,8 +33,13 @@ from python_keywords.node_management import (
     storage_node_healthcheck,
     storage_node_set_status,
 )
-from storage_policy import get_nodes_with_object, get_simple_object_copies
-from utility import placement_policy_from_container, wait_for_gc_pass_on_storage_nodes
+from pytest_tests.helpers.storage_policy import get_nodes_with_object, get_simple_object_copies
+from pytest_tests.helpers.utility import (
+    placement_policy_from_container,
+    wait_for_gc_pass_on_storage_nodes,
+)
+from pytest_tests.resources.common import FROSTFS_CONTRACT_CACHE_TIMEOUT, MORPH_BLOCK_TIME
+from pytest_tests.steps.cluster_test_base import ClusterTestBase
 
 logger = logging.getLogger("NeoLogger")
 check_nodes: list[StorageNode] = []
@@ -128,7 +132,7 @@ class TestNodeManagement(ClusterTestBase):
         simple_object_size,
     ):
         """
-        This test remove one node from cluster then add it back. Test uses base control operations with storage nodes (healthcheck, netmap-snapshot, set-status).
+        This test remove one node from pytest_tests.helpers.cluster then add it back. Test uses base control operations with storage nodes (healthcheck, netmap-snapshot, set-status).
         """
         wallet = default_wallet
         placement_rule_3 = "REP 3 IN X CBF 1 SELECT 3 FROM * AS X"

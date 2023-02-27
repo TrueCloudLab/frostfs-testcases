@@ -1,5 +1,6 @@
 import pytest
-from wallet import WalletFactory, WalletFile
+
+from pytest_tests.helpers.wallet import WalletFactory, WalletFile
 
 
 @pytest.fixture(scope="module")

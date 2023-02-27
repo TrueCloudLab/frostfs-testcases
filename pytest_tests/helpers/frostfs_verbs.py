@@ -6,11 +6,12 @@ import uuid
 from typing import Any, Optional
 
 import allure
-from cluster import Cluster
-from common import ASSETS_DIR, FROSTFS_CLI_EXEC, WALLET_CONFIG
 from frostfs_testlib.cli import FrostfsCli
 from frostfs_testlib.shell import Shell
 from frostfs_testlib.utils import json_utils
+
+from pytest_tests.helpers.cluster import Cluster
+from pytest_tests.resources.common import ASSETS_DIR, FROSTFS_CLI_EXEC, WALLET_CONFIG
 
 logger = logging.getLogger("NeoLogger")
 

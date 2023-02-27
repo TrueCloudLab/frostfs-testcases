@@ -1,10 +1,11 @@
 import logging
 import re
 
-from common import FROSTFS_ADM_EXEC, FROSTFS_CLI_EXEC, WALLET_CONFIG
 from frostfs_testlib.cli import FrostfsAdm, FrostfsCli
 from frostfs_testlib.hosting import Hosting
 from frostfs_testlib.shell import Shell
+
+from pytest_tests.resources.common import FROSTFS_ADM_EXEC, FROSTFS_CLI_EXEC, WALLET_CONFIG
 
 logger = logging.getLogger("NeoLogger")
 

@@ -1,8 +1,9 @@
 import allure
-import epoch
 import pytest
-from cluster import Cluster
 from frostfs_testlib.shell import Shell
+
+from pytest_tests.helpers import epoch
+from pytest_tests.helpers.cluster import Cluster
 
 
 # To skip adding every mandatory singleton dependency to EACH test function

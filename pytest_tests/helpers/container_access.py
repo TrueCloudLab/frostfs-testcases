@@ -1,9 +1,10 @@
 from typing import List, Optional
 
-from acl import EACLOperation
-from cluster import Cluster
 from frostfs_testlib.shell import Shell
-from python_keywords.object_access import (
+
+from pytest_tests.helpers.acl import EACLOperation
+from pytest_tests.helpers.cluster import Cluster
+from pytest_tests.helpers.object_access import (
     can_delete_object,
     can_get_head_object,
     can_get_object,

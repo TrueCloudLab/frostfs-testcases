@@ -2,16 +2,19 @@ import logging
 
 import allure
 import pytest
-from cluster import Cluster, StorageNode
-from failover_utils import wait_all_storage_nodes_returned, wait_object_replication
-from file_helper import generate_file, get_file_hash
 from frostfs_testlib.hosting import Host
 from frostfs_testlib.resources.common import PUBLIC_ACL
 from frostfs_testlib.shell import CommandOptions
-from python_keywords.container import create_container
-from python_keywords.frostfs_verbs import get_object, put_object_to_random_node
 
-from steps.cluster_test_base import ClusterTestBase
+from pytest_tests.helpers.cluster import Cluster, StorageNode
+from pytest_tests.helpers.container import create_container
+from pytest_tests.helpers.failover_utils import (
+    wait_all_storage_nodes_returned,
+    wait_object_replication,
+)
+from pytest_tests.helpers.file_helper import generate_file, get_file_hash
+from pytest_tests.helpers.frostfs_verbs import get_object, put_object_to_random_node
+from pytest_tests.steps.cluster_test_base import ClusterTestBase
 
 logger = logging.getLogger("NeoLogger")
 stopped_nodes: list[StorageNode] = []

@@ -6,12 +6,13 @@ import logging
 from typing import Optional
 
 import allure
-from cluster import Cluster
-from common import FROSTFS_CLI_EXEC, WALLET_CONFIG
-from complex_object_actions import get_link_object
 from frostfs_testlib.cli import FrostfsCli
 from frostfs_testlib.shell import Shell
-from frostfs_verbs import head_object
+
+from pytest_tests.helpers.cluster import Cluster
+from pytest_tests.helpers.complex_object_actions import get_link_object
+from pytest_tests.helpers.frostfs_verbs import head_object
+from pytest_tests.resources.common import FROSTFS_CLI_EXEC, WALLET_CONFIG
 
 logger = logging.getLogger("NeoLogger")
 

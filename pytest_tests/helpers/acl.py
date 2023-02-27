@@ -10,10 +10,11 @@ from typing import Any, Dict, List, Optional, Union
 
 import allure
 import base58
-from common import ASSETS_DIR, FROSTFS_CLI_EXEC, WALLET_CONFIG
 from frostfs_testlib.cli import FrostfsCli
 from frostfs_testlib.shell import Shell
 from frostfs_testlib.utils import wallet_utils
+
+from pytest_tests.resources.common import ASSETS_DIR, FROSTFS_CLI_EXEC, WALLET_CONFIG
 
 logger = logging.getLogger("NeoLogger")
 EACL_LIFETIME = 100500

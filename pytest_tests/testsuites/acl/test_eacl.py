@@ -1,9 +1,8 @@
 import allure
 import pytest
-from cluster_test_base import ClusterTestBase
-from failover_utils import wait_object_replication
 from frostfs_testlib.resources.common import PUBLIC_ACL
-from python_keywords.acl import (
+
+from pytest_tests.helpers.acl import (
     EACLAccess,
     EACLOperation,
     EACLRole,
@@ -12,14 +11,15 @@ from python_keywords.acl import (
     set_eacl,
     wait_for_cache_expired,
 )
-from python_keywords.container import create_container
-from python_keywords.container_access import (
+from pytest_tests.helpers.container import create_container
+from pytest_tests.helpers.container_access import (
     check_full_access_to_container,
     check_no_access_to_container,
 )
-from python_keywords.frostfs_verbs import put_object_to_random_node
-from python_keywords.node_management import drop_object
-from python_keywords.object_access import (
+from pytest_tests.helpers.failover_utils import wait_object_replication
+from pytest_tests.helpers.frostfs_verbs import put_object_to_random_node
+from pytest_tests.helpers.node_management import drop_object
+from pytest_tests.helpers.object_access import (
     can_delete_object,
     can_get_head_object,
     can_get_object,
@@ -28,6 +28,7 @@ from python_keywords.object_access import (
     can_put_object,
     can_search_object,
 )
+from pytest_tests.steps.cluster_test_base import ClusterTestBase
 
 
 @pytest.mark.sanity
