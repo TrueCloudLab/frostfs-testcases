@@ -1,4 +1,4 @@
-#!/usr/bin/python3.9
+#!/usr/bin/python3.10
 
 """
 Helper functions to use with `frostfs-cli`, `neo-go` and other CLIs.
