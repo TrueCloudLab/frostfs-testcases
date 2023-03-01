@@ -8,14 +8,14 @@ from typing import Any, Optional
 import allure
 import boto3
 import pytest
-import s3_gate_bucket
-import s3_gate_object
 import urllib3
 from botocore.config import Config
 from botocore.exceptions import ClientError
 from frostfs_testlib.shell import Shell
 from pytest import FixtureRequest
 
+from pytest_tests.steps import s3_gate_bucket
+from pytest_tests.steps import s3_gate_object
 from pytest_tests.helpers.aws_cli_client import AwsCliClient
 from pytest_tests.helpers.cli_helpers import _cmd_run, _configure_aws_cli, _run_with_passwd
 from pytest_tests.helpers.cluster import Cluster
