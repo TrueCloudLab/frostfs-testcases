@@ -9,27 +9,27 @@ These tests rely on resources and utility modules that have been originally deve
 ### Initial preparation
 
 1. Install frostfs-cli
-    - `git clone git@github.com:nspcc-dev/frostfs-node.git`
+    - `git clone git@github.com:TrueCloudLab/frostfs-node.git`
     - `cd frostfs-node`
     - `make`
     - `sudo cp bin/frostfs-cli /usr/local/bin/frostfs-cli`
 
 2. Install frostfs-authmate
-    - `git clone git@github.com:nspcc-dev/frostfs-s3-gw.git`
+    - `git clone git@github.com:TrueCloudLab/frostfs-s3-gw.git`
     - `cd frostfs-s3-gw`
     - `make`
-    - `sudo cp bin/frostfs-authmate /usr/local/bin/frostfs-authmate`
+    - `sudo cp bin/frostfs-s3-authmate /usr/local/bin/frostfs-authmate`
 
 3. Install neo-go
     - `git clone git@github.com:nspcc-dev/neo-go.git`
     - `cd neo-go`
-    - `git checkout v0.92.0` (or the current version in the frostfs-dev-env)
+    - `git checkout v0.101.0` (or the current version in the frostfs-dev-env)
     - `make`
     - `sudo cp bin/neo-go /usr/local/bin/neo-go`
     or download binary from releases: https://github.com/nspcc-dev/neo-go/releases
 
 4. Clone frostfs-dev-env
-`git clone git@github.com:nspcc-dev/frostfs-dev-env.git`
+`git clone git@github.com:TrueCloudLab/frostfs-dev-env.git`
 
 Note that we expect frostfs-dev-env to be located under
 the `<testcases_root_dir>/../frostfs-dev-env` directory. If you put this repo in any other place,
@@ -44,7 +44,7 @@ python3.10-dev
 libssl-dev
 ```
 As we use frostfs-dev-env, you'll also need to install
-[prerequisites](https://github.com/nspcc-dev/frostfs-dev-env#prerequisites) of this repository.
+[prerequisites](https://github.com/TrueCloudLab/frostfs-dev-env#prerequisites) of this repository.
 
 6. Prepare virtualenv
 
