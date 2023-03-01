@@ -6,7 +6,8 @@ from typing import Optional
 
 import allure
 from frostfs_testlib.shell import Shell
-from remote_process import RemoteProcess
+
+from pytest_tests.helpers.remote_process import RemoteProcess
 
 EXIT_RESULT_CODE = 0
 LOAD_RESULTS_PATTERNS = {
