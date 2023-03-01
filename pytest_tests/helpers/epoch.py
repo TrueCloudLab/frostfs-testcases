@@ -6,9 +6,9 @@ import allure
 from frostfs_testlib.cli import FrostfsAdm, FrostfsCli, NeoGo
 from frostfs_testlib.shell import Shell
 from frostfs_testlib.utils import datetime_utils, wallet_utils
-from payment_neogo import get_contract_hash
 
 from pytest_tests.helpers.cluster import Cluster, StorageNode
+from pytest_tests.helpers.payment_neogo import get_contract_hash
 from pytest_tests.helpers.test_control import wait_for_success
 from pytest_tests.resources.common import (
     FROSTFS_ADM_CONFIG_PATH,

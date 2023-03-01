@@ -10,9 +10,9 @@ from urllib.parse import quote_plus
 
 import allure
 import requests
-from aws_cli_client import LONG_TIMEOUT
 from frostfs_testlib.shell import Shell
 
+from pytest_tests.helpers.aws_cli_client import LONG_TIMEOUT
 from pytest_tests.helpers.cli_helpers import _cmd_run
 from pytest_tests.helpers.cluster import StorageNode
 from pytest_tests.helpers.file_helper import get_file_hash

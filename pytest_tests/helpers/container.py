@@ -8,12 +8,12 @@ import allure
 from frostfs_testlib.cli import FrostfsCli
 from frostfs_testlib.shell import Shell
 from frostfs_testlib.utils import json_utils
-from wallet import WalletFile
 
 from pytest_tests.helpers.cluster import Cluster
 from pytest_tests.helpers.file_helper import generate_file, get_file_hash
 from pytest_tests.helpers.frostfs_verbs import put_object, put_object_to_random_node
 from pytest_tests.helpers.storage_object_info import StorageObjectInfo
+from pytest_tests.helpers.wallet import WalletFile
 from pytest_tests.resources.common import FROSTFS_CLI_EXEC, WALLET_CONFIG
 
 logger = logging.getLogger("NeoLogger")
